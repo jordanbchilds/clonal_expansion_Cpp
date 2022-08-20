@@ -12,13 +12,102 @@
 
 using namespace std;
 
-// global variables for mtDNA model
-const int n_species = 2;
-const int n_reactions = 5;
-int Pre[n_reactions][n_species] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
-int Post[n_reactions][n_species] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
-float S[n_reactions][n_species] = { 0 };
+class sim_network {
+private:
+	float Tmax;
+	float step_out;
+	int Nout;
+	int n_reactions;
+	int n_species;
+	int* Post;
+	int* Pre;
+	int* Stoi;
+public:
+	float get_Tmax(){
+		return Tmax;
+	}
+	float get_stepOut(){
+		return step_out;
+	}
+	int get_Nout(){
+		return (int) (Tmax/step_out + 1.0);
+	}
+	void set_Tmax(int t){
+		Tmax = t;
+	}
+	void set_stepOut(int step){
+		step_out = step;
+	}
+	int get_nReactions(){
+		return n_reactions;
+	}
+	int get_nSpecies(){
+		return n_species;
+	}
+	
+	void set_Pre(int* ptr){
+		Pre = ptr;
+	}
+	void set_Post(int* ptr){
+		Post = ptr;
+	}
+	void set_Stoi(int* post_ptr, int*pre_ptr){
+		assert(post_ptr!=nullptr & pre_ptr!=nullptr);
+		assert(n_reactions>0 & n_species>0);
+		
+		for(int i=0; i<n_reactions; ++i){
+			for(int j=0; i<n_species; ++j){
+				*(Stoi+i*n_species+j) = *(post_ptr+i*n_species+j) - *(pre_ptr+i*n_species+j);
+			}
+		}
+	}
+	int* get_Pre(){
+		return Pre;
+	}
+	int* get_Stoi(){
+		return Stoi;
+	}
+	void set_mats(int* post_ptr, int* pre_ptr, int* stoi_ptr );
+	sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut);
+	sim_network();
+};
+sim_network::sim_network(){
+	Tmax = 0.0;
+	step_out = 0.0;
+	n_reactions = 0;
+	n_species = 0;
+	Post = nullptr;
+	Pre = nullptr;
+	Stoi = nullptr;
+}
 
+sim_network::sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut){
+	Tmax = tmax;
+	step_out = stepOut;
+	n_reactions = nReacts;
+	n_species = nSpecies;
+	Post = post_ptr;
+	Pre = pre_ptr;
+	Stoi = stoi_ptr;
+	
+	for(int i=0; i<n_reactions; ++i){
+		for(int j=0; j<n_species; ++j){
+			*(Stoi+i*nSpecies+j) = *(Post+i*nSpecies+j) - *(Pre+i*nSpecies+j);
+		}
+	}
+}
+void sim_network::set_mats(int* post_ptr, int* pre_ptr, int* stoi_ptr ){
+	assert(post_ptr!=nullptr & post_ptr!=nullptr & n_reactions!=0 & n_species!=0);
+	Post = post_ptr;
+	Pre = pre_ptr;
+	Stoi = stoi_ptr;
+	
+	for(int i=0; i<n_reactions; ++i){
+		for(int j=0; j<n_species; ++j){
+			*(Stoi+i*n_species+j) = *(Post+i*n_species+j) - *(Pre+i*n_species+j);
+		}
+	}
+}
 
 unsigned choose(unsigned n, unsigned k){
     if (k>n) return 0;
@@ -84,7 +173,7 @@ int rand_disc(int size, float* weights=0){
     return -1; // requires a return outside the loop
 }
 
-float rep_controller(float con_rates[2], float rep_rate, float error) {
+float rep_controller(float con_rates[2], float rep_rate, int error) {
 	if( error >= 0){
 		return rep_rate*2.0/(1.0+exp(error*con_rates[0]));
 	} else {
@@ -92,79 +181,91 @@ float rep_controller(float con_rates[2], float rep_rate, float error) {
 	}
 }
 
-float* myHazards(float x[n_species], float rates[n_reactions], float error, float con_rates[2]){
-	float temp_rates[n_reactions];
-	temp_rates[0] = rep_controller(con_rates, rates[0], error);
-	temp_rates[1] = rep_controller(con_rates, rates[1], error);
-	for(int i=2; i<n_reactions; ++i)
-		temp_rates[i] = rates[i];
+void myHazard(float* haz_ptr, int* x, float* con_rates, float* rates, int error, sim_network simnet){
+	int n_reactions = simnet.get_nReactions();
+	int n_species = simnet.get_nSpecies();
+	int* Pre = simnet.get_Pre();
 	
-    static float hazards[n_reactions];
-    for(int i=0; i<n_reactions; ++i){
-        float h_i = temp_rates[i];
-        for(int j=0; j<n_species; ++j)
-            h_i *= choose(x[j], Pre[i][j]);
-        hazards[i] = h_i;
-    }
-    return hazards;
+	*haz_ptr = rep_controller(con_rates, *rates, error);
+	*(haz_ptr+1) = rep_controller(con_rates, *(rates+1), error);
+	for(int i=2; i<n_reactions; ++i)
+		*(haz_ptr+i) = *(rates+i);
+
+	for(int i=0; i<n_reactions; ++i){
+		for(int j=0; j<n_species; ++j)
+			*(haz_ptr+i) *= choose(x[j], *(Pre+i*n_species+j));
+	}
+	// return hazards;
 }
 
-float* gillespied(float Tmax, float step_out, float x[n_species], float rates[n_reactions], float con_rates[2], float S[n_reactions][n_species]){
+void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 	// could use pointers and such instead of stating array size in function argument?
-    // Tmax, step_out, x, rates all non-negative - use unsigned?
-	int Nout = (int) (Tmax/step_out + 1);
-    
-    float out_arr[Nout][n_species];
+	int x[2];
+	for(int i=0; i<2; ++i)
+		x[i] = *(x_init+i);
+	
+	int n_species = simnet.get_nSpecies();
+	int n_reactions = simnet.get_nReactions();
+	float step_out = simnet.get_stepOut();
+	float Tmax = simnet.get_Tmax();
+	int* S = simnet.get_Stoi();
+	int* Pre = simnet.get_Pre();
+	
     for(int j=0; j<n_species; ++j)
-        out_arr[0][j] = x[j];
+		*(out_array+j) = x[j];
     
-    // count, target, tt, are all non-negative - use unsigned?
     int count = 1;
     float target = step_out;
     float tt = 0;
-    float* haz_ptr;
-	float C0 = x[0]+x[1];
-    
+
+	int C0 = x[0]+x[1];
+	int copyNum = C0;
+	
     while( tt<Tmax ){
-		float copyNum = x[0]+x[1];
-        haz_ptr = myHazards(x, rates, copyNum-C0, con_rates);
-        float haz_total = 0; // hazard total non-negative - unsigned?
+		float temp_rates[n_reactions];
+		temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
+		temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
+		for(int i=2; i<n_reactions; ++i)
+			temp_rates[i] = *(rates+i);
 		
+		float hazards[n_reactions];
+		for(int i=0; i<n_reactions; ++i){
+			float h_i = temp_rates[i];
+			for(int j=0; j<n_species; ++j)
+				h_i *= choose(x[j], *(Pre+i*n_species+j));
+			hazards[i] = h_i;
+		}
+		
+		//float hazards[n_reactions];
+		//myHazard(hazards, x, con_rates, rates, C0-copyNum, simnet);
+		
+        float haz_total = 0;
         for(int i=0; i<n_reactions; ++i)
-            haz_total += *(haz_ptr + i);
+			haz_total += hazards[i];
         
-        if( haz_total<1e-10 )
-            tt = 1e10;
+        if( copyNum == 0 )
+			break;
         else
             tt += rand_exp(haz_total);
-        
-        while( tt>=target ){
-			//cout<< x[0]<<" "<<x[1] <<endl;
-            for(int j=0; j<n_species; ++j)
-                out_arr[count][j] = x[j];
-            count += 1;
-            target += step_out;
-            if( count>Nout )
-                goto save_output;
-        }
-        int r = rand_disc(n_reactions, haz_ptr);
+		if( tt>=target ){
+			for(int j=0; j<n_species; ++j)
+				*(out_array+count*n_species+j ) = x[j];
+			count += 1;
+			target += step_out;
+		}
 		
-        for(int i=0; i<n_species; ++i)
-			x[i] += S[r][i];
+        int r = rand_disc(n_reactions, hazards);
+		
+        for(int j=0; j<n_species; ++j)
+			x[j] += *(S+r*n_species+j);
+		
+		copyNum = x[0]+x[1];
+		if( count>simnet.get_Nout() | copyNum==0 )
+			break;
     }
-    save_output:
-    /*
-     ofstream myfile;
-     myfile.open("Gillespie/Output/simmy_1.txt", ios::out);
-     for(int row=0; row<Nout; row++){
-         for(int col=0; col<n_species; col++)
-             myfile << *(out_arr[row] + col)<<  " " ;
-         myfile << "\n";
-     }
-     myfile.close();
-     */
-    return x;
+    // return out_arrAY;
 }
+
 
 int main() {
 	// global variables I like
@@ -172,37 +273,35 @@ int main() {
 	float day = 24*hour;
 	float year = 365*day;
     filesystem::current_path( "/Users/jordanchilds/Documents/C++/Gillespie" );
-    
-	for(int i=0; i<n_reactions; ++i){
-		for(int j=0; j<n_species; ++j){
-			S[i][j] = Post[i][j] - Pre[i][j];
-		}
-	}
-
-    float x_init[n_species] = {500,500};
+    // system parameters
+	// global variables for mtDNA model
+	const int Nreact = 5;
+	const int Nspecies = 2;
+	int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
+	int* Pre_ptr = &Pre_mat[0][0];
+	int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
+	int* Post_ptr = &Post_mat[0][0];
+	int S_mat[Nreact][Nspecies];
+	int* S_ptr = &S_mat[0][0];
+	
+    int x_init[2] = {500,500};
     float tmax = 100*year;
-    float stepOut = 1*year;
-    float react_rates[n_reactions] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
-	float con_rates[2] = {0.0, 0.0};
+    float stepOut = 300*day;
+    float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
+	float con_rates[2] = {2.0e-3, 2.0e-3};
 	
-	float* xx;
-	srand48((long)time(NULL));
-	xx = gillespied(tmax, tmax, x_init, react_rates, con_rates, S);
-	cout << *xx << " " << *(xx+1) << "\n" ;
+	sim_network spn = sim_network(Nreact, Nspecies, Post_ptr, Pre_ptr, S_ptr, tmax, stepOut);
 	
-	for(int ii=0; ii<100; ++ii){
-		float* xx;
-		srand48((long) 101010101);
-		xx = gillespied(tmax, tmax, x_init, react_rates, con_rates, S);
-		cout << *xx << " " << *(xx+1) << "\n" ;
-	}
-	/*
-	std::ofstream outfile ("test.txt");
-	for(int ii=0; ii<1000; ++ii){
-		float* xx;
-        xx = gillespied(tmax, tmax, x_init, react_rates, con_rates, S);
-		outfile << *xx << " " << *(xx+1) << "\n" ;
-	}
-	outfile.close();
-	*/
+	int output[spn.get_Nout()][spn.get_nSpecies()];
+	int* output_ptr = &output[0][0];
+	
+	srand((unsigned)time(NULL));
+	gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+	
+	for(int i=0; i<spn.get_Nout(); ++i){
+		for(int j=0; j<spn.get_nSpecies(); ++j){
+			cout<< output[i][j] << " ";
+		}
+		cout<<endl;
+	}	
 }
