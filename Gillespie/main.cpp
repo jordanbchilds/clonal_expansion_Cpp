@@ -79,7 +79,7 @@ unsigned choose(unsigned n, unsigned k){
     return result;
 }
 
-double rand_unif(float lower=0, float upper=1){
+double rand_unif(float lower=0.0, float upper=1.0){
 	float unif_01;
     float unif;
     unif_01 = (float) rand() / (float) RAND_MAX;
@@ -238,8 +238,8 @@ int main() {
 	int* S_ptr = &S_mat[0][0];
 	
     int x_init[2] = {500,500};
-    float tmax = 3784320000; //120*365*24*60*60 in seconds
-    float stepOut = 365*24*60*60; // in seconds
+    float tmax = 3784320000.0; //120*365*24*60*60 in seconds
+    float stepOut = 365.0*24.0*60.0*60.0; // in seconds
     float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
 	float con_rates[2] = {2.0e-3, 2.0e-3};
 	
