@@ -14,7 +14,7 @@
 using namespace std;
 
 class sim_network {
-private:
+public:
 	float Tmax;
 	float step_out;
 	int Nout;
@@ -23,51 +23,7 @@ private:
 	int* Post;
 	int* Pre;
 	int* Stoi;
-public:
-	float get_Tmax(){
-		return Tmax;
-	}
-	float get_stepOut(){
-		return step_out;
-	}
-	int get_Nout(){
-		return (int) (Tmax/step_out + 1.0);
-	}
-	void set_Tmax(int t){
-		Tmax = t;
-	}
-	void set_stepOut(int step){
-		step_out = step;
-	}
-	int get_nReactions(){
-		return n_reactions;
-	}
-	int get_nSpecies(){
-		return n_species;
-	}
-	
-	void set_Pre(int* ptr){
-		Pre = ptr;
-	}
-	void set_Post(int* ptr){
-		Post = ptr;
-	}
-	void set_Stoi(int* post_ptr, int*pre_ptr){
-		assert(post_ptr!=nullptr & pre_ptr!=nullptr);
-		assert(n_reactions>0 & n_species>0);
-		
-		for(int i=0; i<n_reactions; ++i){
-			for(int j=0; i<n_species; ++j){
-				*(Stoi+i*n_species+j) = *(post_ptr+i*n_species+j) - *(pre_ptr+i*n_species+j);
-			}
-		}
-	}
-	int* get_Pre(){
-		return Pre;
-	}
-	int* get_Stoi(){
-		return Stoi;
-	}
+
 	void set_mats(int* post_ptr, int* pre_ptr, int* stoi_ptr );
 	sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut);
 	sim_network();
@@ -183,9 +139,9 @@ float rep_controller(float con_rates[2], float rep_rate, int error) {
 }
 
 void myHazard(float* haz_ptr, int* x, float* con_rates, float* rates, int error, sim_network simnet){
-	int n_reactions = simnet.get_nReactions();
-	int n_species = simnet.get_nSpecies();
-	int* Pre = simnet.get_Pre();
+	int n_reactions = simnet.n_reactions;
+	int n_species = simnet.n_species;
+	int* Pre = simnet.Pre;
 	
 	*haz_ptr = rep_controller(con_rates, *rates, error);
 	*(haz_ptr+1) = rep_controller(con_rates, *(rates+1), error);
@@ -205,12 +161,12 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
 	for(int i=0; i<2; ++i)
 		x[i] = *(x_init+i);
 	
-	int n_species = simnet.get_nSpecies();
-	int n_reactions = simnet.get_nReactions();
-	float step_out = simnet.get_stepOut();
-	float Tmax = simnet.get_Tmax();
-	int* S = simnet.get_Stoi();
-	int* Pre = simnet.get_Pre();
+	int n_species = simnet.n_species;
+	int n_reactions = simnet.n_reactions;
+	float step_out = simnet.step_out;
+	float Tmax = simnet.Tmax;
+	int* S = simnet.Stoi;
+	int* Pre = simnet.Pre;
 	
     for(int j=0; j<n_species; ++j)
 		*(out_array+j) = x[j];
@@ -261,7 +217,7 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
 			x[j] += *(S+r*n_species+j);
 		
 		copyNum = x[0]+x[1];
-		if( count>simnet.get_Nout() | copyNum==0 )
+		if( count>(simnet.Tmax/simnet.step_out + 1.0) | copyNum==0 )
 			break;
     }
     // return out_arrAY;
@@ -293,7 +249,7 @@ int main() {
 	
 	sim_network spn = sim_network(Nreact, Nspecies, Post_ptr, Pre_ptr, S_ptr, tmax, stepOut);
 	
-	int output[spn.get_Nout()][spn.get_nSpecies()];
+	int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
 	int* output_ptr = &output[0][0];
 	
 	srand((unsigned)time(NULL));
@@ -302,7 +258,7 @@ int main() {
 	ofstream outfile;
 	outfile.open("sim.out");
 	outfile<< "Wild-type\tMutant"<<endl;
-	for(int i=0; i<spn.get_Nout(); ++i){
+	for(int i=0; i<int(spn.Tmax/spn.step_out + 1.0); ++i){
 		outfile<< to_string(output[i][0])+"\t"+to_string(output[i][1]) << endl;
 	}
 	outfile.close();
