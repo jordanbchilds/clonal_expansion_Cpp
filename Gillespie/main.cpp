@@ -225,10 +225,6 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
 
 
 int main() {
-	// global variables I like
-	float hour = 3600;
-	float day = 24*hour;
-	float year = 365*day;
 	//std::experimental::filesystem::current_path("/Users/jordanchilds/Documents/C++/Gillespie" );
     // system parameters
 	// global variables for mtDNA model
@@ -242,8 +238,8 @@ int main() {
 	int* S_ptr = &S_mat[0][0];
 	
     int x_init[2] = {500,500};
-    float tmax = 100*year;
-    float stepOut = 300*day;
+    float tmax = 3784320000; //120*365*24*60*60 in seconds
+    float stepOut = 365*24*60*60; // in seconds
     float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
 	float con_rates[2] = {2.0e-3, 2.0e-3};
 	
@@ -257,9 +253,9 @@ int main() {
 	
 	ofstream outfile;
 	outfile.open("sim.out");
-	outfile<< "Wild-type\tMutant"<<endl;
+	outfile<< "Age (y)\tWild-type\tMutant"<<endl;
 	for(int i=0; i<int(spn.Tmax/spn.step_out + 1.0); ++i){
-		outfile<< to_string(output[i][0])+"\t"+to_string(output[i][1]) << endl;
+		outfile<< to_string(i*stepOut/(365*24*60*60))+"\t"+to_string(output[i][0])+"\t"+to_string(output[i][1]) << endl;
 	}
 	outfile.close();
 }
