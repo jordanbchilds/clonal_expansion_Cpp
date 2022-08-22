@@ -7,7 +7,8 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
-#include <filesystem>
+//#include <experimental/filesystem>
+#include <cassert>
 #include <chrono>
 
 using namespace std;
@@ -272,7 +273,7 @@ int main() {
 	float hour = 3600;
 	float day = 24*hour;
 	float year = 365*day;
-    filesystem::current_path( "/Users/jordanchilds/Documents/C++/Gillespie" );
+	//std::experimental::filesystem::current_path("/Users/jordanchilds/Documents/C++/Gillespie" );
     // system parameters
 	// global variables for mtDNA model
 	const int Nreact = 5;
@@ -298,10 +299,11 @@ int main() {
 	srand((unsigned)time(NULL));
 	gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 	
+	ofstream outfile;
+	outfile.open("sim.out");
+	outfile<< "Wild-type\tMutant"<<endl;
 	for(int i=0; i<spn.get_Nout(); ++i){
-		for(int j=0; j<spn.get_nSpecies(); ++j){
-			cout<< output[i][j] << " ";
-		}
-		cout<<endl;
-	}	
+		outfile<< to_string(output[i][0])+"\t"+to_string(output[i][1]) << endl;
+	}
+	outfile.close();
 }
