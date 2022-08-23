@@ -1,21 +1,15 @@
 #include <cmath>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 
 using namespace std;
 
-// global variables I like
-const float hour = 3600;
-const float day = 24*hour;
-const float year = 365*day;
-
 // global variables for mtDNA model
 const int MAX_LEN = 2000;
-const int n_species = 2;
 
 float rand_unif(float lower=0, float upper=1){
 	srand( (unsigned)time(NULL) );
-	rand();
 	float unif_01;
 	float unif;
 	unif_01 = (float) rand() / (float) RAND_MAX;
@@ -23,17 +17,12 @@ float rand_unif(float lower=0, float upper=1){
 	return unif;
 }
 
-/*
-#include <stdlib.h>double randZeroToOne(){
-	return rand() / (RAND_MAX + 1.);
-}
- */
 
 class agent {
 private:
 	int unique_id;
 	int parent_id;
-	int species; // wild type: 0, mutant type: 1 (just like our matrix.)
+	int species; // wild type: 0, mutant type: 1
 	int n_reactions;
 	float* rates;
 	
@@ -54,17 +43,15 @@ public:
 	int get_pid() {
 		return parent_id;
 	}
-	
 	void set_type(int mol_type) {
 		assert( mol_type==0 || mol_type==1);
 		species = mol_type;
 		if(species==0){
 			n_reactions = 3;
 		} else {
-			n_reactions = 2;
+			n_reactions = 3;
 		}
 	}
-	
 	int get_type() {
 		return species;
 	}
@@ -77,7 +64,7 @@ public:
 	int react(float deltaT, float con_rates[2], float error=0);
 };
 
-// constructor ??
+// constructor
 agent::agent(){
 	unique_id = -1;
 	parent_id = -1;
@@ -85,36 +72,37 @@ agent::agent(){
 	n_reactions = -1;
 	rates = nullptr;
 }
+
 agent::agent(int id, int pid, int mol_type, float* react_rates){
 	assert(mol_type==0 || mol_type==1);
 	unique_id = id;
 	parent_id = pid;
 	species = mol_type;
 	rates = react_rates;
-	if(mol_type==0){
+	if( mol_type==0 ){
 		n_reactions = 3;
 	} else {
-		n_reactions = 2;
+		n_reactions = 3;
 	}
 }
-// deconstructor ??
+// deconstructor
 agent::~agent(){}
 
-/*
 float rep_controller(float con_rates[2], float rep_rate, float error) {
-	if( error>= 0){
-		float out = rep_rate*2.0/(1.0+exp(error*con_rates[0]));
+	if( error>=0){
+		float out = rep_rate*2.0 / (1.0+exp(error*con_rates[0]));
 		return out;
 	} else {
 		float out = rep_rate*(1.0+exp(-1*error*con_rates[1]))/2.0;
 		return out;
 	}
 }
- */
+
+/*
 float rep_controller(float con_rates[2], float rep_rate, float error){
 	return 3.06e-8;
 }
-
+*/
 int agent::react(float deltaT, float con_rates[2], float error) {
 	/*
 	 returns a integer [0,1,2,3] depending on which reaction takes place
@@ -123,7 +111,6 @@ int agent::react(float deltaT, float con_rates[2], float error) {
 	 2: degradation
 	 3: mutation (can only occur for wild type)
 	 */
-	
 	if( species==-1 )
 		return -1;
 	
@@ -134,174 +121,172 @@ int agent::react(float deltaT, float con_rates[2], float error) {
 	
 	float haz_total = 0;
 	for(int i=0; i<n_reactions; ++i)
-		haz_total += *(rates+i); // rates should be a pointer to a vector of length n_reactions
+		haz_total += temp_rates[i];
 	if( haz_total==0 )
 		return 0;
 	
+
 	float event_prob = 1 - exp(-1*haz_total*deltaT);
-	//double u1 = rand_unif();
 	float u1 = drand48();
-	/*
-	 the probability of an event occurring in (t,t+dt] is given as 1-exp(-h0*dt), where h0 is the total hazard
-	 */
+
 	if( u1<event_prob ){
 		// could change this to use the rand_disc function you wrote? - in Gillespie file
 		float cumProb[n_reactions];
-		cumProb[0] = *rates /haz_total;
+		cumProb[0] = temp_rates[0] /haz_total;
 		
 		for(int i=1; i<n_reactions; ++i){
-			float p_i = *rates /haz_total;
+			float p_i = temp_rates[0] /haz_total;
 			for(int j=1; j<=i; ++j)
-				p_i += *(rates+j)/haz_total;
+				p_i += temp_rates[j] /haz_total;
 			cumProb[i] = p_i;
 		}
-		
-		//double u2 = rand_unif();
 		float u2 = drand48();
+		
 		if( u2<=cumProb[0] )
 			return 1; // replication: 1
 		for(int i=1; i<n_reactions; ++i){
-			if(cumProb[i-1]<u2 && u2<=cumProb[i])
+			if(cumProb[i-1]<u2 & u2<=cumProb[i])
 				return i+1; // degradation: 2, mutation: 3
 		}
 	}
 	return 0; // no reaction: 0
 }
 
-agent* system_update(agent* current_ptr, float step, int current_id, float* wld_rates, float* mnt_rates, float* con_rates){
+void system_update(agent* system_ptr, int copyNum, int error, float step, int current_id, float* wld_rates, float* mnt_rates, float* con_rates){
 	
-	int react_vector[MAX_LEN]; // array to store reaction that occur for each mol 0,1,...,(MAX_LEN-1)
-
+	int react_vector[copyNum];
+	
 	// pararallellelise
-	for( int i=0; i<MAX_LEN; ++i)
-		react_vector[i] = (*(current_ptr+i)).react(step, con_rates);
-	
-	static agent new_system[MAX_LEN]; // saves to stack so can be accessed outside function
-	bool mol_exist = true; // boolean to indicate if the molecule in the massive array exists or if it is just a place holder
-	
+	agent old_system[copyNum];
+	for( int i=0; i<copyNum; ++i){
+		old_system[i] = *(system_ptr+i);
+		react_vector[i] = ( *(system_ptr+i) ).react(step, con_rates, error);
+	}
+
 	int new_count = 0; // new copy number `slash' new system array indicator
-	int old_count = 0; // old copy number `slash' old system array indicator
-	
-	while( mol_exist ){ // loop to create to system array
-		switch ( react_vector[old_count] ) { // based on the reaction indicator create the system array
+
+	for(int i=0; i<copyNum; ++i){
+		switch ( react_vector[i] ) { // based on the reaction indicator create the system array
 			case 0: // no reaction
-				new_system[new_count] = *(current_ptr+old_count);
+				*(system_ptr+new_count) = old_system[i];
 				new_count += 1;
-				old_count += 1;
 				break;
 			case 1: // replication
-				new_system[new_count] = agent(current_id, (*(current_ptr+old_count)).get_id(), (*(current_ptr+old_count)).get_type(), (*(current_ptr+old_count)).get_rates());
+				*(system_ptr+new_count) = agent(current_id, (old_system[i]).get_id(), (old_system[i]).get_type(), (old_system[i]).get_rates());
 				
-				new_system[new_count+1] = agent(current_id+1, (*(current_ptr+old_count)).get_id(), (*(current_ptr+old_count)).get_type(), (*(current_ptr+old_count)).get_rates());
-				old_count += 1;
+				*(system_ptr+new_count+1) = agent(current_id+1, (old_system[i]).get_id(), (old_system[i]).get_type(), (old_system[i]).get_rates());
 				new_count += 2;
 				current_id += 2;
 				break;
-			case 2: // degradation
-				old_count += 1;
-				break;
 			case 3: // mutation
-				new_system[new_count] = agent(current_id, (*(current_ptr+old_count)).get_id(), 0, wld_rates); // birth wild
-				new_system[new_count+1] = agent(current_id+1, (*(current_ptr+old_count)).get_id(), 1, mnt_rates); // birth mutant
-				old_count += 1;
+				*(system_ptr+new_count) = agent(current_id, (old_system[i]).get_id(), 0, wld_rates); // birth wild
+				*(system_ptr+new_count+1) = agent(current_id+1, (old_system[i]).get_id(), 1, mnt_rates); // birth mutant
 				new_count += 2;
 				current_id += 2;
 				break;
 			default:
-				// if the molecule is purely a place holder in our massive system array the reat() output should be one
-				// when the first react() = -1 occurs we can exist our loop
-				mol_exist = false;
+				break;
 		}
 	}
-	return new_system; // return new system state
+	for(int i=new_count; i<MAX_LEN; ++i)
+		*(system_ptr+i) = agent();
 }
 
-float* agented(float Tmax, float step, float step_out, float init[n_species], float* wld_rates, float* mnt_rates, float* con_rates){
-	// define population vector, x to be updated with each iteration
-	int x[n_species];
+void agented(int* output_array, agent* system_ptr, float Tmax, float step, float step_out, float init[2], float* wld_rates, float* mnt_rates, float* con_rates){
+
+	int x[2];
 	x[0] = init[0];
 	x[1] = init[1];
 	
-	int copyNum = x[0] + x[1];
+	int copyNum = x[0]+x[1];
+	int C0 = x[0] + x[1];
 	int current_id = copyNum + 1; // (unique) id to be given to each new molecule in the system
 	int Nout = (int) (Tmax/step_out + 1); // the number of time points saved in the output
 	int Niter = (int) (Tmax/step + 1); // the number of iterations of the algorithm
 
-	float out_arr[Nout][2]; // array to store the output
 	float target = step_out; // next time at which the output is saved
 	float tt = 0; // current time
 	int iter = 1; // interation number of the algorithm
-	int out_iter = 1;
+	int out_iter = 1; // iteration of saved output
 	
-	out_arr[0][0] = x[0]; // input the starting conditions to the output array
-	out_arr[0][1] = x[1]; // ditto
+	*output_array = x[0];
+	*(output_array+1) = x[1];
 	
-	agent system_state[MAX_LEN]; // create a system array of length MAX_LEN
-	
-	// create the molecules and save them in the system array
 	for(int i=0; i<x[0]; ++i)
-		*(system_state+i) = agent(i+1, 0, 0, wld_rates);
+		*(system_ptr+i) = agent(i+1, 0, 0, wld_rates);
 	for(int i=x[0]; i<copyNum; ++i)
-		*(system_state+i) = agent(i+1, 0, 1, mnt_rates);
+		*(system_ptr+i) = agent(i+1, 0, 1, mnt_rates);
 
 	while( tt<Tmax ){ // simulate forward in time
-		agent old_state[MAX_LEN]; // define
+		agent old_state[copyNum];
 		for(int i=0; i<copyNum; ++i)
-			*(old_state + i) = *(system_state + i);
-			
-		agent* system_state;
-		system_state = system_update(old_state, step, current_id, wld_rates, mnt_rates, con_rates);
+			old_state[i] = *(system_ptr + i);
+		
+		int error = copyNum - C0;
+		
+		system_update(system_ptr, copyNum, error, step, current_id, wld_rates, mnt_rates, con_rates);
 		
 		bool mol_exist = true;
-		int copyNum = 0;
 		x[0] = 0;
 		x[1] = 0;
+		int count = 0;
+		
 		while( mol_exist ){
-			switch ((*(system_state+copyNum)).get_type()) {
-				case 1:
-					x[0] += 1;
-					copyNum +=1 ;
-					break;
+			switch( (*(system_ptr+count)).get_type() ){
 				case 0:
+					x[0] += 1;
+					count += 1;
+					break;
+				case 1:
 					x[1] += 1;
-					copyNum += 1;
+					count += 1;
 					break;
 				default:
 					mol_exist = false;
 			}
 		}
-
-		while( tt>target ){
+		copyNum = x[0] + x[1];
+		assert( copyNum<=MAX_LEN);
+		if( tt>target ){
 			assert( out_iter<=Nout );
-			// cout<< x[0] << " " <<x[1] <<endl;
-			out_arr[out_iter][0] = x[0];
-			out_arr[out_iter][1] = x[1];
+			*(output_array+2*out_iter) = x[0];
+			*(output_array+2*out_iter+1) = x[1];
 			out_iter += 1;
 			target += step_out;
 		}
 		tt += step;
 		iter += 1;
-		assert( iter<=Niter );
 	}
-
 }
 
 int main(){
-	srand48((long)time(NULL));
+	filesystem::current_path( "/Users/jordanchilds/Documents/C++/ABM" );
+	// global variables I like
+	const float hour = 3600;
+	const float day = 24*hour;
+	const float year = 365*day;
 	
-	float wild_rates[3] = {3.06e-8, 3.06e-8, 3.06e-11};
-	float mutant_rates[2] = {3.06e-5, 3.06e-5};
-	float control_rates[2] = {5e-4, 5e-4};
+	const int n_species = 2;
+	
+	float wild_rates[3] = {3.06e-8, 3.06e-8, 0};
+	float mutant_rates[3] = {3.06e-8, 3.06e-8, 0.0};
+	float control_rates[2] = {2.0e-3, 2.0e-3};
 	
 	float tmax = 100*year;
 	float delta_t = 10*day;
-	float stepOut = 50*day;
-	float x_init[2] = {100,100};
+	float stepOut = 1*year;
+	int Nout = (int) (tmax/stepOut);
+	float x_init[2] = {500,500};
 	
-	for(int i=0; i<100; ++i){
-		agented(tmax, delta_t, stepOut, x_init, wild_rates, mutant_rates, control_rates);
+	int output_array[Nout][n_species];
+	int* output_ptr = &output_array[0][0];
+	agent system_state[MAX_LEN];
+	agent* system_ptr = &system_state[0];
+	
+	agented(output_ptr, system_ptr, tmax, delta_t, stepOut, x_init, wild_rates, mutant_rates, control_rates);
+	
+	for(int i=0; i<Nout; ++i){
+		cout<< output_array[i][0] << " " << output_array[i][0] << endl;
 	}
-
-	
 }
 
