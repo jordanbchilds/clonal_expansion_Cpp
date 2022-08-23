@@ -1,28 +1,25 @@
-//
-//  main.cpp
-//  Stochastic Simulation
-//
-//  Created by JORDAN CHILDS on 26/07/2022.
-//
 #include <cmath>
-#include <iostream>
-#include <fstream>
-//#include <experimental/filesystem>
 #include <cassert>
-#include <chrono>
+#include <poplar/Vertex.hpp>
+#include <algorithm>
+#include <array>
+#include <ipu_vector_math>
 
+using namespace poplar;
 using namespace std;
 
-class sim_network {
+class sim_network : public poplar::Vertex{
 public:
-	float Tmax;
-	float step_out;
-	int Nout;
-	int n_reactions;
-	int n_species;
-	int* Post;
-	int* Pre;
-	int* Stoi;
+	poplar::Input<float> Tmax;
+	poplar::Input<float> step_out;
+	poplar::Input<int> Nout;
+	poplar::Input<int> n_reactions;
+	poplar::Input<int> n_species;
+	poplar::Input<int>* Post;
+	poplar::Input<int>* Pre;
+	poplar::Input<int>* Stoi;
+
+       poplar::Output<float> out;
 
 	void set_mats(int* post_ptr, int* pre_ptr, int* stoi_ptr );
 	sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut);
@@ -223,11 +220,7 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
     // return out_arrAY;
 }
 
-
-int main() {
-	//std::experimental::filesystem::current_path("/Users/jordanchilds/Documents/C++/Gillespie" );
-    // system parameters
-	// global variables for mtDNA model
+bool compute(){
 	const int Nreact = 5;
 	const int Nspecies = 2;
 	int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
@@ -250,12 +243,6 @@ int main() {
 	
 	srand((unsigned)time(NULL));
 	gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-	
-	ofstream outfile;
-	outfile.open("sim.out");
-	outfile<< "Age (y)\tWild-type\tMutant"<<endl;
-	for(int i=0; i<int(spn.Tmax/spn.step_out + 1.0); ++i){
-		outfile<< to_string(i*stepOut/(365*24*60*60))+"\t"+to_string(output[i][0])+"\t"+to_string(output[i][1]) << endl;
-	}
-	outfile.close();
+	*out = output;
+    return true;
 }
