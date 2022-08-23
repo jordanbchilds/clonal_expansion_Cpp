@@ -19,7 +19,7 @@ public:
 	poplar::Input<int>* Pre;
 	poplar::Input<int>* Stoi;
 
-    poplar::Output<float> out;
+       poplar::Output<float> out;
 
 	void set_mats(int* post_ptr, int* pre_ptr, int* stoi_ptr );
 	sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut);
