@@ -34,37 +34,6 @@ struct sim_network {
 	int* Post;
 	int* Pre;
 	int* Stoi;
-
-	void set_mats(int* post_ptr, int* pre_ptr, int* stoi_ptr ){
-		assert(post_ptr!=nullptr & post_ptr!=nullptr & n_reactions!=0 & n_species!=0);
-		Post = post_ptr;
-		Pre = pre_ptr;
-		Stoi = stoi_ptr;
-	 
-		for(int i=0; i<n_reactions; ++i){
-			for(int j=0; j<n_species; ++j){
-				*(Stoi+i*n_species+j) = *(Post+i*n_species+j) - *(Pre+i*n_species+j);
-			}
-		}
-	}
-	
-	sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut){
-		Tmax = tmax;
-		step_out = stepOut;
-		n_reactions = nReacts;
-		n_species = nSpecies;
-		Post = post_ptr;
-		Pre = pre_ptr;
-		Stoi = stoi_ptr;
-	 
-		for(int i=0; i<n_reactions; ++i){
-			for(int j=0; j<n_species; ++j){
-				*(Stoi+i*nSpecies+j) = *(Post+i*nSpecies+j) - *(Pre+i*nSpecies+j);
-			}
-		}
-	}
-	
-	sim_network(){}
 };
 
 unsigned choose(unsigned n, unsigned k){
@@ -224,8 +193,6 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
     // return out_arrAY;
 }
 	
-	const int Nreact = 5;
-	const int Nspecies = 2;
 	int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
 	int* Pre_ptr = &Pre_mat[0][0];
 	int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
@@ -234,13 +201,19 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
 	int* S_ptr = &S_mat[0][0];
 	
     //int x_init[2] = {500,500};
-    float tmax = 3784320000.0; //120*365*24*60*60 in seconds
-    float stepOut = 365.0*24.0*60.0*60.0; // in seconds
     //float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
 	//float con_rates[2] = {2.0e-3, 2.0e-3};
 
 	
-	sim_network spn = sim_network(Nreact, Nspecies, Post_ptr, Pre_ptr, S_ptr, tmax, stepOut);
+	sim_network spn;
+	spn.Tmax = 3784320000.0; // 120 years in seconds
+	spn.step_out = 365.0*24.0*60.0*60.0; // one year in seconds
+	spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out + 1.0);
+	spn.n_reactions = 5;
+	spn.n_species = 2;
+	spn.Post = Post_ptr;
+	spn.Pre = Pre_ptr;
+	spn.Stoi = S_ptr;
 	
 	int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
 	int* output_ptr = &output[0][0];
