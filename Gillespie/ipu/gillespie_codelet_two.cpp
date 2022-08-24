@@ -25,7 +25,7 @@ public:
 
 bool compute(){
 	
-class sim_network {
+struct sim_network {
 	float Tmax;
 	float step_out;
 	int Nout;
