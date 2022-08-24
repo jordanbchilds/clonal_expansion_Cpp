@@ -84,7 +84,7 @@ int main()
   }
 
   // Add steps to initialize the variables
-  Tensor x_init = graph.addConstant<int>(INT, {datasetSize}, x_initVals);
+  Tensor x_init = graph.addConstant<int>(INT, {datasetSize,2}, x_initVals);
   Tensor react_rates = graph.addConstant<float>(FLOAT, {datasetSize,5}, react_ratesVals);
   Tensor con_rates= graph.addConstant<float>(FLOAT, {datasetSize,2}, con_ratesVals);
 
