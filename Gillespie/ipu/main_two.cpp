@@ -63,30 +63,50 @@ int main()
   // Create a control program that is a sequence of steps
   Sequence prog;
 
-  int x_initVals[datasetSize][2];
-  float react_ratesVals[datasetSize][5];
-  float con_ratesVals[datasetSize][2];
+  int w_initVals[datasetSize];
+  int m_initVals[datasetSize];
+  float reactOne_ratesVals[datasetSize];
+  float reactTwo_ratesVals[datasetSize];
+  float reactThree_ratesVals[datasetSize];
+  float reactFour_ratesVals[datasetSize];
+  float reactFive_ratesVals[datasetSize];
+  float conOne_ratesVals[datasetSize];
+  float conTwo_ratesVals[datasetSize];
   
-    int x_initBoss[2] = {500,500};
-    float react_ratesBoss[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
-    float con_ratesBoss[2] = {2.0e-3, 2.0e-3};
+    int w_initBoss = 500;
+	int m_initBoss[2] = 500;
+    float reactOne_ratesBoss = 3.06e-8;
+	float reactTwo_ratesBoss = 3.06e-8;
+	float reactThree_ratesBoss = 3.06e-8;
+	float reactFour_ratesBoss = 3.06e-8;
+	float reactFive_ratesBoss = 0.0;
+	float conOne_ratesBoss = 2.0e-3;
+	float conTwo_ratesBoss = 2.0e-3;
   
     for (int i = 0; i < datasetSize; ++i){
-		for(int j=0; j<2; ++j){
-			x_initVals[i][j] = x_initBoss[j];
-		}
-	    for(int j=0; j<5; j++){
-		  react_ratesVals[i][j] =  react_ratesBoss[j];
-	    }
-	    for(int j=0; j<2; j++){
-		  con_ratesVals[i][j] = con_ratesBoss[j];
-	    }
+		w_initVals[i] = w_initBoss;
+		m_initVals[i] = m_initBoss;
+		reactOne_ratesVals[i] =  reactOne_ratesBoss;
+		reactTwo_ratesVals[i] =  reactTwo_ratesBoss;
+		reactThree_ratesVals[i] =  reactThree_ratesBoss;
+		reactFour_ratesVals[i] =  reactFour_ratesBoss;
+		reactFive_ratesVals[i] =  reactFive_ratesBoss;
+		conOne_rateVals[i] = conOne_ratesBoss;
+		conTwo_ratesVals[i] = conTwo_ratesBoss;
     }
 
   // Add steps to initialize the variables
-  Tensor x_init = graph.addConstant<int>(INT, {datasetSize,2}, x_initVals);
-  Tensor react_rates = graph.addConstant<float>(FLOAT, {datasetSize,5}, react_ratesVals);
-  Tensor con_rates= graph.addConstant<float>(FLOAT, {datasetSize,2}, con_ratesVals);
+  Tensor w_init = graph.addConstant<int>(INT, {datasetSize}, w_initVals);
+  Tensor m_init = graph.addConstant<int>(INT, {datasetSize}, m_initVals);
+	
+  Tensor reactOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactOne_ratesVals);
+	Tensor reactTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactTwo_ratesVals);
+	Tensor reactThree_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactThree_ratesVals);
+	Tensor reactFour_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFour_ratesVals);
+	Tensor reactFive_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFive_ratesVals);
+	
+  Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
+	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 
   Tensor out = graph.addVariable(INT, {datasetSize,2,int(tmax/step_out + 1.0)}, "output");
 
