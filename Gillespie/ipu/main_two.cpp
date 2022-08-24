@@ -63,17 +63,17 @@ int main()
   // Create a control program that is a sequence of steps
   Sequence prog;
 
-  int w_initVals[datasetSize];
-  int m_initVals[datasetSize];
-  float reactOne_ratesVals[datasetSize];
-  float reactTwo_ratesVals[datasetSize];
-  float reactThree_ratesVals[datasetSize];
-  float reactFour_ratesVals[datasetSize];
-  float reactFive_ratesVals[datasetSize];
-  float conOne_ratesVals[datasetSize];
-  float conTwo_ratesVals[datasetSize];
+	int w_initVals[datasetSize];
+	int m_initVals[datasetSize];
+	float reactOne_ratesVals[datasetSize];
+	float reactTwo_ratesVals[datasetSize];
+	float reactThree_ratesVals[datasetSize];
+	float reactFour_ratesVals[datasetSize];
+	float reactFive_ratesVals[datasetSize];
+	float conOne_ratesVals[datasetSize];
+	float conTwo_ratesVals[datasetSize];
   
-    int w_initBoss = 500;
+	int w_initBoss = 500;
 	int m_initBoss = 500;
     float reactOne_ratesBoss = 3.06e-8;
 	float reactTwo_ratesBoss = 3.06e-8;
@@ -91,71 +91,71 @@ int main()
 		reactThree_ratesVals[i] =  reactThree_ratesBoss;
 		reactFour_ratesVals[i] =  reactFour_ratesBoss;
 		reactFive_ratesVals[i] =  reactFive_ratesBoss;
-		conOne_rateVals[i] = conOne_ratesBoss;
+		conOne_ratesVals[i] = conOne_ratesBoss;
 		conTwo_ratesVals[i] = conTwo_ratesBoss;
     }
 
   // Add steps to initialize the variables
-  Tensor w_init = graph.addConstant<int>(INT, {datasetSize}, w_initVals);
-  Tensor m_init = graph.addConstant<int>(INT, {datasetSize}, m_initVals);
-	
-  Tensor reactOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactOne_ratesVals);
+	Tensor w_init = graph.addConstant<int>(INT, {datasetSize}, w_initVals);
+	Tensor m_init = graph.addConstant<int>(INT, {datasetSize}, m_initVals);
+
+	Tensor reactOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactOne_ratesVals);
 	Tensor reactTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactTwo_ratesVals);
 	Tensor reactThree_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactThree_ratesVals);
 	Tensor reactFour_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFour_ratesVals);
 	Tensor reactFive_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFive_ratesVals);
-	
-  Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
+
+	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 
-  Tensor out = graph.addVariable(INT, {datasetSize,2,int(tmax/step_out + 1.0)}, "output");
+	Tensor out = graph.addVariable(INT, {datasetSize,2,int(tmax/step_out + 1.0)}, "output");
 
-  ComputeSet computeSet = graph.addComputeSet("computeSet");
+	ComputeSet computeSet = graph.addComputeSet("computeSet");
 
-  // iterate through tiles on the IPU, map 6 sets of variables and 6 option pricers to each tile
-  for (int i = 0; i < datasetSize; ++i)
-  {
-    int roundCount = i % int(numberOfTiles * threadsPerTile);
-    int tileInt = std::floor(
-        float(roundCount) / float(threadsPerTile)
-        );
-    // std::cout << "theadsPerIPU=" << int(numberOfTiles * threadsPerTile) << "i="<< i << " roundCount=" << roundCount << " tileInt=" << tileInt << std::endl;
+	// iterate through tiles on the IPU, map 6 sets of variables and 6 option pricers to each tile
+	for (int i = 0; i < datasetSize; ++i)
+	{
+		int roundCount = i % int(numberOfTiles * threadsPerTile);
+		int tileInt = std::floor(
+			float(roundCount) / float(threadsPerTile)
+			);
+		// std::cout << "theadsPerIPU=" << int(numberOfTiles * threadsPerTile) << "i="<< i << " roundCount=" << roundCount << " tileInt=" << tileInt << std::endl;
 
-    graph.setTileMapping(x_init[i], tileInt);
-    graph.setTileMapping(react_rates[i], tileInt);
-    graph.setTileMapping(con_rates[i], tileInt);
-    graph.setTileMapping(out[i], tileInt);
+		graph.setTileMapping(x_init[i], tileInt);
+		graph.setTileMapping(react_rates[i], tileInt);
+		graph.setTileMapping(con_rates[i], tileInt);
+		graph.setTileMapping(out[i], tileInt);
 
-    VertexRef vtx = graph.addVertex(computeSet, "sim_network");
-    graph.setTileMapping(vtx, tileInt);
+		VertexRef vtx = graph.addVertex(computeSet, "sim_network");
+		graph.setTileMapping(vtx, tileInt);
 
-    graph.connect(vtx["x_init"], x_init[i]);
-    graph.connect(vtx["react_rates"], react_rates[i]);
-    graph.connect(vtx["con_rates"], con_rates[i]);
-    graph.connect(vtx["out"], out[i]);
+		graph.connect(vtx["x_init"], x_init[i]);
+		graph.connect(vtx["react_rates"], react_rates[i]);
+		graph.connect(vtx["con_rates"], con_rates[i]);
+		graph.connect(vtx["out"], out[i]);
 
-  }
+	}
 
-  // Add a step to execute the compute set
-  prog.add(Execute(computeSet));
-  // Add a step to print out sim results
-  prog.add(PrintTensor("out", out));
-  // Create the engine
-  Engine engine(graph, prog);
-  engine.load(device);
+	// Add a step to execute the compute set
+	prog.add(Execute(computeSet));
+	// Add a step to print out sim results
+	prog.add(PrintTensor("out", out));
+	// Create the engine
+	Engine engine(graph, prog);
+	engine.load(device);
 
-  auto start = std::chrono::system_clock::now();
-  // Run the control program
-  engine.run(0);
-  auto end = std::chrono::system_clock::now();
+	auto start = std::chrono::system_clock::now();
+	// Run the control program
+	engine.run(0);
+	auto end = std::chrono::system_clock::now();
 
-  std::chrono::duration<double> elapsed_seconds = end-start;
-  std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
-  std::cout << "Completed computation at " << std::ctime(&end_time)
-            << "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
-  
-  std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
+	std::cout << "Completed computation at " << std::ctime(&end_time)
+			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
 
-  return 0;
+	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
+
+	return 0;
 }
