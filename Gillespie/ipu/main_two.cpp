@@ -127,9 +127,17 @@ int main()
 			);
 		// std::cout << "theadsPerIPU=" << int(numberOfTiles * threadsPerTile) << "i="<< i << " roundCount=" << roundCount << " tileInt=" << tileInt << std::endl;
 
-		graph.setTileMapping(x_init[i], tileInt);
-		graph.setTileMapping(react_rates[i], tileInt);
-		graph.setTileMapping(con_rates[i], tileInt);
+		graph.setTileMapping(w_init[i], tileInt);
+		graph.setTileMapping(m_init[i], tileInt);
+		graph.setTileMapping(reactOne_rates[i], tileInt);
+		graph.setTileMapping(reactTwo_rates[i], tileInt);
+		graph.setTileMapping(reactThree_rates[i], tileInt);
+		graph.setTileMapping(reactFour_rates[i], tileInt);
+		graph.setTileMapping(reactFive_rates[i], tileInt);
+		
+		graph.setTileMapping(conOne_rates[i], tileInt);
+		graph.setTileMapping(conTwo_rates[i], tileInt);
+		
 		graph.setTileMapping(out[i], tileInt);
 
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network");
