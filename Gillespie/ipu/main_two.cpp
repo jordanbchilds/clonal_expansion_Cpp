@@ -114,10 +114,7 @@ int main()
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	
-	float step_out = 3600*24*365;
-	float tmax = 3600*24*365*120;
-
-	Tensor out = graph.addVariable(INT, {datasetSize,2,int(tmax/step_out + 1.0)}, "output");
+	Tensor out = graph.addVariable(INT, {datasetSize,2,int(tmax/stepOut + 1.0)}, "output");
 
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 
