@@ -63,7 +63,7 @@ int main()
   // Create a control program that is a sequence of steps
   Sequence prog;
 
-  int x_initVals[datasetSize][2];
+  int x_initVals[8831][2];
   float react_ratesVals[datasetSize][5];
   float con_ratesVals[datasetSize][2];
   
