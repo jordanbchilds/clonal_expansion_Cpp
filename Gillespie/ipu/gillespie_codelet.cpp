@@ -8,18 +8,25 @@
 using namespace poplar;
 using namespace std;
 
-class sim_network : public poplar::Vertex{
-public:
-	poplar::Input<float> Tmax;
-	poplar::Input<float> step_out;
-	poplar::Input<int> Nout;
-	poplar::Input<int> n_reactions;
-	poplar::Input<int> n_species;
-	poplar::Input<int>* Post;
-	poplar::Input<int>* Pre;
-	poplar::Input<int>* Stoi;
+class sim_network_vertex : public poplar::Vertex{
+	poplar::Input<int> x_init[2];
+    poplar::Input<float> react_rates[5];
+    poplar::Input<float> con_rates[2];
 
-       poplar::Output<float> out;
+    poplar::Output<float> out;
+
+bool compute(){
+	
+class sim_network {
+public:
+	float Tmax;
+	float step_out;
+	int Nout;
+	int n_reactions;
+	int n_species;
+	int* Post;
+	int* Pre;
+	int* Stoi;
 
 	void set_mats(int* post_ptr, int* pre_ptr, int* stoi_ptr );
 	sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut);
@@ -219,8 +226,7 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
     }
     // return out_arrAY;
 }
-
-bool compute(){
+	
 	const int Nreact = 5;
 	const int Nspecies = 2;
 	int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
@@ -230,11 +236,12 @@ bool compute(){
 	int S_mat[Nreact][Nspecies];
 	int* S_ptr = &S_mat[0][0];
 	
-    int x_init[2] = {500,500};
+    //int x_init[2] = {500,500};
     float tmax = 3784320000.0; //120*365*24*60*60 in seconds
     float stepOut = 365.0*24.0*60.0*60.0; // in seconds
-    float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
-	float con_rates[2] = {2.0e-3, 2.0e-3};
+    //float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
+	//float con_rates[2] = {2.0e-3, 2.0e-3};
+
 	
 	sim_network spn = sim_network(Nreact, Nspecies, Post_ptr, Pre_ptr, S_ptr, tmax, stepOut);
 	
@@ -245,4 +252,5 @@ bool compute(){
 	gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 	*out = output;
     return true;
+}
 }
