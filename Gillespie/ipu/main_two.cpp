@@ -144,8 +144,14 @@ int main()
 		graph.setTileMapping(vtx, tileInt);
 
 		graph.connect(vtx["w_init"], w_init[i]);
-		graph.connect(vtx["react_rates"], react_rates[i]);
-		graph.connect(vtx["con_rates"], con_rates[i]);
+		graph.connect(vtx["m_init"], m_init[i]);
+		graph.connect(vtx["reactOne_rates"], reactOne_rates[i]);
+		graph.connect(vtx["reactTwo_rates"], reactTwo_rates[i]);
+		graph.connect(vtx["reactThree_rates"], reactThree_rates[i]);
+		graph.connect(vtx["reactFour_rates"], reactFour_rates[i]);
+		graph.connect(vtx["reactFive_rates"], reactFive_rates[i]);
+		graph.connect(vtx["conOne_rates"], conOne_rates[i]);
+		graph.connect(vtx["conTwo_rates"], conTwo_rates[i]);
 		graph.connect(vtx["out"], out[i]);
 
 	}
