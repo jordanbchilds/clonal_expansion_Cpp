@@ -27,41 +27,47 @@ using namespace poplar::program;
 
 int main()
 {
-  const int numberOfTiles = 1472;
-  const int threadsPerTile = 6;
+	const int numberOfTiles = 1472;
+	const int threadsPerTile = 6;
 
-  long unsigned int datasetSize = 8832; // anything less than 8832 takes the same runtime, 8833 takes double the runtime
-  int tileInt;
-  int nVal = 10000; // number of simulations
-  
-  float tmax = 3784320000.0; //120*365*24*60*60 in seconds
-  float stepOut = 365.0*24.0*60.0*60.0; // in seconds
+	long unsigned int datasetSize = 8832; // anything less than 8832 takes the same runtime, 8833 takes double the runtime
+	int tileInt;
+	int nVal = 10000; // number of simulations
+
+	float tmax = 3784320000.0; //120*365*24*60*60 in seconds
+	float stepOut = 365.0*24.0*60.0*60.0; // in seconds
 
 
-  // Create the DeviceManager which is used to discover devices
-  auto manager = DeviceManager::createDeviceManager();
-  // Attempt to attach to a single IPU:
-  auto devices = manager.getDevices(poplar::TargetType::IPU, 1);
-  std::cout << "Trying to attach to IPU\n";
-  auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
-     return device.attach();
-  });
-  if (it == devices.end()) {
-    std::cerr << "Error attaching to device\n";
-    return -1;
-  }
-  auto device = std::move(*it);
-  std::cout << "Attached to IPU " << device.getId() << std::endl;
-  Target target = device.getTarget();
+	// Create the DeviceManager which is used to discover devices
+	auto manager = DeviceManager::createDeviceManager();
+	// Attempt to attach to a single IPU:
+	auto devices = manager.getDevices(poplar::TargetType::IPU, 1);
+	std::cout << "Trying to attach to IPU\n";
+	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
+		return device.attach();
+	});
+	if (it == devices.end()) {
+		std::cerr << "Error attaching to device\n";
+		return -1;
+	}
+	auto device = std::move(*it);
+	std::cout << "Attached to IPU " << device.getId() << std::endl;
+	Target target = device.getTarget();
 
-  // Create the Graph object
-  Graph graph(target);
+	// Create the Graph object
+	Graph graph(target);
 
-  // Add codelets to the graph
-  graph.addCodelets("gillespie_codelet.cpp");
+	// Add codelets to the graph
+	graph.addCodelets("gillespie_codelet.cpp");
 
-  // Create a control program that is a sequence of steps
-  Sequence prog;
+	// Create a control program that is a sequence of steps
+	Sequence prog;
+	/*
+	 the input matrices of initial populations and rates have been split into vectors of length
+	 datasetSize.
+	 
+	 Having them as matrices kept throwing errors that were making me upset.
+	 */
 
 	int w_initVals[datasetSize];
 	int m_initVals[datasetSize];
@@ -94,8 +100,8 @@ int main()
 		conOne_ratesVals[i] = conOne_ratesBoss;
 		conTwo_ratesVals[i] = conTwo_ratesBoss;
     }
-
-  // Add steps to initialize the variables
+	
+	// Add steps to initialize the variables
 	Tensor w_init = graph.addConstant<int>(INT, {datasetSize}, w_initVals);
 	Tensor m_init = graph.addConstant<int>(INT, {datasetSize}, m_initVals);
 
@@ -107,6 +113,9 @@ int main()
 
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
+	
+	float step_out = 3600*24*365;
+	float tmax = 3600*24*365*120;
 
 	Tensor out = graph.addVariable(INT, {datasetSize,2,int(tmax/step_out + 1.0)}, "output");
 
