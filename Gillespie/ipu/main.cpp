@@ -67,11 +67,20 @@ int main()
   float react_ratesVals[datasetSize][5];
   float con_ratesVals[datasetSize][2];
   
+  int x_initBoss[2] = {500,500};
+  float react_ratesBoss[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
+  float con_ratesBoss[2] = {2.0e-3, 2.0e-3};
   
   for (int i = 0; i < datasetSize; ++i){
-    x_initVals[i] = {500,500};
-    react_ratesVals[i] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
-    con_ratesVals[i] = {2.0e-3, 2.0e-3};
+	  for(int j=0; j<2; j++){
+		x_initVals[i][j] = x_initBoss[j];
+	  }
+	  for(int j=0; j<5; j++){
+		react_ratesVals[i][j] =  react_ratesBoss[j];
+	  }
+	  for(int j=0; j<2; j++){
+		con_ratesVals[i][j] = con_ratesBoss[j];
+	  }
   }
 
   // Add steps to initialize the variables
@@ -79,7 +88,7 @@ int main()
   Tensor react_rates = graph.addConstant<float>(FLOAT, {datasetSize,5}, react_ratesVals);
   Tensor con_rates= graph.addConstant<float>(FLOAT, {datasetSize,2}, con_ratesVals);
 
-  Tensor out = graph.addVariable(INT, {datasetSize,2,int(tax/step_out + 1.0)}, "output");
+  Tensor out = graph.addVariable(INT, {datasetSize,2,int(tmax/step_out + 1.0)}, "output");
 
   ComputeSet computeSet = graph.addComputeSet("computeSet");
 
