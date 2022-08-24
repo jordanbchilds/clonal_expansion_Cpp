@@ -68,12 +68,13 @@ int main()
   float con_ratesVals[datasetSize][2];
   
     int x_initBoss[2] = {500,500};
-	int init_wld_boss[datasetSize];
     float react_ratesBoss[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
     float con_ratesBoss[2] = {2.0e-3, 2.0e-3};
   
     for (int i = 0; i < datasetSize; ++i){
-		init_wld_boss[i] = 500;
+		for(int j=0; j<2; ++j){
+			x_initVals[i][j] = x_initBoss[j];
+		}
 	    for(int j=0; j<5; j++){
 		  react_ratesVals[i][j] =  react_ratesBoss[j];
 	    }
@@ -83,8 +84,7 @@ int main()
     }
 
   // Add steps to initialize the variables
-  Tensor init_wld = graph.addConstant<int>(INT, {datasetSize}, init_wld_boss);
-	
+  Tensor x_init = graph.addConstant<int>(INT, {datasetSize 2}, x_initVals);
   Tensor react_rates = graph.addConstant<float>(FLOAT, {datasetSize,5}, react_ratesVals);
   Tensor con_rates= graph.addConstant<float>(FLOAT, {datasetSize,2}, con_ratesVals);
 
