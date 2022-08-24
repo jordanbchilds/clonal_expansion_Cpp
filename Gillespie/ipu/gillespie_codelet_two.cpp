@@ -64,7 +64,7 @@ class sim_network {
 		}
 	}
 	
-	sim_network::sim_network();
+	sim_network();
 };
 
 unsigned choose(unsigned n, unsigned k){
