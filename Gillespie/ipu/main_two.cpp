@@ -36,7 +36,8 @@ int main()
 
 	float tmax = 3784320000.0; //120*365*24*60*60 in seconds
 	float stepOut = 365.0*24.0*60.0*60.0; // in seconds
-	int Nout = (int) (tmax/stepOut + 1.0)
+	int Nout = (int) (tmax/stepOut + 1.0);
+	
 	// Create the DeviceManager which is used to discover devices
 	auto manager = DeviceManager::createDeviceManager();
 	// Attempt to attach to a single IPU:
