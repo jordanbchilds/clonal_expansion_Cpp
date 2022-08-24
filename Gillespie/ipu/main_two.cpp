@@ -143,7 +143,7 @@ int main()
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network");
 		graph.setTileMapping(vtx, tileInt);
 
-		graph.connect(vtx["w_init"], x_init[i]);
+		graph.connect(vtx["w_init"], w_init[i]);
 		graph.connect(vtx["react_rates"], react_rates[i]);
 		graph.connect(vtx["con_rates"], con_rates[i]);
 		graph.connect(vtx["out"], out[i]);
