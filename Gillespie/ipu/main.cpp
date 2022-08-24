@@ -67,6 +67,7 @@ int main()
   float react_ratesVals[datasetSize][5];
   float con_ratesVals[datasetSize][2];
   
+  
   for (int i = 0; i < datasetSize; ++i){
     x_initVals[i] = {500,500};
     react_ratesVals[i] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
@@ -108,8 +109,8 @@ int main()
 
   // Add a step to execute the compute set
   prog.add(Execute(computeSet));
-  // Add a step to print out the option values
-  prog.add(PrintTensor("output", output));
+  // Add a step to print out sim results
+  prog.add(PrintTensor("out", out));
   // Create the engine
   Engine engine(graph, prog);
   engine.load(device);

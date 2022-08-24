@@ -8,6 +8,12 @@
 using namespace poplar;
 using namespace std;
 
+class sim_network_vertex : public poplar::Vertex{
+	poplar::Input<int> x_init[2];
+    poplar::Input<float> react_rates[5];
+    poplar::Input<float> con_rates[2];
+
+    poplar::Output<float> out;
 
 bool compute(){
 	
@@ -235,12 +241,7 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
     float stepOut = 365.0*24.0*60.0*60.0; // in seconds
     //float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
 	//float con_rates[2] = {2.0e-3, 2.0e-3};
-	
-	poplar::Input<int> x_init[2];
-    poplar::Input<float> react_rates[5];
-    poplar::Input<float> con_rates[2];
 
-    poplar::Output<float> out;
 	
 	sim_network spn = sim_network(Nreact, Nspecies, Post_ptr, Pre_ptr, S_ptr, tmax, stepOut);
 	
@@ -251,4 +252,5 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
 	gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 	*out = output;
     return true;
+}
 }
