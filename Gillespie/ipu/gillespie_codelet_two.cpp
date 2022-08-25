@@ -214,7 +214,20 @@ public:
 		spn.Post = Post_ptr;
 		spn.Pre = Pre_ptr;
 		spn.Stoi = S_ptr;
-
+		
+		int x_init[Nspecies];
+		x_init[0] = w_init;
+		x_init[1] = m_init;
+		float react_rates[Nreact];
+		react_rates[0] = reactOne_rates;
+		react_rates[1] = reactTwo_rates;
+		react_rates[2] = reactThree_rates;
+		react_rates[3] = reactFour_rates;
+		react_rates[4] = reactFive_rates;
+		float con_rates[2];
+		con_rates[0] = conOne_rates;
+		con_rates[1] = conTwo_rates;
+		
 		int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
 		int* output_ptr = &output[0][0];
 
