@@ -236,4 +236,4 @@ public:
 		*out = output[0][0];
 		return true;
 	}
-}
+};
