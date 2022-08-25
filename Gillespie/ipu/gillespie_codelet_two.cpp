@@ -191,35 +191,37 @@ public:
 
 	bool compute()
 	{
-	int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
-	int* Pre_ptr = &Pre_mat[0][0];
-	int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
-	int* Post_ptr = &Post_mat[0][0];
-	int S_mat[Nreact][Nspecies];
-	int* S_ptr = &S_mat[0][0];
+		const Nreact = 5;
+		const Nspecies = 2;
+		int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
+		int* Pre_ptr = &Pre_mat[0][0];
+		int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
+		int* Post_ptr = &Post_mat[0][0];
+		int S_mat[Nreact][Nspecies];
+		int* S_ptr = &S_mat[0][0];
 
-	//int x_init[2] = {500,500};
-	//float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
-	//float con_rates[2] = {2.0e-3, 2.0e-3};
+		//int x_init[2] = {500,500};
+		//float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
+		//float con_rates[2] = {2.0e-3, 2.0e-3};
 
 
-	sim_network spn;
-	spn.Tmax = 3784320000.0; // 120 years in seconds
-	spn.step_out = 365.0*24.0*60.0*60.0; // one year in seconds
-	spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out + 1.0);
-	spn.n_reactions = 5;
-	spn.n_species = 2;
-	spn.Post = Post_ptr;
-	spn.Pre = Pre_ptr;
-	spn.Stoi = S_ptr;
+		sim_network spn;
+		spn.Tmax = 3784320000.0; // 120 years in seconds
+		spn.step_out = 365.0*24.0*60.0*60.0; // one year in seconds
+		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out + 1.0);
+		spn.n_reactions = Nreact;
+		spn.n_species = Nspecies;
+		spn.Post = Post_ptr;
+		spn.Pre = Pre_ptr;
+		spn.Stoi = S_ptr;
 
-	int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
-	int* output_ptr = &output[0][0];
+		int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
+		int* output_ptr = &output[0][0];
 
-	//srand((unsigned)time(NULL));
-	gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-	*out = output;
-	return true;
+		//srand((unsigned)time(NULL));
+		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		*out = output;
+		return true;
 	
 	}
 }
