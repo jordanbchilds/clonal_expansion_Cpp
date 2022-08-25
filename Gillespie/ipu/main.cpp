@@ -58,7 +58,7 @@ int main()
 	Graph graph(target);
 
 	// Add codelets to the graph
-	graph.addCodelets("gillespie_codelet_two.cpp");
+	graph.addCodelets("gillespie_codelet.cpp");
 
 	// Create a control program that is a sequence of steps
 	Sequence prog;
@@ -114,7 +114,8 @@ int main()
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	
-	Tensor popDyn = graph.addVariable(INT, {Nout,2}, "popDyn");
+	Tensor w_popDyn = graph.addVariable(INT, {Nout}, "w_popDyn");
+	Tensor m_popDyn = graph.addVariable(INT, {Nout}, "m_popDyn");
 	Tensor out = graph.addVariable(INT, {datasetSize,Nout,2}, "output");
 
 	ComputeSet computeSet = graph.addComputeSet("computeSet");

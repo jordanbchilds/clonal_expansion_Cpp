@@ -21,8 +21,8 @@ public:
     poplar::Input<float> conOne_rates;
 	poplar::Input<float> conTwo_rates;
 	
-	poplar::InOut<poplar::Tensor<int>> popDyn;
-	
+	poplar::InOut<poplar::Vector<int>> w_popDyn;
+	poplar::InOut<poplar::Vector<int>> m_popDyn;
     poplar::Output<float> out;
 	
 	struct sim_network {
@@ -141,8 +141,8 @@ public:
 		
 		for(int j=0; j<n_species; ++j){
 			// *(out_array+j) = x[j];
-			popDyn[0][0] = x[0];
-			popDyn[0][1] = x[1];
+			w_popDyn[0] = x[0];
+			m_popDyn[0] = x[1];
 		}
 		int count = 1;
 		float target = step_out;
@@ -177,8 +177,8 @@ public:
 			if( tt>=target ){
 				for(int j=0; j<n_species; ++j){
 					//*(out_array+count*n_species+j ) = x[j];
-					popDyn[count][0] = x[0];
-					popDyn[count][1] = x[1];
+					w_popDyn[count] = x[0];
+					m_popDyn[count] = x[1];
 				}
 				count += 1;
 				target += step_out;
@@ -240,7 +240,8 @@ public:
 
 		//srand((unsigned)time(NULL));
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = popDyn[0][0];
+		
+		*out = w_popDyn[0];
 		return true;
 	}
 };
