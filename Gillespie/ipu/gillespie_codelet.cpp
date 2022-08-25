@@ -20,7 +20,9 @@ public:
 	poplar::Input<float> reactFive_rates;
     poplar::Input<float> conOne_rates;
 	poplar::Input<float> conTwo_rates;
-
+	
+	poplar::InOut<poplar::Tensor<int>> popDyn;
+	
     poplar::Output<float> out;
 	
 	struct sim_network {
@@ -137,9 +139,11 @@ public:
 		for(int i=0; i<n_species; ++i)
 			x[i] = *(x_init+i);
 		
-		for(int j=0; j<n_species; ++j)
-			*(out_array+j) = x[j];
-		
+		for(int j=0; j<n_species; ++j){
+			// *(out_array+j) = x[j];
+			popDyn[0][0] = x[0];
+			popDyn[0][1] = x[1];
+		}
 		int count = 1;
 		float target = step_out;
 		float tt = 0;
@@ -171,8 +175,11 @@ public:
 			else
 				tt += rand_exp(haz_total);
 			if( tt>=target ){
-				for(int j=0; j<n_species; ++j)
-					*(out_array+count*n_species+j ) = x[j];
+				for(int j=0; j<n_species; ++j){
+					//*(out_array+count*n_species+j ) = x[j];
+					popDyn[count][0] = x[0];
+					popDyn[count][1] = x[1];
+				}
 				count += 1;
 				target += step_out;
 			}
@@ -233,7 +240,7 @@ public:
 
 		//srand((unsigned)time(NULL));
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = output[0][0];
+		*out = popDyn[0][0];
 		return true;
 	}
 };

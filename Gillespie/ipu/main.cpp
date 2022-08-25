@@ -114,7 +114,8 @@ int main()
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	
-	Tensor out = graph.addVariable(INT, {datasetSize,2,Nout}, "output");
+	Tensor popDyn = graph.addVariable(INT, {Nout,2}, "popDyn");
+	Tensor out = graph.addVariable(INT, {datasetSize,Nout,2}, "output");
 
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 
