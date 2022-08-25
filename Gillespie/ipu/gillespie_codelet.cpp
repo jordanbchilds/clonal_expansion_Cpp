@@ -178,7 +178,7 @@ public:
 			if( tt>=target ){
 				/*
 				for(int j=0; j<n_species; ++j){
-					//*(out_array+count*n_species+j ) = x[j];
+					*(out_array+count*n_species+j ) = x[j];
 					w_popDyn[count] = x[0];
 					m_popDyn[count] = x[1];
 				}
@@ -245,8 +245,8 @@ public:
 
 		//srand((unsigned)time(NULL));
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		
 		*out = w_popDyn[0];
+		
 		return true;
 	}
 };
