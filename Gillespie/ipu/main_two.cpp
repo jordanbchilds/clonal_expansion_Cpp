@@ -140,7 +140,7 @@ int main()
 		
 		graph.setTileMapping(out[i], tileInt);
 
-		VertexRef vtx = graph.addVertex(computeSet, "sim_network");
+		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
 		graph.setTileMapping(vtx, tileInt);
 
 		graph.connect(vtx["w_init"], w_init[i]);
