@@ -233,8 +233,7 @@ public:
 
 		//srand((unsigned)time(NULL));
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = output;
+		*out = output[0][0];
 		return true;
-	
 	}
 }
