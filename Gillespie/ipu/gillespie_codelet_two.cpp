@@ -46,20 +46,20 @@ public:
 		}
 		return result;
 	}
-	
+	/*
 	double rand_unif(float lower=0.0, float upper=1.0){
 		float unif_01;
 		float unif;
-		unif_01 = (float) rand() / (float) RAND_MAX;
+		unif_01 = (float) __builtin_ipu_urand32() / (float) RAND_MAX;
 		unif = unif_01*(upper-lower) + lower;
 		return unif;
 	}
-	
+	*/
 	
 	double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
 		float x;
 		float unif_01;
-		unif_01 = drand48();
+		unif_01 = __builtin_ipu_urand_f32();
 		x = -log(1-unif_01)/lambda;
 		return x;
 	}
@@ -87,7 +87,7 @@ public:
 				cumWeights[i] = cc;
 			}
 		}
-		float u = drand48();
+		float u = __builtin_ipu_urand_f32();
 		if( u<cumWeights[0] ){
 			return 0;
 		} else {
@@ -216,7 +216,7 @@ public:
 	int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
 	int* output_ptr = &output[0][0];
 
-	srand((unsigned)time(NULL));
+	//srand((unsigned)time(NULL));
 	gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 	*out = output;
 	return true;
