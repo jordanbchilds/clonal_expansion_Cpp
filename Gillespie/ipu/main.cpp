@@ -114,13 +114,13 @@ int main()
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	
-	Tensor w_popDyn = graph.addVariable(INT, {Nout}, "w_popDyn");
-	Tensor m_popDyn = graph.addVariable(INT, {Nout}, "m_popDyn");
-	Tensor out = graph.addVariable(INT, {datasetSize}, "output");
+	Tensor w_popDyn = graph.addVariable(INT, {datasetsize,Nout}, "w_popDyn");
+	Tensor m_popDyn = graph.addVariable(INT, {datasetsize,Nout}, "m_popDyn");
+	Tensor output = graph.addVariable(INT, {datasetSize}, "output");
 
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 
-	// iterate through tiles on the IPU, map 6 sets of variables and 6 option pricers to each tile
+	// iterate through tiles on the IPU, map simulations to each thread (6) on each tile
 	for (int i = 0; i < datasetSize; ++i)
 	{
 		int roundCount = i % int(numberOfTiles * threadsPerTile);
@@ -143,7 +143,7 @@ int main()
 		graph.setTileMapping(w_popDyn[i], tileInt);
 		graph.setTileMapping(m_popDyn[i], tileInt);
 		
-		graph.setTileMapping(out[i], tileInt);
+		graph.setTileMapping(output[i], tileInt);
 
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
 		graph.setTileMapping(vtx, tileInt);
@@ -159,14 +159,14 @@ int main()
 		graph.connect(vtx["conTwo_rates"], conTwo_rates[i]);
 		graph.connect(vtx["w_popDyn"], w_popDyn[i]);
 		graph.connect(vtx["m_popDyn"], m_popDyn[i]);
-		graph.connect(vtx["out"], out[i]);
+		graph.connect(vtx["out"], output[i]);
 
 	}
 
 	// Add a step to execute the compute set
 	prog.add(Execute(computeSet));
 	// Add a step to print out sim results
-	prog.add(PrintTensor("out", out));
+	prog.add(PrintTensor("output", output));
 	// Create the engine
 	Engine engine(graph, prog);
 	engine.load(device);
