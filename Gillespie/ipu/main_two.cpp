@@ -58,7 +58,7 @@ int main()
 	Graph graph(target);
 
 	// Add codelets to the graph
-	graph.addCodelets("gillespie_codelet.cpp");
+	graph.addCodelets("gillespie_codelet_two.cpp");
 
 	// Create a control program that is a sequence of steps
 	Sequence prog;
