@@ -133,8 +133,8 @@ public:
 		int* S = simnet.Stoi;
 		int* Pre = simnet.Pre;
 		
-		int x[simnet.n_species];
-		for(int i=0; i<spn.n_species; ++i)
+		int x[n_species];
+		for(int i=0; i<n_species; ++i)
 			x[i] = *(x_init+i);
 		
 		for(int j=0; j<n_species; ++j)
