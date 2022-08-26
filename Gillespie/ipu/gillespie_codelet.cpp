@@ -89,7 +89,7 @@ public:
 				cumWeights[i] = cc;
 			}
 		}
-		float u = __builtin_ipu_urand_f32()+1.0;
+		float u = (__builtin_ipu_urand_f32()+1.0) ;
 		if( 0<u && u<cumWeights[0] ){
 			return 0;
 		} else {
@@ -241,8 +241,8 @@ public:
 		int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
 		int* output_ptr = &output[0][0];
 
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDyn[1]+m_popDyn[1];
+		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		*out = __builtin_ipu_urand32();;
 		
 		return true;
 	}
