@@ -61,7 +61,7 @@ public:
 	double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
 		float x;
 		float unif_01;
-		unif_01 = __builtin_ipu_urand_f32();
+		unif_01 = (__builtin_ipu_urand_f32()+1.0)/2.0;
 		x = -log(1-unif_01)/lambda;
 		return x;
 	}
@@ -89,7 +89,7 @@ public:
 				cumWeights[i] = cc;
 			}
 		}
-		float u = __builtin_ipu_urand_f32();
+		float u = (__builtin_ipu_urand_f32()+1.0)/2.0;
 		if( u<cumWeights[0] ){
 			return 0;
 		} else {
@@ -243,7 +243,7 @@ public:
 
 		//srand((unsigned)time(NULL));
 		// gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = __builtin_ipu_urand_f32();
+		*out = (__builtin_ipu_urand_f32()+1.0)/2.0;
 		
 		return true;
 	}
