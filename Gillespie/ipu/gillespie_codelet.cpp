@@ -242,8 +242,8 @@ public:
 		int* output_ptr = &output[0][0];
 
 		//srand((unsigned)time(NULL));
-		// gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDyn[0]+m_popDyn[0];
+		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		*out = w_popDyn[1]+m_popDyn[1];
 		
 		return true;
 	}
