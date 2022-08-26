@@ -243,7 +243,7 @@ public:
 
 		//srand((unsigned)time(NULL));
 		// gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDym[spn.Nout-1]+m_popDyn[spn.Nout-1];
+		*out = w_popDyn[spn.Nout-1]+m_popDyn[spn.Nout-1];
 		
 		return true;
 	}
