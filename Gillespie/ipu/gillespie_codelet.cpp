@@ -66,26 +66,26 @@ public:
 		return x;
 	}
 	
-	int rand_disc(int size, float* weights=0){
+	int rand_react(float* weights=nullptr){
 		// size and weights can only be positive - use types unsigned int and unsigned double?
 		float norm; // normalising constant
-		if( weights!=0 ){ // if weights given
+		if( weights!=nullptr ){ // if weights given
 			norm = 0;
-			for(int i=0; i<size; ++i)
-				norm += weights[i];
+			for(int i=0; i<5; ++i)
+				norm += *(weights+i);
 		} else {
 			norm = size;
 		} // if no weights given norm is the
 		
-		float cumWeights[size];
-		if( weights==0 ){
+		float cumWeights[5];
+		if( weights==nullptr ){
 			for(int i=0; i<size; ++i)
 				cumWeights[i] = (i+1)/norm;
 		} else {
-			for(int i=0; i<size; ++i){
+			for(int i=0; i<5; ++i){
 				float cc = 0;
 				for(int j=0; j<=i; ++j)
-					cc += weights[j]/norm;
+					cc += *(weights+j)/norm;
 				cumWeights[i] = cc;
 			}
 		}
@@ -93,7 +93,7 @@ public:
 		if( u<cumWeights[0] ){
 			return 0;
 		} else {
-			for(int i=1; i<size; ++i){
+			for(int i=1; i<5; ++i){
 				if( cumWeights[i-1]<u & u<=cumWeights[i] )
 					return i;
 			}
@@ -135,13 +135,14 @@ public:
 		int* S = simnet.Stoi;
 		int* Pre = simnet.Pre;
 		
-		int x[n_species];
+		int x[2];
 		for(int i=0; i<n_species; ++i)
 			x[i] = *(x_init+i);
-		
+		/*
 		for(int j=0; j<n_species; ++j){
 			// *(out_array+j) = x[j];
 		}
+		*/
 		w_popDyn[0] = x[0];
 		m_popDyn[0] = x[1];
 
@@ -153,13 +154,13 @@ public:
 		int copyNum = C0;
 		
 		while( tt<Tmax ){
-			float temp_rates[n_reactions];
+			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
 			for(int i=2; i<n_reactions; ++i)
 				temp_rates[i] = *(rates+i);
 			
-			float hazards[n_reactions];
+			float hazards[5];
 			for(int i=0; i<n_reactions; ++i){
 				float h_i = temp_rates[i];
 				for(int j=0; j<n_species; ++j)
@@ -179,8 +180,6 @@ public:
 				/*
 				for(int j=0; j<n_species; ++j){
 					*(out_array+count*n_species+j ) = x[j];
-					w_popDyn[count] = x[0];
-					m_popDyn[count] = x[1];
 				}
 				*/
 				w_popDyn[count] = x[0];
@@ -189,7 +188,7 @@ public:
 				target += step_out;
 			}
 			
-			int r = rand_disc(n_reactions, hazards);
+			int r = rand_react(hazards);
 			
 			for(int j=0; j<n_species; ++j)
 				x[j] += *(S+r*n_species+j);
@@ -215,7 +214,6 @@ public:
 		//int x_init[2] = {500,500};
 		//float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
 		//float con_rates[2] = {2.0e-3, 2.0e-3};
-
 
 		sim_network spn;
 		spn.Tmax = 3784320000.0; // 120 years in seconds

@@ -35,7 +35,6 @@ public:
   poplar::Input<bool> isAmerican;
 
   poplar::InOut<poplar::Vector<float>> prices;
-
   poplar::Output<float> out;
 
   float spotCalc(int i, int j, float S, float u, float d)
