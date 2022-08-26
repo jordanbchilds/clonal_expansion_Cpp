@@ -89,7 +89,7 @@ public:
 				cumWeights[i] = cc;
 			}
 		}
-		float u = (__builtin_ipu_urand_f32()+1.0)/2.0;
+		float u = (__builtin_ipu_urand_f32()+1.0);
 		if( u<cumWeights[0] ){
 			return 0;
 		} else {
