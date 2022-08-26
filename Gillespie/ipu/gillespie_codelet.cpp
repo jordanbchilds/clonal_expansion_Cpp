@@ -48,20 +48,20 @@ public:
 		}
 		return result;
 	}
-	/*
+	
 	double rand_unif(float lower=0.0, float upper=1.0){
 		float unif_01;
 		float unif;
-		unif_01 = (float) __builtin_ipu_urand32() / (float) RAND_MAX;
+		unif_01 = (float) (__builtin_ipu_urand32()/ 4294967295) ; // 4,294,967,295 is the max value of an unsigned iteger
 		unif = unif_01*(upper-lower) + lower;
 		return unif;
 	}
-	*/
+	
 	
 	double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
 		float x;
 		float unif_01;
-		unif_01 = (__builtin_ipu_urand_f32()+1.0)/2.0;
+		unif_01 = (rand_unif()+1.0)/2.0;
 		x = -log(1-unif_01)/lambda;
 		return x;
 	}
@@ -89,7 +89,7 @@ public:
 				cumWeights[i] = cc;
 			}
 		}
-		float u = (__builtin_ipu_urand_f32()+1.0) ;
+		float u = rand_unif() ;
 		if( 0<u && u<cumWeights[0] ){
 			return 0;
 		} else {
