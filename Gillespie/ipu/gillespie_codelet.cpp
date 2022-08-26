@@ -239,7 +239,7 @@ public:
 		int* output_ptr = &output[0][0];
 
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = rand_react() ;
+		*out = (float) rand_react() ;
 		
 		return true;
 	}
