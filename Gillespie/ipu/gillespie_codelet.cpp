@@ -90,11 +90,11 @@ public:
 			}
 		}
 		float u = (__builtin_ipu_urand_f32()+1.0);
-		if( u<cumWeights[0] ){
+		if( 0<u && u<cumWeights[0] ){
 			return 0;
 		} else {
 			for(int i=1; i<5; ++i){
-				if( cumWeights[i-1]<u & u<=cumWeights[i] )
+				if( cumWeights[i-1]<u && u<=cumWeights[i] )
 					return i;
 			}
 		}
@@ -242,7 +242,7 @@ public:
 		int* output_ptr = &output[0][0];
 
 		//srand((unsigned)time(NULL));
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		*out = rand_react();
 		
 		return true;
