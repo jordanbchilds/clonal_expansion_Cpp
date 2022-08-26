@@ -74,7 +74,7 @@ public:
 			for(int i=0; i<5; ++i)
 				norm += *(weights+i);
 		} else {
-			norm = size;
+			norm = 5;
 		} // if no weights given norm is the
 		
 		float cumWeights[5];
