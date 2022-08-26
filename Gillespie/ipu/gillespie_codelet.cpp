@@ -79,7 +79,7 @@ public:
 		
 		float cumWeights[5];
 		if( weights==nullptr ){
-			for(int i=0; i<size; ++i)
+			for(int i=0; i<5; ++i)
 				cumWeights[i] = (i+1)/norm;
 		} else {
 			for(int i=0; i<5; ++i){
