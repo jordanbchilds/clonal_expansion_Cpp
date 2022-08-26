@@ -23,7 +23,7 @@ public:
 	
 	poplar::InOut<poplar::Vector<int>> w_popDyn;
 	poplar::InOut<poplar::Vector<int>> m_popDyn;
-    poplar::Output<float> out;
+    poplar::Output<int> out;
 	
 	struct sim_network {
 		float Tmax;
@@ -243,7 +243,7 @@ public:
 
 		//srand((unsigned)time(NULL));
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDyn[100]+m_popDyn[100];
+		*out = rand_react();
 		
 		return true;
 	}
