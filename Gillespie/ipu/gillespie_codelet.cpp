@@ -50,7 +50,7 @@ public:
 	}
 	
 	float rand_unif(float lower=0.0, float upper=1.0){
-		float unif_01 = (float) (__builtin_ipu_urand32()/ 4294967295) ; // 4,294,967,295 is the max value of an unsigned iteger
+		float unif_01 = (float) (__builtin_ipu_urand32() / (float) (4294967295) ; // 4,294,967,295 is the max value of an unsigned iteger
 		float unif = unif_01*(upper-lower) + lower;
 		return unif;
 	}
