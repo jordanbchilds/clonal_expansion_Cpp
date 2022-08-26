@@ -23,7 +23,7 @@ public:
 	
 	poplar::InOut<poplar::Vector<int>> w_popDyn;
 	poplar::InOut<poplar::Vector<int>> m_popDyn;
-    poplar::Output<int> out;
+    poplar::Output<float> out;
 	
 	struct sim_network {
 		float Tmax;
