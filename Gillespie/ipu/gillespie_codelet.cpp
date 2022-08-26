@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <ipu_vector_math>
+#include <poprand/RandomGen.hpp>
 
 using namespace poplar;
 using namespace std;
@@ -240,7 +241,7 @@ public:
 		int* output_ptr = &output[0][0];
 
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = poplar::uniform();
+		*out = poprand::uniform();
 		
 		return true;
 	}
