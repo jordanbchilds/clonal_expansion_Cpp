@@ -5,6 +5,7 @@
 #include <array>
 #include <ipu_vector_math>
 #include <ipudef.h>
+#include <ipu_builtins.h>
 
 using namespace poplar;
 using namespace std;
@@ -58,11 +59,8 @@ public:
 	
 	
 	double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
-		float x;
-		float unif_01;
-		unif_01 = (rand_unif()+1.0)/2.0;
-		x = -log(1-unif_01)/lambda;
-		return x;
+		float unif_01 = (__builtin_ipu_urand32_f32()+1.0)/2.0;
+		return -1.0*__builtin_ipu_ln(1-unif_01)/lambda;
 	}
 	
 	int rand_react(float* weights=nullptr){
@@ -241,7 +239,7 @@ public:
 		int* output_ptr = &output[0][0];
 
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = poprand::uniform();
+		*out = __builtin_ipu_urand32_f32();
 		
 		return true;
 	}
