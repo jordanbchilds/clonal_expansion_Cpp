@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <array>
 #include <ipu_vector_math>
-#include <poprand/RandomGen.hpp>
+#include <ipudef.h>
 
 using namespace poplar;
 using namespace std;
