@@ -240,7 +240,7 @@ public:
 
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		for(int i=0; i<1e5; ++i){
-			__builtin_ipu_urand_f32();
+			float x = __builtin_ipu_urand_f32();
 		}
 		*out = (__builtin_ipu_urand_f32()+1.0)/2.0;
 		
