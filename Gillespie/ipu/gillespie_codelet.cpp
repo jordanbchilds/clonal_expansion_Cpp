@@ -72,7 +72,7 @@ public:
 				norm += *(weights+i);
 		} else {
 			norm = 5;
-		} // if no weights given norm is the
+		} // if no weights given norm is the number of reactions
 		
 		float cumWeights[5];
 		if( weights==nullptr ){
@@ -86,7 +86,7 @@ public:
 				cumWeights[i] = cc;
 			}
 		}
-		float u = rand_unif() ;
+		float u = __builtin_ipu_urand_f32() ;
 		if( 0<=u && u<cumWeights[0] ){
 			return 0;
 		} else {
