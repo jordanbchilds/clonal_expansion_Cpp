@@ -239,8 +239,8 @@ public:
 		int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
 		int* output_ptr = &output[0][0];
 
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDyn[100];
+		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		*out = uniform();
 		
 		return true;
 	}
