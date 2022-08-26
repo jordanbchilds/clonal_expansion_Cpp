@@ -23,7 +23,7 @@ public:
 	
 	poplar::InOut<poplar::Vector<int>> w_popDyn;
 	poplar::InOut<poplar::Vector<int>> m_popDyn;
-    poplar::Output<int> out;
+    poplar::Output<float> out;
 	
 	struct sim_network {
 		float Tmax;
@@ -242,8 +242,8 @@ public:
 		int* output_ptr = &output[0][0];
 
 		//srand((unsigned)time(NULL));
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDyn[10]+m_popDyn[10];
+		// gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		*out = __builtin_ipu_urand_f32();
 		
 		return true;
 	}
