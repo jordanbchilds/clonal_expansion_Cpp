@@ -26,7 +26,7 @@ public:
 	poplar::Output<poplar::Vector<int>> w_popDyn;
 	poplar::Output<poplar::Vector<int>> m_popDyn;
 	
-    poplar::Output<Tensor<float>> out;
+    poplar::Output<poplar::Tensor<float>> out;
 	
 	struct sim_network {
 		float Tmax;
