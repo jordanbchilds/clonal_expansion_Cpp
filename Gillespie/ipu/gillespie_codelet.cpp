@@ -249,7 +249,7 @@ public:
 
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 
-		*out = w_popDyn[0]+m_popDyn[0];
+		*out = w_popDyn[1]+m_popDyn[1];
 		return true;
 	}
 };
