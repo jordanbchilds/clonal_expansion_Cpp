@@ -28,6 +28,7 @@ public:
 	sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut);
 	sim_network();
 };
+
 sim_network::sim_network(){
 	Tmax = 0.0;
 	step_out = 0.0;
@@ -225,9 +226,6 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
 
 
 int main() {
-	//std::experimental::filesystem::current_path("/Users/jordanchilds/Documents/C++/Gillespie" );
-    // system parameters
-	// global variables for mtDNA model
 	const int Nreact = 5;
 	const int Nspecies = 2;
 	int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
@@ -248,14 +246,16 @@ int main() {
 	int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
 	int* output_ptr = &output[0][0];
 	
-	srand((unsigned)time(NULL));
-	gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-	
-	ofstream outfile;
-	outfile.open("sim.out");
-	outfile<< "Age (y)\tWild-type\tMutant"<<endl;
-	for(int i=0; i<int(spn.Tmax/spn.step_out + 1.0); ++i){
-		outfile<< to_string(i*stepOut/(365*24*60*60))+"\t"+to_string(output[i][0])+"\t"+to_string(output[i][1]) << endl;
+	auto start = std::chrono::system_clock::now();
+	for(int i=0; i<8832; ++i){
+		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 	}
-	outfile.close();
+	auto end = std::chrono::system_clock::now();
+	
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+	std::cout << "Completed computation at " << std::ctime(&end_time)
+			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
+	
 }
