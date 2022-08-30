@@ -23,10 +23,10 @@ public:
     poplar::Input<float> conOne_rates;
 	poplar::Input<float> conTwo_rates;
 	
-	poplar::Output<Vector<int>> w_popDyn;
-	poplar::Output<Vector<int>> m_popDyn;
+	// poplar::Output<Vector<int>> w_popDyn;
+	// poplar::Output<Vector<int>> m_popDyn;
 	
-    poplar::Output<Vector<Vector<float>>> out;
+    poplar::Output<Vector<float>> out;
 	
 	struct sim_network {
 		float Tmax;
@@ -140,11 +140,11 @@ public:
 		int x[2];
 		for(int i=0; i<n_species; ++i)
 			x[i] = *(x_init+i);
-		/*
+		
 		for(int j=0; j<n_species; ++j){
 			// *(out_array+j) = x[j];
 		}
-		*/
+		
 		w_popDyn[0] = x[0];
 		m_popDyn[0] = x[1];
 
@@ -177,13 +177,12 @@ public:
 			tt += rand_exp(haz_total);
 
 			if( tt>=target ){
-				/*
 				for(int j=0; j<n_species; ++j){
-					*(out_array+count*n_species+j ) = x[j];
+					*( out_array+count*n_species+j ) = x[j];
 				}
-				*/
-				w_popDyn[count] = x[0];
-				m_popDyn[count] = x[1];
+				
+				// w_popDyn[count] = x[0];
+				// m_popDyn[count] = x[1];
 				count += 1;
 				target += step_out;
 			}
@@ -242,8 +241,7 @@ public:
 		int* output_ptr = &output[0][0];
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*(out) = w_popDyn[spn.Nout];
-		*(out+1) = m_popDyn[spn.Nout];
+		*out = out[spn.Nout-1][0] + output[spn.Nout-1][1];
 		return true;
 	}
 };
