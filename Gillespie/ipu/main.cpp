@@ -141,8 +141,8 @@ int main()
 		graph.setTileMapping(conOne_rates[i], tileInt);
 		graph.setTileMapping(conTwo_rates[i], tileInt);
 		
-		graph.setTileMapping(w_popDyn[i], tileInt);
-		graph.setTileMapping(m_popDyn[i], tileInt);
+		// graph.setTileMapping(w_popDyn[i], tileInt);
+		// graph.setTileMapping(m_popDyn[i], tileInt);
 		
 		graph.setTileMapping(output[i], tileInt);
 
@@ -158,8 +158,8 @@ int main()
 		graph.connect(vtx["reactFive_rates"], reactFive_rates[i]);
 		graph.connect(vtx["conOne_rates"], conOne_rates[i]);
 		graph.connect(vtx["conTwo_rates"], conTwo_rates[i]);
-		graph.connect(vtx["w_popDyn"], w_popDyn[i]);
-		graph.connect(vtx["m_popDyn"], m_popDyn[i]);
+		// graph.connect(vtx["w_popDyn"], w_popDyn[i]);
+		// graph.connect(vtx["m_popDyn"], m_popDyn[i]);
 		graph.connect(vtx["out"], output[i]);
 
 	}
