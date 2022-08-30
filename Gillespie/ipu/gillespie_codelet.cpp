@@ -168,6 +168,7 @@ public:
 				hazards[i] = h_i;
 			}
 			
+			float haz_total = 0;
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
 			
