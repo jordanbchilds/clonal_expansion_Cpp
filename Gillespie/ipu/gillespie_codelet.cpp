@@ -242,8 +242,8 @@ public:
 		int* output_ptr = &output[0][0];
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out[0] = w_popDyn[spn.Nout];
-		*out[1] = m_popDyn[spn.Nout];
+		*(out) = w_popDyn[spn.Nout];
+		*(out+1) = m_popDyn[spn.Nout];
 		return true;
 	}
 };
