@@ -126,13 +126,13 @@ public:
 	
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
-		int n_out = simnet.Nout;
+		int Nout = simnet.Nout;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;
 		float step_out = simnet.step_out;
 		float Tmax = simnet.Tmax;
-		int* S = simnet.Stoi;
-		int* Pre = simnet.Pre;
+		int* S_pt = simnet.Stoi;
+		int* Pre_pt = simnet.Pre;
 		
 		int x[2];
 		for(int i=0; i<n_species; ++i)
@@ -152,7 +152,7 @@ public:
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
 		
-		while( count<n_out ){
+		while( count<Nout ){
 			/*
 			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
@@ -164,14 +164,13 @@ public:
 			for(int i=0; i<n_reactions; ++i){
 				float h_i = temp_rates[i];
 				for(int j=0; j<n_species; ++j)
-					h_i *= choose(x[j], *(Pre+i*n_species+j));
+					h_i *= choose(x[j], *(Pre+_pt+i*n_species+j));
 				hazards[i] = h_i;
 			}
 			
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
 			 */
-			
 			
 			float hazards[5] = {3.06e-8,3.06e-8,3.06e-8,3.06e-8,0.0};
 			float haz_total = 4*(3.06e-8);
@@ -196,8 +195,12 @@ public:
 			
 			int r = rand_react(hazards);
 			
+			/*
 			for(int j=0; j<n_species; ++j)
-				x[j] += *(S+r*n_species+j);
+				x[j] += *(S_pt+r*n_species+j);
+			*/
+			x[0] = *(S_pt + r*2);
+			x[1] = *(S_pt + r*2 +1);
 			
 			copyNum = x[0]+x[1];
 			if( count>simnet.Nout || copyNum==0 )
