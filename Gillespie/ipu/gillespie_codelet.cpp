@@ -247,7 +247,23 @@ public:
 		int* output_ptr = &output[0][0];
 
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDyn[10]+m_popDyn[10];
+		
+		float haz_total = 4*(3.06e-8);
+		float tt = 0.0;
+		int count = 0;
+		float target = 0.0;
+		for( tt<=spn.Tmax ){
+			tt += rand_exp(haz_total);
+			if( tt>=target ){
+				output[count][0] = 500;
+				output[count][1] = 500;
+				++cout;
+				target += spn.step_out;
+			}
+		}
+		
+		*out = output[10][0]+output[10][1];
+		
 		return true;
 	}
 };
