@@ -171,6 +171,9 @@ public:
 				haz_total += hazards[i];
 			 */
 			
+			
+			float hazards[5];
+			hazards = {3.06e-8,3.06e-8,3.06e-8,3.06e-8,0.0};
 			float haz_total = 4*(3.06e-8);
 			
 			if( copyNum == 0 )
@@ -191,15 +194,16 @@ public:
 				target += step_out;
 			}
 			
-			/*
+			
 			int r = rand_react(hazards);
+			
 			for(int j=0; j<n_species; ++j)
 				x[j] += *(S+r*n_species+j);
 			
 			copyNum = x[0]+x[1];
 			if( count>simnet.Nout || copyNum==0 )
 				break;
-			 */
+			 
 		}
 	}
 
