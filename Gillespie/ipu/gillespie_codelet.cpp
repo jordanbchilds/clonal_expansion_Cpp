@@ -250,7 +250,7 @@ public:
 		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
 
-		// gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 
 		*out = w_popDyn[1]+m_popDyn[1];
 		return true;
