@@ -204,6 +204,10 @@ public:
 		int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
 		int* Post_ptr = &Post_mat[0][0];
 		int S_mat[Nreact][Nspecies];
+		for(int i=0; i<Nreact; ++i){
+			for(int j=0; j<Nspecies; ++j)
+				S_mat[i][j] = Post_mat - Pre_mat;
+		}
 		int* S_ptr = &S_mat[0][0];
 
 		//int x_init[2] = {500,500};
@@ -237,7 +241,7 @@ public:
 		int* output_ptr = &output[0][0];
 
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = S_mat[3][0];
+		*out = S_mat[0][0];
 		return true;
 	}
 };
