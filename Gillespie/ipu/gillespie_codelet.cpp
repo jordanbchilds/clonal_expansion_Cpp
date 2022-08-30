@@ -193,10 +193,6 @@ public:
 			}
 			*/
 			
-			w_popDyn[count] = x[0];
-			m_popDyn[count] = x[1];
-			count += 1;
-			
 			int r = rand_react(hazards);
 			
 			for(int j=0; j<n_species; ++j)
@@ -205,7 +201,10 @@ public:
 			copyNum = x[0]+x[1];
 			if( count>simnet.Nout || copyNum==0 )
 				break;
-			 
+			
+			w_popDyn[count] = x[0];
+			m_popDyn[count] = x[1];
+			count += 1;
 		}
 	}
 
