@@ -221,11 +221,12 @@ public:
 		int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
 		int* Post_ptr = &Post_mat[0][0];
 		int S_mat[Nreact][Nspecies];
+		int* S_ptr = &S_mat[0][0];
 		for(int i=0; i<Nreact; ++i){
 			for(int j=0; j<Nspecies; ++j)
-				S_mat[i][j] = Post_mat[i][j] - Pre_mat[i][j];
+				*(S_ptr + i*Nspecies + j) = *(Post_ptr+ i*Nspecies + j) - *(Pre_ptr + i*Nspecies + j);
 		}
-		int* S_ptr = &S_mat[0][0];
+
 
 		sim_network spn;
 		spn.Tmax = 365.0*24.0*3600.0; // 1 year in seconds
