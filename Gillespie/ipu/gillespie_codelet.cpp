@@ -23,10 +23,10 @@ public:
     poplar::Input<float> conOne_rates;
 	poplar::Input<float> conTwo_rates;
 	
-	poplar::Output<poplar::Vector<int>> w_popDyn;
-	poplar::Output<poplar::Vector<int>> m_popDyn;
+	poplar::Output<Vector<int>> w_popDyn;
+	poplar::Output<Vector<int>> m_popDyn;
 	
-    poplar::Output<poplar::Tensor<float>> out;
+    poplar::Output<Vector<Vector<float>>> out;
 	
 	struct sim_network {
 		float Tmax;
