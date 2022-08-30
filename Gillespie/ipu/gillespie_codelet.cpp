@@ -172,10 +172,12 @@ public:
 			*/
 			
 			float haz_total = 4*(3.06e-8);
+			/*
 			if( copyNum == 0 )
 				break;
 			else
-				tt += rand_exp(haz_total);
+			*/
+			tt += rand_exp(haz_total);
 			
 			if( tt>=target ){
 				/*
