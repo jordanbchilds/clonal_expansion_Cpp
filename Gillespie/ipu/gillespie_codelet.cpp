@@ -124,7 +124,7 @@ public:
 		}
 	}
 	
-	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
+	int gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
 		int Nout = simnet.Nout;
 		int n_species = simnet.n_species;
@@ -151,9 +151,9 @@ public:
 
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
-		
+		/*
 		while( count<Nout ){
-			/*
+			
 			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
@@ -170,7 +170,6 @@ public:
 			
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
-			 */
 			
 			float hazards[5] = {3.06e-8,3.06e-8,3.06e-8,3.06e-8,0.0};
 			float haz_total = 4*(3.06e-8);
@@ -179,10 +178,8 @@ public:
 				break;
 			else
 			 tt += rand_exp(haz_total);
-			
-			/*
+
 			if( tt>=target ){
-				
 				for(int j=0; j<n_species; ++j){
 					*(out_array+count*n_species+j ) = x[j];
 				}
@@ -191,16 +188,9 @@ public:
 				count += 1;
 				target += step_out;
 			}
-			*/
-			
 			int r = rand_react(hazards);
-			
-			/*
 			for(int j=0; j<n_species; ++j)
 				x[j] += *(S_pt+r*n_species+j);
-			*/
-			x[0] = *(S_pt + r*2);
-			x[1] = *(S_pt + r*2 +1);
 			
 			copyNum = x[0]+x[1];
 			if( count>simnet.Nout || copyNum==0 )
@@ -210,6 +200,8 @@ public:
 			m_popDyn[count] = x[1];
 			count += 1;
 		}
+		*/
+		return *( S_pt )
 	}
 
 	bool compute()
@@ -222,11 +214,11 @@ public:
 		int* Post_ptr = &Post_mat[0][0];
 		int S_mat[Nreact][Nspecies];
 		int* S_ptr = &S_mat[0][0];
+		
 		for(int i=0; i<Nreact; ++i){
 			for(int j=0; j<Nspecies; ++j)
 				S_mat[i][j] = Post_mat[i][j] - Pre_mat[i][j];
 		}
-
 
 		sim_network spn;
 		spn.Tmax = 365.0*24.0*3600.0; // 1 year in seconds
@@ -254,9 +246,8 @@ public:
 		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
 
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-
-		*out = w_popDyn[1]+m_popDyn[1];
+		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		*out = gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		return true;
 	}
 };
