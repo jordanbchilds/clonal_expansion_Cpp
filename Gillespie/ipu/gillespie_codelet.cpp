@@ -252,14 +252,9 @@ public:
 		float tt = 0.0;
 		int count = 0;
 		float target = 0.0;
-		while( tt<=spn.Tmax ){
-			tt += rand_exp(haz_total);
-			if( tt>=target ){
+		for(int count=0; i<spn.Nout; ++count){
 				output[count][0] = 500;
 				output[count][1] = 500;
-				++count;
-				target += spn.step_out;
-			}
 		}
 		
 		*out = output[10][0]+output[10][1];
