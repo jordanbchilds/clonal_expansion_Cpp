@@ -58,7 +58,6 @@ public:
 		return unif;
 	}
 	
-	
 	double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
 		// float unif_01 = (__builtin_ipu_urand_f32()+1.0)/2.0;
 		float unif_01 = rand_unif();
@@ -101,11 +100,15 @@ public:
 	}
 	
 	float rep_controller(float con_rates[2], float rep_rate, int error) {
+		float new_rate = error >= 0 ? rep_rate*2.0/(1.0+exp(error*con_rates[0])) : rep_rate*(1.0+exp(-1*error*con_rates[1]))/2.0 ;
+		return new_rate;
+		/*
 		if( error >= 0){
 			return rep_rate*2.0/(1.0+exp(error*con_rates[0]));
 		} else {
 			return rep_rate*(1.0+exp(-1*error*con_rates[1]))/2.0;
 		}
+		 */
 	}
 	
 	void myHazard(float* haz_ptr, int* x, float* con_rates, float* rates, int error, sim_network simnet){
@@ -153,7 +156,6 @@ public:
 		int copyNum = C0;
 		
 		while( count<=Nout ){
-			
 			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
@@ -171,11 +173,8 @@ public:
 			float haz_total = 0;
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
-			
-			if( copyNum == 0 )
-				break;
-			else
-			 tt += rand_exp(haz_total);
+
+			tt += rand_exp(haz_total);
 
 			if( tt>=target ){
 				/*
@@ -217,8 +216,8 @@ public:
 		}
 
 		sim_network spn;
-		spn.Tmax = 120.0*365.0*24.0*3600.0; // 1 year in seconds
-		spn.step_out = 365*24.0*60.0*60.0; // ten days in seconds
+		spn.Tmax = 120.0*365.0*24.0*3600.0; // 120 years in seconds
+		spn.step_out = 365*24.0*60.0*60.0; // 1 year in seconds
 		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out);
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
@@ -242,10 +241,6 @@ public:
 		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
 		
-		/*
-		for(int i=0; i<1e6; ++i)
-			rand_react();
-		*/
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		*out = w_popDyn[spn.Nout]+m_popDyn[spn.Nout];
 		return true;
