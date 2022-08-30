@@ -252,7 +252,7 @@ public:
 		float tt = 0.0;
 		int count = 0;
 		float target = 0.0;
-		for( tt<=spn.Tmax ){
+		while( tt<=spn.Tmax ){
 			tt += rand_exp(haz_total);
 			if( tt>=target ){
 				output[count][0] = 500;
