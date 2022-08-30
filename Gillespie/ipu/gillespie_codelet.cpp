@@ -255,10 +255,12 @@ public:
 		bool simBool = true;
 		
 		while( simBool ){
-			if( rand_unif()>0.1 ){
+			tt += haz_total;
+			if( tt>=target ){
 				output[count][0] = x_init[0];
 				output[count][1] = x_init[1];
 				++count;
+				target += spn.step_out;
 				if( count==spn.Nout )
 					simBool = false;
 			}
