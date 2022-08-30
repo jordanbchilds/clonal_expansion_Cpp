@@ -23,8 +23,8 @@ public:
     poplar::Input<float> conOne_rates;
 	poplar::Input<float> conTwo_rates;
 	
-	poplar::InOut<poplar::Vector<int>> w_popDyn;
-	poplar::InOut<poplar::Vector<int>> m_popDyn;
+	poplar::Output<poplar::Vector<int>> w_popDyn;
+	poplar::Output<poplar::Vector<int>> m_popDyn;
 	
     poplar::Output<float> out;
 	
@@ -224,7 +224,7 @@ public:
 		int* S_ptr = &S_mat[0][0];
 		for(int i=0; i<Nreact; ++i){
 			for(int j=0; j<Nspecies; ++j)
-				*(S_ptr + i*Nspecies + j) = *(Post_ptr+ i*Nspecies + j) - *(Pre_ptr + i*Nspecies + j);
+				S_mat[i][j] = Post_mat[i][j] - *Pre_mat[i][j];
 		}
 
 
