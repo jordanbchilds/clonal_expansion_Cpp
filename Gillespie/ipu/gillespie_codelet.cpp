@@ -189,7 +189,7 @@ public:
 				target += step_out;
 			}
 			
-			/*
+			
 			int r = rand_react(hazards);
 			for(int j=0; j<n_species; ++j)
 				x[j] += *(S+r*n_species+j);
@@ -197,7 +197,6 @@ public:
 			copyNum = x[0]+x[1];
 			if( count>simnet.Nout || copyNum==0 )
 				break;
-			 */
 		}
 	}
 
