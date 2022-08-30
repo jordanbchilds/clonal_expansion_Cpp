@@ -247,7 +247,7 @@ public:
 			rand_react();
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDyn[1]+m_popDyn[1];
+		*out = w_popDyn[spn.Nout]+m_popDyn[spn.Nout];
 		return true;
 	}
 };
