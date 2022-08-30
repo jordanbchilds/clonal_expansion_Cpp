@@ -186,8 +186,8 @@ public:
 				}
 				*/
 				
-				w_popDyn[count] = x[0];
-				m_popDyn[count] = x[1];
+				w_popDyn[count] = 500;
+				m_popDyn[count] = 500;
 				count += 1;
 				target += step_out;
 			}
