@@ -246,15 +246,19 @@ public:
 		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
 
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
 		float haz_total = 4*(3.06e-8);
 		float tt = 0.0;
 		int count = 0;
 		float target = 0.0;
-		for(int count=0; count<=spn.Nout; ++count){
-				output[count][0] = 500;
-				output[count][1] = 500;
+		bool simBool = true;
+		while( simBool ){
+			output[count][0] = 500;
+			output[count][1] = 500;
+			++count;
+			if( count>spn.Nout )
+				simBool = false;
 		}
 		
 		*out = output[10][0]+output[10][1];
