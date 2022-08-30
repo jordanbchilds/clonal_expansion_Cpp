@@ -142,11 +142,11 @@ public:
 			x[i] = *(x_init+i);
 		
 		for(int j=0; j<n_species; ++j){
-			// *(out_array+j) = x[j];
+			*(out_array+j) = x[j];
 		}
 		
-		w_popDyn[0] = x[0];
-		m_popDyn[0] = x[1];
+		// w_popDyn[0] = x[0];
+		// m_popDyn[0] = x[1];
 
 		int count = 1;
 		float target = step_out;
