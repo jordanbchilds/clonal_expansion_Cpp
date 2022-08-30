@@ -252,7 +252,7 @@ public:
 		float tt = 0.0;
 		int count = 0;
 		float target = 0.0;
-		for(int count=0; i<spn.Nout; ++count){
+		for(int count=0; count<=spn.Nout; ++count){
 				output[count][0] = 500;
 				output[count][1] = 500;
 		}
