@@ -53,7 +53,7 @@ public:
 	}
 	
 	float rand_unif(float lower=0.0, float upper=1.0){
-		float unif_01 = (float) (__builtin_ipu_urand32()) / (float) (4294967295) ; // 4,294,967,295 is the max value of an unsigned iteger
+		float unif_01 = (float) (__builtin_ipu_urand32()) / (float) (4294967295) ; // 4,294,967,295 is the max value of an unsigned iteger... I think.
 		float unif = unif_01*(upper-lower) + lower;
 		return unif;
 	}
@@ -152,7 +152,7 @@ public:
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
 		
-		while( count<Nout ){
+		while( count<=Nout ){
 			
 			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
@@ -196,7 +196,6 @@ public:
 			copyNum = x[0]+x[1];
 			if( count>simnet.Nout || copyNum==0 )
 				break;
-
 		}
 		
 	}
@@ -220,7 +219,7 @@ public:
 		sim_network spn;
 		spn.Tmax = 120.0*365.0*24.0*3600.0; // 1 year in seconds
 		spn.step_out = 365*24.0*60.0*60.0; // ten days in seconds
-		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out + 1.0);
+		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out);
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
 		spn.Post = Post_ptr;
@@ -243,11 +242,12 @@ public:
 		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
 		
+		/*
 		for(int i=0; i<1e6; ++i)
 			rand_react();
-		
+		*/
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDyn[spn.Nout-1]+m_popDyn[spn.Nout-1];
+		*out = w_popDyn[spn.Nout]+m_popDyn[spn.Nout];
 		return true;
 	}
 };
