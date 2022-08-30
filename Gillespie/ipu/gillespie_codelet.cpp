@@ -152,7 +152,7 @@ public:
 		int copyNum = C0;
 		
 		while( count<simnet.Nout ){
-			/*
+			
 			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
@@ -170,15 +170,11 @@ public:
 			float haz_total = 0;
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
-			*/
-			
-			float haz_total = 4*(3.06e-8);
-			/*
+
 			if( copyNum == 0 )
 				break;
 			else
-			*/
-			tt += rand_exp(haz_total);
+			 tt += rand_exp(haz_total);
 			
 			if( tt>=target ){
 				/*
