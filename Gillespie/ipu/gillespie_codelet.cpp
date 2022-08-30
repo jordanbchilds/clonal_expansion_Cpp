@@ -201,7 +201,7 @@ public:
 			count += 1;
 		}
 		*/
-		return *( S_pt + 2 + 1);
+		return *( S_pt + 2 + 0 );
 	}
 
 	bool compute()
