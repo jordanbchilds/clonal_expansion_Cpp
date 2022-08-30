@@ -245,8 +245,12 @@ public:
 		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
 
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = w_popDyn[5]+m_popDyn[5];
+		// gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		
+		float tt = 0.0;
+		float haz_total = 4*(3.06e-8);
+		
+		*out = rand_exp(haz_total);
 		return true;
 	}
 };
