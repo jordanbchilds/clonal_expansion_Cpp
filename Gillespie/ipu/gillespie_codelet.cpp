@@ -248,7 +248,6 @@ public:
 
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
-		/*
 		float haz_total = 4*(3.06e-8);
 		float tt = 0.0;
 		int count = 0;
@@ -256,13 +255,15 @@ public:
 		bool simBool = true;
 		
 		while( simBool ){
-			output[count][0] = x_init[0];
-			output[count][1] = x_init[1];
-			++count;
-			if( count>spn.Nout )
-				simBool = false;
+			if( rand_unif()>0.1 ){
+				output[count][0] = x_init[0];
+				output[count][1] = x_init[1];
+				++count;
+				if( count==spn.Nout )
+					simBool = false;
+			}
 		}
-		*/
+		
 			
 		*out = rand_unif();
 		
