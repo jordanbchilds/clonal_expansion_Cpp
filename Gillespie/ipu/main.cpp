@@ -188,7 +188,7 @@ int main()
 	std::ofstream myfile;
     myfile.open ("output_copyNum.txt");
 	for(int i=0; i<datasetSize; ++i)
-		myfile<< output[i]<<"\n"
+		myfile<< output[i]<<"\n" ;
 	myfile.close();
 	
 	return 0;
