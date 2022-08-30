@@ -60,7 +60,7 @@ public:
 	
 	double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
 		float unif_01 = (__builtin_ipu_urand_f32()+1.0)/2.0;
-		return -1.0*__builtin_ipu_ln(1-unif_01)/lambda;
+		return -1.0*log(1-unif_01)/lambda;
 	}
 	
 	int rand_react(float* weights=nullptr){
@@ -189,7 +189,7 @@ public:
 				x[j] += *(S+r*n_species+j);
 			
 			copyNum = x[0]+x[1];
-			if( count>(simnet.Tmax/simnet.step_out + 1.0) | copyNum==0 )
+			if( count>simnet.Nout || copyNum==0 )
 				break;
 		}
 		// return out_array;
@@ -233,12 +233,11 @@ public:
 		con_rates[0] = conOne_rates;
 		con_rates[1] = conTwo_rates;
 		
-		int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
+		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
 
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = (float) log(100) ;
-		
+		*out = S[0][0];
 		return true;
 	}
 };
