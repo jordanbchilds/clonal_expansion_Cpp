@@ -237,7 +237,7 @@ public:
 		int* output_ptr = &output[0][0];
 
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = S_mat[1][1];
+		*out = S_mat[2][0];
 		return true;
 	}
 };
