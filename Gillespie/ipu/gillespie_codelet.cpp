@@ -255,7 +255,7 @@ public:
 		bool simBool = true;
 		
 		while( simBool ){
-			tt += haz_total;
+			tt += rand_exp(haz_total);
 			if( tt>=target ){
 				output[count][0] = x_init[0];
 				output[count][1] = x_init[1];
@@ -266,9 +266,7 @@ public:
 			}
 		}
 		
-			
 		*out = output[10][0] + output[10][1];
-		
 		return true;
 	}
 };
