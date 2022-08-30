@@ -151,7 +151,7 @@ public:
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
 		
-		while( simnet.count<Nout ){
+		while( count<simnet.Nout ){
 			/*
 			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
