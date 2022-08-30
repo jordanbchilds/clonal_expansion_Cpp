@@ -164,15 +164,12 @@ public:
 			for(int i=0; i<n_reactions; ++i){
 				float h_i = temp_rates[i];
 				for(int j=0; j<n_species; ++j)
-					h_i *= choose(x[j], *(Pre+_pt+i*n_species+j));
+					h_i *= choose(x[j], *( Pre_pt+i*n_species+j ));
 				hazards[i] = h_i;
 			}
 			
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
-			
-			float hazards[5] = {3.06e-8,3.06e-8,3.06e-8,3.06e-8,0.0};
-			float haz_total = 4*(3.06e-8);
 			
 			if( copyNum == 0 )
 				break;
