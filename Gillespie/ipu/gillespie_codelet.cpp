@@ -25,6 +25,7 @@ public:
 	
 	poplar::InOut<poplar::Vector<int>> w_popDyn;
 	poplar::InOut<poplar::Vector<int>> m_popDyn;
+	
     poplar::Output<float> out;
 	
 	struct sim_network {
@@ -148,8 +149,10 @@ public:
 
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
-		/*
+		
+		
 		while( tt<=Tmax ){
+			/*
 			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
@@ -171,9 +174,10 @@ public:
 			if( copyNum == 0 )
 				break;
 			else
-				tt += rand_exp(haz_total);
-			
-			
+			 */
+			float haz_total = 4*(3.06e-8);
+			tt += rand_exp(haz_total);
+			/*
 			if( tt>=target ){
 				for(int j=0; j<n_species; ++j){
 					*(out_array+count*n_species+j ) = x[j];
@@ -192,9 +196,8 @@ public:
 			copyNum = x[0]+x[1];
 			if( count>simnet.Nout || copyNum==0 )
 				break;
+			 */
 		}
-		*/
-		// return out_array;
 	}
 
 	bool compute()
@@ -213,8 +216,8 @@ public:
 		int* S_ptr = &S_mat[0][0];
 
 		sim_network spn;
-		spn.Tmax = 365.0*24.0*3600.0; // 120 years in seconds
-		spn.step_out = 10.0*24.0*60.0*60.0; // one year in seconds
+		spn.Tmax = 365.0*24.0*3600.0; // 1 year in seconds
+		spn.step_out = 10.0*24.0*60.0*60.0; // ten days in seconds
 		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out + 1.0);
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
@@ -239,7 +242,7 @@ public:
 		int* output_ptr = &output[0][0];
 
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = output[10][0]+output[10][1];
+		*out = w_popDyn[10]+m_popDyn[10];
 		return true;
 	}
 };
