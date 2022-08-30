@@ -218,7 +218,7 @@ public:
 		}
 
 		sim_network spn;
-		spn.Tmax = 100.0*365.0*24.0*3600.0; // 1 year in seconds
+		spn.Tmax = 120.0*365.0*24.0*3600.0; // 1 year in seconds
 		spn.step_out = 365*24.0*60.0*60.0; // ten days in seconds
 		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out + 1.0);
 		spn.n_reactions = Nreact;
