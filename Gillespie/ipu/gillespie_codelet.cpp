@@ -150,7 +150,6 @@ public:
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
 		
-		
 		while( tt<=Tmax ){
 			/*
 			float temp_rates[5];
@@ -170,14 +169,13 @@ public:
 			float haz_total = 0;
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
-			
+			*/
 			if( copyNum == 0 )
 				break;
 			else
-			 */
-			float haz_total = 4*(3.06e-8);
-			tt += rand_exp(haz_total);
-			/*
+				tt += rand_exp(haz_total);
+			
+			
 			if( tt>=target ){
 				for(int j=0; j<n_species; ++j){
 					*(out_array+count*n_species+j ) = x[j];
@@ -188,7 +186,7 @@ public:
 				target += step_out;
 			}
 			
-			
+			/*
 			int r = rand_react(hazards);
 			for(int j=0; j<n_species; ++j)
 				x[j] += *(S+r*n_species+j);
