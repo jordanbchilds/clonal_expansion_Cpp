@@ -170,6 +170,7 @@ public:
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
 			*/
+			float haz_total = 4*(3.06e-8);
 			if( copyNum == 0 )
 				break;
 			else
