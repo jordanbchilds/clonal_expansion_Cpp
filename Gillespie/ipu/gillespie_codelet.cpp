@@ -88,7 +88,7 @@ public:
 				cumWeights[i] = cc;
 			}
 		}
-		float u = __builtin_ipu_urand_f32() ;
+		float u = rand_unif() ;
 		if( 0<=u && u<cumWeights[0] ){
 			return 0;
 		} else {
