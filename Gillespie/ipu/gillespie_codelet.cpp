@@ -263,8 +263,6 @@ public:
 				simBool = false;
 		}
 		*/
-		for(int i=0; i<1000; ++i)
-			rand_unif();
 			
 		*out = rand_unif();
 		
