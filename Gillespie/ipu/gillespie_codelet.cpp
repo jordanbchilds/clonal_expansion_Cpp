@@ -124,7 +124,7 @@ public:
 		}
 	}
 	
-	int gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
+	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
 		int Nout = simnet.Nout;
 		int n_species = simnet.n_species;
@@ -151,7 +151,7 @@ public:
 
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
-		/*
+		
 		while( count<Nout ){
 			
 			float temp_rates[5];
@@ -190,18 +190,14 @@ public:
 			}
 			int r = rand_react(hazards);
 			for(int j=0; j<n_species; ++j)
-				x[j] += *(S_pt+r*n_species+j);
+				x[j] += *( S_pt + r*n_species + j );
 			
 			copyNum = x[0]+x[1];
 			if( count>simnet.Nout || copyNum==0 )
 				break;
-			
-			w_popDyn[count] = x[0];
-			m_popDyn[count] = x[1];
-			count += 1;
+
 		}
-		*/
-		return *( S_pt + 8 + 1 );
+		
 	}
 
 	bool compute()
@@ -247,7 +243,7 @@ public:
 		int* output_ptr = &output[0][0];
 
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		*out = rand_react();
 		return true;
 	}
 };
