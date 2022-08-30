@@ -120,7 +120,6 @@ public:
 			for(int j=0; j<n_species; ++j)
 				*(haz_ptr+i) *= choose(x[j], *(Pre+i*n_species+j));
 		}
-		// return hazards;
 	}
 	
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
@@ -210,13 +209,9 @@ public:
 		}
 		int* S_ptr = &S_mat[0][0];
 
-		//int x_init[2] = {500,500};
-		//float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
-		//float con_rates[2] = {2.0e-3, 2.0e-3};
-
 		sim_network spn;
-		spn.Tmax = 3784320000.0; // 120 years in seconds
-		spn.step_out = 365.0*24.0*60.0*60.0; // one year in seconds
+		spn.Tmax = 365.0*24.0*3600.0; // 120 years in seconds
+		spn.step_out = 10.0*24.0*60.0*60.0; // one year in seconds
 		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out + 1.0);
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
@@ -241,7 +236,7 @@ public:
 		int* output_ptr = &output[0][0];
 
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = output[100][0]+output[100][1];
+		*out = output[10][0]+output[10][1];
 		return true;
 	}
 };
