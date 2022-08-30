@@ -61,7 +61,7 @@ public:
 	
 	double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
 		// float unif_01 = (__builtin_ipu_urand_f32()+1.0)/2.0;
-		float unif_01 = rand_unif;
+		float unif_01 = rand_unif();
 		return -1.0*log(1-unif_01)/lambda;
 	}
 	
