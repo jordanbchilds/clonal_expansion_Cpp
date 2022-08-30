@@ -251,7 +251,7 @@ public:
 
 		// gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 
-		*out = S_mat[4][1];
+		*out = *(S_ptr);
 		return true;
 	}
 };
