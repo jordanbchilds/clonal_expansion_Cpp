@@ -265,7 +265,7 @@ public:
 		}
 		
 			
-		*out = rand_unif();
+		*out = output[10][0] + output[10][1];
 		
 		return true;
 	}
