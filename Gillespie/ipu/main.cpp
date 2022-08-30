@@ -185,10 +185,14 @@ int main()
 
 	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
 	
+	for(int i=0; i<datasetSize; ++i){
+		cout<< output[i] <<endl;
+	}
+	/*
 	ofstream myfile.open("ipu_copyNum.txt");
 	for(int i=0; i<datasetSize; ++i)
 		myfile<<output[i]<<endl;
 	myfile.close();
-	
+	*/
 	return 0;
 }
