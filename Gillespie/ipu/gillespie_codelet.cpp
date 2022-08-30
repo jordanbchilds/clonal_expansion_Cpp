@@ -172,8 +172,7 @@ public:
 			 */
 			
 			
-			float hazards[5];
-			hazards = {3.06e-8,3.06e-8,3.06e-8,3.06e-8,0.0};
+			float hazards[5] = {3.06e-8,3.06e-8,3.06e-8,3.06e-8,0.0};
 			float haz_total = 4*(3.06e-8);
 			
 			if( copyNum == 0 )
