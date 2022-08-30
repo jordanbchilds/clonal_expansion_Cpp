@@ -242,7 +242,7 @@ public:
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		// *out = output[spn.Nout-1][0] + output[spn.Nout-1][1];
-		*out = w_init ;
+		*out[0] = w_init ;
 		return true;
 	}
 };
