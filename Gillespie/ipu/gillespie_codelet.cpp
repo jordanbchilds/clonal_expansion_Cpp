@@ -257,7 +257,7 @@ public:
 			if( tt>=target ){
 				output[count][0] = 500;
 				output[count][1] = 500;
-				++cout;
+				++count;
 				target += spn.step_out;
 			}
 		}
