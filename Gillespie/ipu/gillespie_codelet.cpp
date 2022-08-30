@@ -26,7 +26,7 @@ public:
 	// poplar::Output<Vector<int>> w_popDyn;
 	// poplar::Output<Vector<int>> m_popDyn;
 	
-    poplar::Output<Vector<float>> out;
+    poplar::Output<float> out;
 	
 	struct sim_network {
 		float Tmax;
@@ -241,8 +241,7 @@ public:
 		int* output_ptr = &output[0][0];
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		// *out = output[spn.Nout-1][0] + output[spn.Nout-1][1];
-		*out = {100.0, 100.0} ;
+		*out = output[spn.Nout-1][0] + output[spn.Nout-1][1];
 		return true;
 	}
 };
