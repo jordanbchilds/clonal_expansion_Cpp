@@ -206,7 +206,7 @@ public:
 		int S_mat[Nreact][Nspecies];
 		for(int i=0; i<Nreact; ++i){
 			for(int j=0; j<Nspecies; ++j)
-				S_mat[i][j] = Post_mat - Pre_mat;
+				S_mat[i][j] = Post_mat[i][j] - Pre_mat[i][j];
 		}
 		int* S_ptr = &S_mat[0][0];
 
