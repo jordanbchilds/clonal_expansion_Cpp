@@ -253,9 +253,10 @@ public:
 		int count = 0;
 		float target = 0.0;
 		bool simBool = true;
+		
 		while( simBool ){
-			output[count][0] = 500;
-			output[count][1] = 500;
+			output[count][0] = x_init[0];
+			output[count][1] = x_init[1];
 			++count;
 			if( count>spn.Nout )
 				simBool = false;
