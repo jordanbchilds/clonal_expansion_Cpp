@@ -151,7 +151,7 @@ public:
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
 		
-		while( tt<=Tmax ){
+		while( count<Nout ){
 			/*
 			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
@@ -257,7 +257,7 @@ public:
 		x[0] = x_init[0];
 		x[1] = x_init[1];
 		
-		while( tt<=spn.Tmax ){
+		while( count<spn.Nout ){
 			tt += rand_exp(haz_total);
 			if( tt>=target ){
 				output[count][0] = x[0];
