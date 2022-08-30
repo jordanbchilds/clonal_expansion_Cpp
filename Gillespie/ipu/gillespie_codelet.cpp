@@ -253,12 +253,15 @@ public:
 		int count = 0;
 		float target = 0.0;
 		bool simBool = true;
+		float x[2];
+		x[0] = x_init[0];
+		x[1] = x_init[1];
 		
 		while( simBool ){
 			tt += rand_exp(haz_total);
 			if( tt>=target ){
-				output[count][0] = x_init[0];
-				output[count][1] = x_init[1];
+				output[count][0] = x[0];
+				output[count][1] = x[1];
 				++count;
 				target += spn.step_out;
 				if( count==spn.Nout )
