@@ -125,6 +125,7 @@ public:
 	}
 	
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
+		
 		int n_out = simnet.Nout;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;
@@ -251,7 +252,7 @@ public:
 
 		// gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 
-		*out = *(S_ptr+8+1);
+		*out = w_popDyn[1]+m_popDyn[1];
 		return true;
 	}
 };
