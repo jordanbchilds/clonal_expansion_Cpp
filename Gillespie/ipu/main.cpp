@@ -25,7 +25,6 @@ using namespace poplar;
 using namespace poplar::program;
 
 
-
 int main()
 {
 	const int numberOfTiles = 1472;
@@ -168,7 +167,7 @@ int main()
 	// Add a step to execute the compute set
 	prog.add(Execute(computeSet));
 	// Add a step to print out sim results
-	prog.add(PrintTensor("output", output));
+	// prog.add(PrintTensor("output", output));
 	// Create the engine
 	Engine engine(graph, prog);
 	engine.load(device);
@@ -185,10 +184,10 @@ int main()
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
 
 	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
-	std::ofstream myfile;
-    myfile.open ("output_copyNum.txt");
+	
+	ofstream myfile.open("ipu_copyNum.txt");
 	for(int i=0; i<datasetSize; ++i)
-		myfile<< output[i]<<"\n" ;
+		myfile<<output[i]<<endl;
 	myfile.close();
 	
 	return 0;

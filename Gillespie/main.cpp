@@ -246,8 +246,10 @@ int main() {
 	int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
 	int* output_ptr = &output[0][0];
 	
+	int Nsim = 8832;
+	
 	auto start = std::chrono::system_clock::now();
-	for(int i=0; i<8832; ++i){
+	for(int i=0; i<Nsim; ++i){
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 	}
 	auto end = std::chrono::system_clock::now();
