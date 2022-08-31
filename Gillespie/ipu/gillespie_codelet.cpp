@@ -32,8 +32,8 @@ public:
 		float Tmax;
 		float step_out;
 		int Nout;
-		const int n_reactions;
-		const int n_species;
+		int n_reactions;
+		int n_species;
 		int* Post;
 		int* Pre;
 		int* Stoi;
@@ -65,28 +65,25 @@ public:
 	}
 	
 	int rand_react(float* weights=nullptr){
-		// size and weights can only be positive - use types unsigned int and unsigned double?
 		float norm; // normalising constant
+		float cumWeights[5];
 		if( weights!=nullptr ){ // if weights given
-			norm = 0;
+			norm = 0.0;
 			for(int i=0; i<5; ++i)
 				norm += *(weights+i);
-		} else {
-			norm = 5;
-		} // if no weights given norm is the number of reactions
-		
-		float cumWeights[5];
-		if( weights==nullptr ){
-			for(int i=0; i<5; ++i)
-				cumWeights[i] = (i+1)/norm;
-		} else {
+			
 			for(int i=0; i<5; ++i){
-				float cc = 0;
+				float cc = 0.0;
 				for(int j=0; j<=i; ++j)
 					cc += *(weights+j)/norm;
 				cumWeights[i] = cc;
 			}
+		} else { // weights not given, equal probability
+			norm = 5.0;
+			for(int i=0; i<5; ++i)
+				cumWeights[i] = (i+1)/norm;
 		}
+		
 		float u = rand_unif() ;
 		if( 0<=u && u<cumWeights[0] ){
 			return 0;
@@ -105,8 +102,8 @@ public:
 	}
 	
 	void myHazard(float* haz_ptr, int* x, float* con_rates, float* rates, int error, sim_network simnet){
-		const int n_reactions = simnet.n_reactions;
-		const int n_species = simnet.n_species;
+		int n_reactions = simnet.n_reactions;
+		int n_species = simnet.n_species;
 		int* Pre = simnet.Pre;
 		
 		*haz_ptr = rep_controller(con_rates, *rates, error);
@@ -123,8 +120,8 @@ public:
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
 		int Nout = simnet.Nout;
-		const int n_species = simnet.n_species;
-		const int n_reactions = simnet.n_reactions;
+		int n_species = simnet.n_species;
+		int n_reactions = simnet.n_reactions;
 		float step_out = simnet.step_out;
 		float Tmax = simnet.Tmax;
 		int* S_pt = simnet.Stoi;
@@ -137,7 +134,7 @@ public:
 		}
 		int count = 0;
 		float target = step_out;
-		float tt = 0;
+		float tt = 0.0;
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
 		
@@ -157,7 +154,7 @@ public:
 				hazards[i] = h_i;
 			}
 			
-			float haz_total = 0;
+			float haz_total = 0.0;
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
 
@@ -181,8 +178,8 @@ public:
 
 	bool compute()
 	{
-		const int Nreact = 5;
-		const int Nspecies = 2;
+		int Nreact = 5;
+		int Nspecies = 2;
 		int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
 		int* Pre_ptr = &Pre_mat[0][0];
 		int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
@@ -197,7 +194,7 @@ public:
 
 		sim_network spn;
 		spn.Tmax = 120.0*365.0*24.0*3600.0; // 120 years in seconds
-		spn.step_out = 365*24.0*60.0*60.0; // 1 year in seconds
+		spn.step_out = 365.0*24.0*60.0*60.0; // 1 year in seconds
 		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out);
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
