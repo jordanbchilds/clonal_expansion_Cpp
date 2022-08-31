@@ -26,20 +26,23 @@ using namespace poplar::program;
 
 int main()
 {
+	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
 
-	long unsigned int datasetSize = 8832; // anything less than 8832 takes the same runtime, 8833 takes double the runtime
+	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ; // 16 cores with 1472 tiles with 6 threads = 141,321 simulataneous simulations (thats a whole lotta simulations)
+	
 	int tileInt;
 
-	float tmax = 3784320000.0; // 120 years in seconds
-	float stepOut = 365.0*24.0*60.0*60.0; // one year in seconds
+	float tmax = 120.0*365.0*24.0*3600.0; // 120 years in seconds
+	float stepOut = 365.0*24.0*3600.0; // 1 year in seconds
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
 	// Create the DeviceManager which is used to discover devices
 	auto manager = DeviceManager::createDeviceManager();
 	// Attempt to attach to a single IPU:
-	auto devices = manager.getDevices(poplar::TargetType::IPU, 1);
+	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
+	
 	std::cout << "Trying to attach to IPU\n";
 	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
 		return device.attach();
