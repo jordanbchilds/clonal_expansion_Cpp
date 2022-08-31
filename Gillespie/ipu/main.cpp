@@ -117,7 +117,7 @@ int main()
 	// Tensor w_popDyn = graph.addVariable(INT, {datasetSize,Nout}, "w_popDyn");
 	// Tensor m_popDyn = graph.addVariable(INT, {datasetSize,Nout}, "m_popDyn");
 	
-	Tensor output = graph.addVariable(FLOAT, {datasetSize,2}, "output");
+	Tensor output = graph.addVariable(FLOAT, {datasetSize}, "output");
 
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 

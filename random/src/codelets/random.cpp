@@ -22,8 +22,9 @@ public:
       const uint32_t num_workers = MultiVertex::numWorkers();
       const size_t per_worker = out.size()/num_workers;
       float* work = reinterpret_cast<float*>(&out[workerId * per_worker]);
+	  
       for (auto e = 0; e < per_worker; ++e) {
-        work[e] = __builtin_ipu_urand_f32();
+			  work[e] = __builtin_ipu_urand_f32();
       }
       return true;
   }
@@ -66,7 +67,6 @@ namespace random_ipu {
       poplar::program::Sequence seq = {
         poplar::program::Execute(random_cs)
       };
-
       prog.add(seq);
   }
 
