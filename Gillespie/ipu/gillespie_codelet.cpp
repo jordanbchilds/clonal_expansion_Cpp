@@ -127,7 +127,7 @@ public:
 		int* S_pt = simnet.Stoi;
 		int* Pre_pt = simnet.Pre;
 		
-		int x[n_species];
+		int x[2];
 		for(int i=0; i<n_species; ++i){
 			x[i] = *(x_init+i);
 			*(out_array+i) = x[i];
