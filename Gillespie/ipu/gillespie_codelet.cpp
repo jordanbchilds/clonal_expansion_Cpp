@@ -60,7 +60,7 @@ public:
 	
 	double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
 		// float unif_01 = (__builtin_ipu_urand_f32()+1.0)/2.0;
-		float unif_01 = __builtin_ipu_urand32()+0.5;
+		float unif_01 = rand_unif();
 		return -1.0*log(1-unif_01)/lambda;
 	}
 	
@@ -87,7 +87,7 @@ public:
 				cumWeights[i] = cc;
 			}
 		}
-		float u = __builtin_ipu_urand32()+0.5 ;
+		float u = rand_unif() ;
 		if( 0<=u && u<cumWeights[0] ){
 			return 0;
 		} else {
@@ -142,23 +142,19 @@ public:
 			x[i] = *(x_init+i);
 			*(out_array+i) = x[i];
 		}
-
 		int count = 1;
 		float target = step_out;
 		float tt = 0;
-
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
-		
-		float temp_rates[5];
-		for(int i=2; i<n_reactions; ++i)
-			temp_rates[i] = *(rates+i);
-		
-		while( count<=Nout ){
 
+		while( count<=Nout ){
+			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
-
+			for(int i=2; i<n_reactions; ++i)
+				temp_rates[i] = *(rates+i);
+			
 			float hazards[5];
 			for(int i=0; i<n_reactions; ++i){
 				float h_i = temp_rates[i];

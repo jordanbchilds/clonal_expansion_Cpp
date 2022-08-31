@@ -167,7 +167,7 @@ int main()
 	// Add a step to execute the compute set
 	prog.add(Execute(computeSet));
 	// Add a step to print out sim results
-	// prog.add(PrintTensor("output", output));
+	prog.add(PrintTensor("output", output));
 	// Create the engine
 	Engine engine(graph, prog);
 	engine.load(device);
