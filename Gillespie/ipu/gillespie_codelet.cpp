@@ -180,12 +180,12 @@ public:
 	{
 		const int Nreact = 5;
 		const int Nspecies = 2;
-		int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
-		int* Pre_ptr = &Pre_mat[0][0];
-		int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
-		int* Post_ptr = &Post_mat[0][0];
+		const int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
+		const int* Pre_ptr = &Pre_mat[0][0];
+		const int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
+		const int* Post_ptr = &Post_mat[0][0];
 		int S_mat[Nreact][Nspecies];
-		int* S_ptr = &S_mat[0][0];
+		const int* S_ptr = &S_mat[0][0];
 		
 		for(int i=0; i<Nreact; ++i){
 			for(int j=0; j<Nspecies; ++j)
