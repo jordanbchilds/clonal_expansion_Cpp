@@ -188,19 +188,6 @@ int main()
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
 
 	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
-	
-	for(std::size_t i=0; i<datasetSize; ++i){
-		std::cout<< (int) output[i] << std::endl;
-	}
-	
-	/*
-	std::ofstream myfile("ipu_copyNum.txt");
-	// ofstream myfile.std::ofstream::open("ipu_copyNum.txt");
-	for(auto i=0; i<datasetSize; ++i){
-		int* cn = reinterpret_cast<int*>(&output[i]);
-		myfile<< *cn <<std::endl;
-	}
-	myfile.close();
-	*/
+
 	return 0;
 }
