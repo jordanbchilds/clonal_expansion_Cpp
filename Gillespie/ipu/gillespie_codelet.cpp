@@ -178,8 +178,8 @@ public:
 
 	bool compute()
 	{
-		int Nreact = 5;
-		int Nspecies = 2;
+		const int Nreact = 5;
+		const int Nspecies = 2;
 		int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
 		int* Pre_ptr = &Pre_mat[0][0];
 		int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
