@@ -24,7 +24,7 @@ public:
 	poplar::Input<float> conTwo_rates;
 	
     //poplar::Output<Vector<float>> out;
-	poplar::Output<float> out;
+	poplar::Output<int> out;
 	
 	struct sim_network {
 		float Tmax;
