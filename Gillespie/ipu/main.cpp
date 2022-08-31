@@ -185,6 +185,7 @@ int main()
 
 	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
 	
+	/*
 	std::ofstream myfile("ipu_copyNum.txt");
 	// ofstream myfile.std::ofstream::open("ipu_copyNum.txt");
 	for(auto i=0; i<datasetSize; ++i){
@@ -192,6 +193,6 @@ int main()
 		myfile<< *cn <<std::endl;
 	}
 	myfile.close();
-	
+	*/
 	return 0;
 }
