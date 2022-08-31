@@ -26,7 +26,8 @@ public:
 	// poplar::Output<Vector<int>> w_popDyn;
 	// poplar::Output<Vector<int>> m_popDyn;
 	
-    poplar::Output<float> out;
+    poplar::Output<Vector<float>> w_out;
+	poplar::Output<Vector<float>> m_out;
 	
 	struct sim_network {
 		float Tmax;
@@ -171,6 +172,9 @@ public:
 
 	bool compute()
 	{
+		int* w_out_ptr = reinterpret_cast<int*>(&w_out);
+		int* m_out_ptr = reinterpret_cast<int*>(&m_out);
+		
 		const int Nreact = 5;
 		const int Nspecies = 2;
 		int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
@@ -212,7 +216,10 @@ public:
 		int* output_ptr = &output[0][0];
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		*out = output[spn.Nout-1][0] + output[spn.Nout-1][1];
+		for(int i=0; i<Nout; ++i){
+			w_out_ptr[i] = output[spn.Nout][0] ;
+			m_out_ptr[i] = output[spn.Nout][1];
+		}
 		return true;
 	}
 };
