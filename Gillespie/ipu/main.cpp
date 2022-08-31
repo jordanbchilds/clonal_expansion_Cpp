@@ -122,7 +122,7 @@ int main()
 	// iterate through tiles on the IPU, map simulations to each thread (6) on each tile
 	for (int i = 0; i < datasetSize; ++i)
 	{
-		int roundCount = i % int(numberOfTiles * threadsPerTile);
+		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		int tileInt = std::floor(
 			float(roundCount) / float(threadsPerTile)
 			);
