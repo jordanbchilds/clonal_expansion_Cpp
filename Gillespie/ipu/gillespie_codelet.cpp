@@ -120,14 +120,14 @@ public:
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
 		int Nout = simnet.Nout;
-		const int n_species = simnet.n_species;
-		const int n_reactions = simnet.n_reactions;
+		int n_species = simnet.n_species;
+		int n_reactions = simnet.n_reactions;
 		float step_out = simnet.step_out;
 		float Tmax = simnet.Tmax;
 		int* S_pt = simnet.Stoi;
 		int* Pre_pt = simnet.Pre;
 		
-		int x[n_species];
+		int x[2];
 		for(int i=0; i<n_species; ++i){
 			x[i] = *(x_init+i);
 			*(out_array+i) = x[i];
