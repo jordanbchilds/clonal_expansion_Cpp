@@ -188,7 +188,7 @@ public:
 		sim_network spn;
 		spn.Tmax = 120.0*365.0*24.0*3600.0; // 120 years in seconds
 		spn.step_out = 365.0*24.0*60.0*60.0; // 1 year in seconds
-		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out);
+		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out+1);
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
 		spn.Post = Post_ptr;
