@@ -21,7 +21,6 @@
 #include <chrono>
 #include <ctime>
 
-using namespace std;
 using namespace poplar;
 using namespace poplar::program;
 
@@ -184,6 +183,10 @@ int main()
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
 
 	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
+	
+	for(int i=0; i<datasetSize; ++i){
+		std::cout<< (int) output[i] <<std::endl;
+	}
 	
 	/*
 	std::ofstream myfile("ipu_copyNum.txt");
