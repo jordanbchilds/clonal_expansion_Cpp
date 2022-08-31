@@ -184,7 +184,7 @@ int main()
 
 	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
 	
-	for(size_t i=0; i<datasetSize; ++i){
+	for(std::size_t i=0; i<datasetSize; ++i){
 		std::cout<< output[i] <<std::endl;
 	}
 	
