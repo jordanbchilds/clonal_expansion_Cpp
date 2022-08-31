@@ -142,7 +142,7 @@ public:
 			x[i] = *(x_init+i);
 			*(out_array+i) = x[i];
 		}
-		int count = 1;
+		int count = 0;
 		float target = step_out;
 		float tt = 0;
 		int C0 = x[0]+x[1];
@@ -168,15 +168,12 @@ public:
 				haz_total += hazards[i];
 
 			tt += rand_exp(haz_total);
-
 			if( tt>=target ){
-				for(int j=0; j<n_species; ++j)
-					*( out_array+count*n_species+j ) = x[j];
-
 				count += 1;
 				target += step_out;
+				for(int j=0; j<n_species; ++j)
+					*( out_array+count*n_species+j ) = x[j];
 			}
-			
 			int r = rand_react(hazards);
 			for(int j=0; j<n_species; ++j)
 				x[j] += *( S_pt + r*n_species + j );
