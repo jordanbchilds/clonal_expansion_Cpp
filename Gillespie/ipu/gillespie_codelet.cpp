@@ -147,16 +147,21 @@ public:
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
 			
 			float hazards[5];
+			float haz_total = 0.0;
 			for(int i=0; i<n_reactions; ++i){
 				float h_i = temp_rates[i];
 				for(int j=0; j<n_species; ++j)
 					h_i *= choose(x[j], *( Pre_pt+i*n_species+j ));
 				hazards[i] = h_i;
+				
+				haz_total += hazards[i];
 			}
+			
+			/*
 			float haz_total = 0.0;
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
-
+			*/
 			tt += rand_exp(haz_total);
 			if( tt>=target ){
 				count += 1;
