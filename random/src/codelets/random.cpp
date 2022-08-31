@@ -24,7 +24,7 @@ public:
       float* work = reinterpret_cast<float*>(&out[workerId * per_worker]);
 	  
       for (auto e = 0; e < per_worker; ++e) {
-			  work[e] = __builtin_ipu_urand_f32();
+		  work[e] = __builtin_ipu_urand_f32();
       }
       return true;
   }

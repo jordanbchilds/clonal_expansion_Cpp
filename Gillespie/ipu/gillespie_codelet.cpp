@@ -153,7 +153,6 @@ public:
 					h_i *= choose(x[j], *( Pre_pt+i*n_species+j ));
 				hazards[i] = h_i;
 			}
-			
 			float haz_total = 0.0;
 			for(int i=0; i<n_reactions; ++i)
 				haz_total += hazards[i];
