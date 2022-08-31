@@ -26,7 +26,7 @@ using namespace poplar::program;
 
 int main()
 {
-	const int numberOfCores = 2; // access to POD16
+	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
 
