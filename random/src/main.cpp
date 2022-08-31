@@ -5,14 +5,15 @@
 
 using namespace std;
 
+const size_t workers = 6;  // TODO: should enumerate this
 const size_t per_worker = 8;
-const size_t workers = 6;
 const size_t random_output_floats = workers * per_worker;
+
+uint32_t base = 0, tile_factor = 0, worker_factor = 0;
 
 class random_output_stream_callback : public poplar::StreamCallback {
     public:
-        random_output_stream_callback(void* pData, uint32_t bytes) :
-            pData(static_cast<uint8_t*>(pData)), bytes(bytes) {}
+        random_output_stream_callback() { }
 
         void fetch(void *p) override {
             // Just print results.
@@ -34,11 +35,9 @@ class random_output_stream_callback : public poplar::StreamCallback {
 
         void complete() override {};
 
-        uint8_t* pData;
-        uint32_t bytes;
 };
 
-void ipu_program(float* random_output_ptr, size_t random_output_floats) {
+void ipu_program(size_t random_output_floats) {
     const uint32_t num_ipus = 1;
     const uint32_t num_tiles = 1;
 
@@ -51,7 +50,6 @@ void ipu_program(float* random_output_ptr, size_t random_output_floats) {
 
     auto& target = devices[0].getTarget();
 
-    //auto graph = unique_ptr<poplar::Graph>(new poplar::Graph{target});
     auto graph = poplar::Graph{target};
 
     auto random_graph = graph.createVirtualGraph(num_tiles);
@@ -59,18 +57,21 @@ void ipu_program(float* random_output_ptr, size_t random_output_floats) {
     const auto output_element_type = poplar::FLOAT;
 
     // Create the random output tensor.
-    auto random_tensor_out = random_graph.addVariable(
-        poplar::FLOAT,
-        {random_output_floats},
-        "random_tensor_out");
+    auto random_tensor_out = random_graph.addVariable(poplar::FLOAT, {random_output_floats}, "random_tensor_out");
 
     // Map random I/O tensors to tile(s).
     assert(num_tiles == 1);
 
-    // Program part for compute.
+    // Program part for setting seeds.
+    auto set_seeds1_prog = poplar::program::Sequence{};
+
+    // Add setSeeds op to program,
+    random_ipu::setSeeds(graph, base,tile_factor,worker_factor, set_seeds1_prog);
+
+    // Program part for compute random stream.
     auto random_prog = poplar::program::Sequence{};
 
-    // Add op to program.
+    // Add random op to program.
     random_ipu::random(graph, random_tensor_out, random_prog);
 
     // Output stream decl.
@@ -84,25 +85,28 @@ void ipu_program(float* random_output_ptr, size_t random_output_floats) {
 
     // Process N times.
     auto n_random = poplar::program::Sequence{
-        random_prog,
-        random_output_prog,
+        set_seeds1_prog,      // Set seeds1 first
+        // First iteration:
+        random_prog,          // Random stream
+        random_output_prog,   // Output results
+#if 0
+        // Repeat iterations:
         random_prog,
         random_output_prog,
         random_prog,
         random_output_prog
+#endif
     };
 
     // Compile and engine creation
-    auto executable = poplar::compileGraph(
-        graph, vector<poplar::program::Program>{n_random});
+    auto executable = poplar::compileGraph( graph, vector<poplar::program::Program>{n_random});
 
     // Create an engine from the executable.
     poplar::Engine engine{move(executable)};
 
     // Connect I/O to the engine.
     engine.connectStreamToCallback("random_output_stream",
-        unique_ptr<random_output_stream_callback>{new random_output_stream_callback(
-            random_output_ptr, random_output_floats * sizeof(poplar::FLOAT))});
+        unique_ptr<random_output_stream_callback>{new random_output_stream_callback()});
 
     // Attach to first available device.
     poplar::Device device;
@@ -129,7 +133,16 @@ void ipu_program(float* random_output_ptr, size_t random_output_floats) {
 int main(int argc, char*argv[]) {
     (void)argc;
     (void)argv;
-    vector<float> random_output(random_output_floats, 0.0f);
-    ipu_program(random_output.data(), random_output.size());
+
+    if (argc > 1)
+      base = atoi(argv[1]);
+    if (argc > 2)
+      tile_factor = atoi(argv[2]);
+    if (argc > 3)
+      worker_factor = atoi(argv[3]);
+
+    std::cout << "base " << base << " tile factor " << tile_factor << " worker_factor " << worker_factor << std::endl;
+    ipu_program(random_output_floats);
+
     return 0;
 }

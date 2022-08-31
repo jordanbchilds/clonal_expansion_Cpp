@@ -21,6 +21,13 @@ namespace random_ipu {
               poplar::program::Sequence &prog);
 
 
+  void setSeeds(poplar::Graph &graph,
+              uint32_t base,
+              uint32_t tile_increment,
+              uint32_t worker_increment,
+              poplar::program::Sequence &prog);
+
+
 }; // namespace random_ipu
 
 #endif // !__POPC__

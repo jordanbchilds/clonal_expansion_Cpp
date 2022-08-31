@@ -9,7 +9,7 @@ CXXFLAGS ?= -std=c++17 -Wall -Wextra -MMD -g
 LDFLAGS ?= -lpoplar -lgcl_ct -lpvti
 POPC ?= popc
 POPXXFLAGS_LIB=-O2
-POPXXFLAGS ?= $(POPXXFLAGS_LIB) -target=ipu2 -DNDEBUG $(JPEG_LIB_MACROS) 
+POPXXFLAGS ?= $(POPXXFLAGS_LIB) -target=ipu2 -DNDEBUG $(EXTRA_FLAGS)
 
 # Files that generate .gp (target IPU).
 CODELET_FILES = $(wildcard $(CODELETS_SRC_DIR)/*.cpp)
