@@ -32,10 +32,9 @@ int main()
 
 	long unsigned int datasetSize = 8832; // anything less than 8832 takes the same runtime, 8833 takes double the runtime
 	int tileInt;
-	int nVal = 10000; // number of simulations
 
-	float tmax = 3784320000.0; //120*365*24*60*60 in seconds
-	float stepOut = 365.0*24.0*60.0*60.0; // in seconds
+	float tmax = 3784320000.0; // 120 years in seconds
+	float stepOut = 365.0*24.0*60.0*60.0; // one year in seconds
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
 	// Create the DeviceManager which is used to discover devices
@@ -114,9 +113,6 @@ int main()
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	
-	// Tensor w_popDyn = graph.addVariable(INT, {datasetSize,Nout}, "w_popDyn");
-	// Tensor m_popDyn = graph.addVariable(INT, {datasetSize,Nout}, "m_popDyn");
-	
 	Tensor output = graph.addVariable(FLOAT, {datasetSize}, "output");
 
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
@@ -162,6 +158,15 @@ int main()
 		// graph.connect(vtx["m_popDyn"], m_popDyn[i]);
 		graph.connect(vtx["out"], output[i]);
 	}
+	
+	// Create the random output tensor.
+	// auto tensor_out = graph.addVariable(INT, {datasetSize}, "tensor_out");
+	
+	// Output stream decl.
+	auto output_datastream = graph.addDeviceToHostFIFO("output_stream", INT, datasetSize);
+	
+	// Program parts for I/O.
+	auto output_prog = poplar::program::Copy(output, output_datastream);
 
 	// Add a step to execute the compute set
 	prog.add(Execute(computeSet));
@@ -185,7 +190,7 @@ int main()
 	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
 	
 	for(std::size_t i=0; i<datasetSize; ++i){
-		std::cout<< (int)output[i] << std::endl;
+		std::cout<< (int) output[i] << std::endl;
 	}
 	
 	/*
