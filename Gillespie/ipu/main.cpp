@@ -19,8 +19,9 @@
 #include <poplar/Graph.hpp>
 #include <poplar/DeviceManager.hpp>
 #include <chrono>
-#include <ctime> 
+#include <ctime>
 
+using namespace std;
 using namespace poplar;
 using namespace poplar::program;
 
@@ -161,7 +162,6 @@ int main()
 		// graph.connect(vtx["w_popDyn"], w_popDyn[i]);
 		// graph.connect(vtx["m_popDyn"], m_popDyn[i]);
 		graph.connect(vtx["out"], output[i]);
-
 	}
 
 	// Add a step to execute the compute set
@@ -185,10 +185,12 @@ int main()
 
 	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
 	
-	std::ofstream myfile.std::ofstream::open("ipu_copyNum.txt");
+	std::ofstream myfile("ipu_copyNum.txt")
+	// ofstream myfile.std::ofstream::open("ipu_copyNum.txt");
 	for(int i=0; i<datasetSize; ++i)
-		myfile<< reinterpret_cast<float>output[i] <<endl;
-	myfile.std::ofstream::close();
+		myfile<< reinterpret_cast<float>output[i] <<std::endl;
+	
+	myfile.close();
 	
 	return 0;
 }
