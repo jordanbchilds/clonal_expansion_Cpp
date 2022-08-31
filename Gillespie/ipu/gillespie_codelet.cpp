@@ -147,13 +147,13 @@ public:
 		float tt = 0;
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
+		float temp_rates[5];
+		for(int i=2; i<n_reactions; ++i)
+			temp_rates[i] = *(rates+i);
 
 		while( count<=Nout ){
-			float temp_rates[5];
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
-			for(int i=2; i<n_reactions; ++i)
-				temp_rates[i] = *(rates+i);
 			
 			float hazards[5];
 			for(int i=0; i<n_reactions; ++i){
