@@ -187,9 +187,10 @@ int main()
 	
 	std::ofstream myfile("ipu_copyNum.txt");
 	// ofstream myfile.std::ofstream::open("ipu_copyNum.txt");
-	for(int i=0; i<datasetSize; ++i)
-		myfile<< reinterpret_cast<float>output[i] <<std::endl;
-	
+	for(int i=0; i<datasetSize; ++i){
+		int cn = reinterpret_cast<int>output[i]
+		myfile<< cn <<std::endl;
+	}
 	myfile.close();
 	
 	return 0;
