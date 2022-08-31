@@ -58,10 +58,10 @@ public:
 		return unif;
 	}
 	
-	double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
+	double rand_exp(float lambda){
 		// float unif_01 = (__builtin_ipu_urand_f32()+1.0)/2.0;
 		float unif_01 = rand_unif();
-		return -1.0*log(1-unif_01)/lambda;
+		return -1.0*log(1.0-unif_01)/lambda;
 	}
 	
 	int rand_react(float* weights=nullptr){
@@ -83,7 +83,6 @@ public:
 			for(int i=0; i<5; ++i)
 				cumWeights[i] = (i+1)/norm;
 		}
-		
 		float u = rand_unif() ;
 		if( 0<=u && u<cumWeights[0] ){
 			return 0;
@@ -100,7 +99,7 @@ public:
 		float new_rate = error >= 0 ? rep_rate*2.0/(1.0+exp(error*con_rates[0])) : rep_rate*(1.0+exp(-1*error*con_rates[1]))/2.0 ;
 		return new_rate;
 	}
-	
+	/*
 	void myHazard(float* haz_ptr, int* x, float* con_rates, float* rates, int error, sim_network simnet){
 		int n_reactions = simnet.n_reactions;
 		int n_species = simnet.n_species;
@@ -116,14 +115,14 @@ public:
 				*(haz_ptr+i) *= choose(x[j], *(Pre+i*n_species+j));
 		}
 	}
-	
+	*/
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
 		int Nout = simnet.Nout;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;
 		float step_out = simnet.step_out;
-		float Tmax = simnet.Tmax;
+		//float Tmax = simnet.Tmax;
 		int* S_pt = simnet.Stoi;
 		int* Pre_pt = simnet.Pre;
 		
@@ -137,7 +136,6 @@ public:
 		float tt = 0.0;
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
-		
 		float temp_rates[5];
 		for(int i=2; i<n_reactions; ++i)
 			temp_rates[i] = *(rates+i);
@@ -145,7 +143,6 @@ public:
 		while( count<=Nout ){
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
-			
 			float hazards[5];
 			float haz_total = 0.0;
 			for(int i=0; i<n_reactions; ++i){
@@ -153,15 +150,8 @@ public:
 				for(int j=0; j<n_species; ++j)
 					h_i *= choose(x[j], *( Pre_pt+i*n_species+j ));
 				hazards[i] = h_i;
-				
-				haz_total += hazards[i];
+				haz_total += h_i;
 			}
-			
-			/*
-			float haz_total = 0.0;
-			for(int i=0; i<n_reactions; ++i)
-				haz_total += hazards[i];
-			*/
 			tt += rand_exp(haz_total);
 			if( tt>=target ){
 				count += 1;
@@ -177,7 +167,6 @@ public:
 			if( count>simnet.Nout || copyNum==0 )
 				break;
 		}
-		
 	}
 
 	bool compute()
