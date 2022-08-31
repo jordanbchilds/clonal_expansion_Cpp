@@ -24,7 +24,6 @@
 using namespace poplar;
 using namespace poplar::program;
 
-
 int main()
 {
 	const int numberOfTiles = 1472;
@@ -159,19 +158,13 @@ int main()
 		graph.connect(vtx["out"], output[i]);
 	}
 	
-	// Create the random output tensor.
-	// auto tensor_out = graph.addVariable(INT, {datasetSize}, "tensor_out");
+	// to be able to read the output
+	graph.createHostRead("output-read", output);
 	
-	// Output stream decl.
-	auto output_datastream = graph.addDeviceToHostFIFO("output_stream", INT, datasetSize);
-	
-	// Program parts for I/O.
-	auto output_prog = poplar::program::Copy(output, output_datastream);
-
 	// Add a step to execute the compute set
 	prog.add(Execute(computeSet));
 	// Add a step to print out sim results
-	prog.add(PrintTensor("output", output));
+	// prog.add(PrintTensor("output", output));
 	// Create the engine
 	Engine engine(graph, prog);
 	engine.load(device);
@@ -186,8 +179,10 @@ int main()
 
 	std::cout << "Completed computation at " << std::ctime(&end_time)
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
-
-	std::cout << "Rate=" << (float(datasetSize)/elapsed_seconds.count()) << std::endl;
-
+	
+	std::vector<int> cpu_vector(datasetSize);
+	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
+	for(int i=0; i<datasetSize; ++i)
+		std::cout << " CPU output: " << cpu_vector[i] <<std::endl;
 	return 0;
 }
