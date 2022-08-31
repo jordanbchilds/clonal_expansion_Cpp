@@ -23,9 +23,6 @@ public:
     poplar::Input<float> conOne_rates;
 	poplar::Input<float> conTwo_rates;
 	
-	// poplar::Output<Vector<int>> w_popDyn;
-	// poplar::Output<Vector<int>> m_popDyn;
-	
     poplar::Output<Vector<float>> w_out;
 	poplar::Output<Vector<float>> m_out;
 	
@@ -216,7 +213,7 @@ public:
 		int* output_ptr = &output[0][0];
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		for(int i=0; i<Nout; ++i){
+		for(int i=0; i<spn.Nout; ++i){
 			w_out_ptr[i] = output[spn.Nout][0] ;
 			m_out_ptr[i] = output[spn.Nout][1];
 		}
