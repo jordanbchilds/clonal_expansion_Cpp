@@ -32,8 +32,8 @@ public:
 		float Tmax;
 		float step_out;
 		int Nout;
-		int n_reactions;
-		int n_species;
+		const int n_reactions;
+		const int n_species;
 		int* Post;
 		int* Pre;
 		int* Stoi;
@@ -102,18 +102,11 @@ public:
 	float rep_controller(float con_rates[2], float rep_rate, int error) {
 		float new_rate = error >= 0 ? rep_rate*2.0/(1.0+exp(error*con_rates[0])) : rep_rate*(1.0+exp(-1*error*con_rates[1]))/2.0 ;
 		return new_rate;
-		/*
-		if( error >= 0){
-			return rep_rate*2.0/(1.0+exp(error*con_rates[0]));
-		} else {
-			return rep_rate*(1.0+exp(-1*error*con_rates[1]))/2.0;
-		}
-		 */
 	}
 	
 	void myHazard(float* haz_ptr, int* x, float* con_rates, float* rates, int error, sim_network simnet){
-		int n_reactions = simnet.n_reactions;
-		int n_species = simnet.n_species;
+		const int n_reactions = simnet.n_reactions;
+		const int n_species = simnet.n_species;
 		int* Pre = simnet.Pre;
 		
 		*haz_ptr = rep_controller(con_rates, *rates, error);
@@ -130,14 +123,14 @@ public:
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
 		int Nout = simnet.Nout;
-		int n_species = simnet.n_species;
-		int n_reactions = simnet.n_reactions;
+		const int n_species = simnet.n_species;
+		const int n_reactions = simnet.n_reactions;
 		float step_out = simnet.step_out;
 		float Tmax = simnet.Tmax;
 		int* S_pt = simnet.Stoi;
 		int* Pre_pt = simnet.Pre;
 		
-		int x[2];
+		int x[n_species];
 		for(int i=0; i<n_species; ++i){
 			x[i] = *(x_init+i);
 			*(out_array+i) = x[i];
@@ -147,6 +140,7 @@ public:
 		float tt = 0;
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
+		
 		float temp_rates[5];
 		for(int i=2; i<n_reactions; ++i)
 			temp_rates[i] = *(rates+i);
