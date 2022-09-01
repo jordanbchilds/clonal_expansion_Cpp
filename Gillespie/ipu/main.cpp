@@ -26,7 +26,7 @@ using namespace poplar::program;
 
 int main()
 {
-	const int numberOfCores = 16; // access to POD16
+	const int numberOfCores = 2; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
 
@@ -35,7 +35,7 @@ int main()
 	int tileInt;
 
 	float tmax = 120.0*365.0*24.0*3600.0; // 120 years in seconds
-	float stepOut = 5.0*365.0*24.0*3600.0; // 1 year in seconds
+	float stepOut = 50.0*365.0*24.0*3600.0; // 1 year in seconds
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
 	// Create the DeviceManager which is used to discover devices
@@ -115,10 +115,10 @@ int main()
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	
-	Tensor output = graph.addVariable(INT, {datasetSize, Nout, 2}, "output");
+	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
 
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
-
+	
 	// iterate through tiles on the IPU, map simulations to each thread (6) on each tile
 	for (int i = 0; i < datasetSize; ++i)
 	{
@@ -149,15 +149,12 @@ int main()
 		graph.connect(vtx["reactFive_rates"], reactFive_rates[i]);
 		graph.connect(vtx["conOne_rates"], conOne_rates[i]);
 		graph.connect(vtx["conTwo_rates"], conTwo_rates[i]);
-		// graph.connect(vtx["w_popDyn"], w_popDyn[i]);
-		// graph.connect(vtx["m_popDyn"], m_popDyn[i]);
+
 		graph.connect(vtx["out"], output[i]);
 	}
-	
-	
-	
+
 	// to be able to read the output
-	// graph.createHostRead("output-read", output);
+	graph.createHostRead("output-read", output);
 	
 	// Add a step to execute the compute set
 	prog.add(Execute(computeSet));
@@ -177,13 +174,19 @@ int main()
 
 	std::cout << "Completed computation at " << std::ctime(&end_time)
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
+	
 	/*
-	std::vector<int> cpu_vector(datasetSize);
-	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
+	// std::vector<int> cpu_vector(datasetSize * Nout * 2);
+	int cpu_output[datasetSize][Nout][2];
+	// engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
+	
+	engine.readTensor("output-read", &cpu_output[0][0], &cpu_output[Nout-1][1]);
 	
 	std::ofstream outfile ("ipu_copyNum.txt");
-	for(int i=0; i<datasetSize; i+=2){
-		outfile << cpu_vector[i] << " " << cpu_vector[i+1] << std::endl;
+	for(int i=0; i<datasetSize; ++i){
+		for(int j=0; j<Nout; ++j){
+			outfile << cpu_output[i][j][0] << " " << cpu_output[i][j][1] << std::endl;
+		}
 	}
 	outfile.close();
 	*/

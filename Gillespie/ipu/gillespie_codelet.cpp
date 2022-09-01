@@ -14,19 +14,17 @@ using namespace std;
 class sim_network_vertex : public poplar::Vertex
 {
 public:
-	poplar::Input<int> w_init;
-	poplar::Input<int> m_init;
-    poplar::Input<float> reactOne_rates;
-	poplar::Input<float> reactTwo_rates;
-	poplar::Input<float> reactThree_rates;
-	poplar::Input<float> reactFour_rates;
-	poplar::Input<float> reactFive_rates;
-    poplar::Input<float> conOne_rates;
-	poplar::Input<float> conTwo_rates;
-	
-    Vector<Output<Vector<int>>> out;
-	//poplar::Output<int> out;
-	//poplar::Output<VectorList<int, ONE_PTR, 1, false>> out;
+	Input<int> w_init;
+	Input<int> m_init;
+    Input<float> reactOne_rates;
+	Input<float> reactTwo_rates;
+	Input<float> reactThree_rates;
+	Input<float> reactFour_rates;
+	Input<float> reactFive_rates;
+    Input<float> conOne_rates;
+	Input<float> conTwo_rates;
+
+    Output<Vector<int>> out;
 	
 	struct sim_network {
 		float Tmax;
@@ -198,10 +196,6 @@ public:
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
-		for(int i=0; i<spn.Nout; ++i){
-			out[i][0] = output[i][0];
-			out[i][1] = output[i][1];
-		}
 		return true;
 	}
 };
