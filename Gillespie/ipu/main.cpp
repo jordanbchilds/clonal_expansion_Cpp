@@ -181,7 +181,7 @@ int main()
 	
 	std::ofstream myFile ("simTimes_ICN_e3.txt");
 	for(int i=0; i<datasetSize; ++i){
-		myFile << cpu_vector[ i*2*Nout + 2*j ] << "\n" ;
+		myFile << cpu_vector[ i ] << "\n" ;
 	}
 	myFile.close();
 	
