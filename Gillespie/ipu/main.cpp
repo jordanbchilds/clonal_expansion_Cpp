@@ -92,7 +92,7 @@ int main()
 	float conOne_ratesBoss = 2.0e-3;
 	float conTwo_ratesBoss = 2.0e-3;
 	
-	default_random_engine generator;
+	std::default_random_engine generator;
 	std::normal_distribution<float> rate_dist(3.06e-8,5e-9);
 	std::normal_distribution<float> con_dist(2e03, 5e-4);
 	std::uniform_real_distribution<float> ML_dist(0.45,0.55);
