@@ -25,6 +25,7 @@ public:
 	
     //poplar::Output<Vector<float>> out;
 	poplar::Output<int> out;
+	poplar::Output<VectorList<int, COMPACT_DELTAN>>> out;
 	
 	struct sim_network {
 		float Tmax;
@@ -97,23 +98,7 @@ public:
 		float new_rate = error >= 0 ? rep_rate*2.0/(1.0+exp(error*con_rates[0])) : rep_rate*(1.0+exp(-1*error*con_rates[1]))/2.0 ;
 		return new_rate;
 	}
-	/*
-	void myHazard(float* haz_ptr, int* x, float* con_rates, float* rates, int error, sim_network simnet){
-		int n_reactions = simnet.n_reactions;
-		int n_species = simnet.n_species;
-		int* Pre = simnet.Pre;
-		
-		*haz_ptr = rep_controller(con_rates, *rates, error);
-		*(haz_ptr+1) = rep_controller(con_rates, *(rates+1), error);
-		for(int i=2; i<n_reactions; ++i)
-			*(haz_ptr+i) = *(rates+i);
 
-		for(int i=0; i<n_reactions; ++i){
-			for(int j=0; j<n_species; ++j)
-				*(haz_ptr+i) *= choose(x[j], *(Pre+i*n_species+j));
-		}
-	}
-	*/
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
 		int Nout = simnet.Nout;

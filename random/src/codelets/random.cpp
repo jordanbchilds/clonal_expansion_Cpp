@@ -91,6 +91,7 @@ namespace random_ipu {
       }
       auto dummy = graph.addConstant(poplar::FLOAT, {workers, per_worker}, values.data(), "dummy");
       graph.connect(random["dummy"], dummy);
+	  
       for (uint32_t worker = 0; worker < workers; ++worker) {
         graph.setTileMapping(dummy, tile);
       }

@@ -161,6 +161,8 @@ int main()
 		graph.connect(vtx["out"], output[i]);
 	}
 	
+	
+	
 	// to be able to read the output
 	graph.createHostRead("output-read", output);
 	
