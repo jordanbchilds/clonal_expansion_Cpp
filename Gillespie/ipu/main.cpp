@@ -26,7 +26,7 @@ using namespace poplar::program;
 
 int main()
 {
-	const int numberOfCores = 2; // access to POD16
+	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
 
@@ -35,7 +35,7 @@ int main()
 	int tileInt;
 
 	float tmax = 120.0*365.0*24.0*3600.0; // 120 years in seconds
-	float stepOut = 50.0*365.0*24.0*3600.0; // 1 year in seconds
+	float stepOut = 365.0*24.0*3600.0; // 1 year in seconds
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
 	// Create the DeviceManager which is used to discover devices
