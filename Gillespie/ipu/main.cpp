@@ -182,7 +182,7 @@ int main()
 	std::ofstream wild_file ("ipu_wldCount.txt");
 	for(int i=0; i<datasetSize; ++i){
 		for(int j=0; j<Nout; ++j){
-			wild_file<< cpu_vector[ i*Nout + 2*j ] << "," ;
+			wild_file<< cpu_vector[ i*2*Nout + 2*j ] << "," ;
 		}
 		wild_file<< "\n\n";
 		wild_file<< " new line ladies!!! ";
@@ -191,9 +191,9 @@ int main()
 	wild_file.close();
 	
 	std::ofstream mtnt_file ("ipu_mntCount.txt");
-	for(int i=0; i<Nout; ++i){
-		for(int j=0; j<datasetSize; ++j){
-			mtnt_file<< cpu_vector[ i*Nout + 2*j + 1 ] << "," ;
+	for(int i=0; i<datasetSize; ++i){
+		for(int j=0; j<Nout; ++j){
+			mtnt_file<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "," ;
 		}
 		mtnt_file<< "\n\n";
 		mtnt_file<< " new line ladies!!! ";
