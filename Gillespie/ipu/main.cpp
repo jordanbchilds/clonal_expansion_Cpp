@@ -185,14 +185,18 @@ int main()
 			wild_file<< cpu_vector[2*j*Nout+i] << " " ;
 		}
 		wild_file<< "\n";
+		wild_file<< " new line ladies!!! "
+		wild_file<< "\n";
 	}
 	wild_file.close();
 	
 	std::ofstream mtnt_file ("ipu_mntCount.txt");
 	for(int i=0; i<Nout; ++i){
 		for(int j=0; j<datasetSize; ++j){
-			mtnt_file<< cpu_vector[2*j*Nout+i+1] << " " ;
+			mtnt_file<< cpu_vector[2*j*Nout+i+1] << ", " ;
 		}
+		mtnt_file<< "\n";
+		mtnt_file<< " new line ladies!!! "
 		mtnt_file<< "\n";
 	}
 	mtnt_file.close();
