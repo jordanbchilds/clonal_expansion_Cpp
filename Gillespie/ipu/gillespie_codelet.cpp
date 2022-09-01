@@ -6,6 +6,7 @@
 #include <ipu_vector_math>
 #include <ipudef.h>
 #include <ipu_builtins.h>
+#include <VectorListTypes.hpp>
 
 using namespace poplar;
 using namespace std;
