@@ -128,6 +128,13 @@ public:
 				hazards[i] = h_i;
 				haz_total += h_i;
 			}
+			if(haz_total<1e-10){
+				for(count<Nout; ++count){
+					*(out_array+count*n_species) = x[0];
+					*(out_array+count*n_species+1) = x[1];
+				}
+				break;
+			}
 			tt += rand_exp(haz_total);
 			if( tt>=target ){
 				count += 1;
@@ -141,8 +148,6 @@ public:
 			x[1]  += *( S_pt + r*n_species + 1 );
 
 			copyNum = x[0]+x[1];
-			if( count>simnet.Nout || copyNum==0 )
-				break;
 		}
 	}
 
