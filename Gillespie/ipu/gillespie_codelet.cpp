@@ -26,7 +26,7 @@ public:
 	
     //poplar::Output<Vector<float>> out;
 	poplar::Output<int> out;
-	poplar::Output<VectorList<int>>> out;
+	poplar::Output<VectorList<int, {100,2}>>> out;
 	
 	struct sim_network {
 		float Tmax;
@@ -115,6 +115,7 @@ public:
 			x[i] = *(x_init+i);
 			*(out_array+i) = x[i];
 		}
+		
 		int count = 0;
 		float target = step_out;
 		float tt = 0.0;
@@ -155,8 +156,6 @@ public:
 
 	bool compute()
 	{
-		//int* out_ptr = reinterpret_cast<int*>(&out);
-		
 		const int Nreact = 5;
 		const int Nspecies = 2;
 		int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
