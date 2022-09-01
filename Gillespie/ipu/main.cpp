@@ -180,9 +180,9 @@ int main()
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 	
 	std::ofstream wild_file ("ipu_wldCount.txt");
-	for(int i=0; i<Nout; ++i){
-		for(int j=0; j<datasetSize; ++j){
-			wild_file<< cpu_vector[ j*2*Nout + i ] << "," ;
+	for(int i=0; i<datasetSize; ++i){
+		for(int j=0; j<Nout; ++j){
+			wild_file<< cpu_vector[ i*Nout + 2*j ] << "," ;
 		}
 		wild_file<< "\n\n";
 		wild_file<< " new line ladies!!! ";
@@ -193,7 +193,7 @@ int main()
 	std::ofstream mtnt_file ("ipu_mntCount.txt");
 	for(int i=0; i<Nout; ++i){
 		for(int j=0; j<datasetSize; ++j){
-			mtnt_file<< cpu_vector[ j*2*Nout + i + 1 ] << "," ;
+			mtnt_file<< cpu_vector[ i*Nout + 2*j + 1 ] << "," ;
 		}
 		mtnt_file<< "\n\n";
 		mtnt_file<< " new line ladies!!! ";
