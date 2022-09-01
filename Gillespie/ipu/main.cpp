@@ -182,9 +182,7 @@ int main()
 	std::ofstream wild_file ("ipu_wldCount.txt");
 	for(int i=0; i<Nout; ++i){
 		for(int j=0; j<datasetSize; ++j){
-			for(int k=0; k<numberOfCores; ++k){
-				wild_file<< cpu_vector[ k*2*Nout + j*2*Nout + i ] << "," ;
-			}
+				wild_file<< cpu_vector[ j*2*Nout + i ] << "," ;
 		}
 		wild_file<< "\n\n";
 		wild_file<< " new line ladies!!! ";
@@ -194,10 +192,8 @@ int main()
 	
 	std::ofstream mtnt_file ("ipu_mntCount.txt");
 	for(int i=0; i<Nout; ++i){
-		for(int j=0; j<numberOfTiles*threadsPerTile; ++j){
-			for(int k=0; k<numberOfCores; ++k){
-				mtnt_file<< cpu_vector[ k*2*Nout + j*2*Nout + i+ 1 ] << "," ;
-			}
+		for(int j=0; j<numberOfTiles*datasetSize; ++j){
+				mtnt_file<< cpu_vector[ j*2*Nout + i + 1 ] << "," ;
 		}
 		mtnt_file<< "\n\n";
 		mtnt_file<< " new line ladies!!! ";
