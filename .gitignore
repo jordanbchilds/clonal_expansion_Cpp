@@ -9,3 +9,6 @@ Gillespie/sim.out
 .DS_Store
 Gillespie/.DS_Store
 random/.makefileok
+Gillespie/ipu_mntCount.txt
+*.filepart
+Gillespie/ipu_wldCount.txt
