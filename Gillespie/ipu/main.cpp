@@ -115,7 +115,7 @@ int main()
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	
-	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
+	Tensor output = graph.addVariable(FLOAT, {datasetSize, 2*Nout}, "output");
 
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
@@ -179,6 +179,13 @@ int main()
 	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 	
+	std::ofstream myFile ("simTimes_ICN_e3.txt");
+	for(int i=0; i<datasetSize; ++i){
+		myFile << cpu_vector[ i*2*Nout + 2*j ] << "\n" ;
+	}
+	myFile.close();
+	
+	/*
 	std::ofstream wild_file ("ipu_wldCount.txt");
 	for(int i=0; i<datasetSize; ++i){
 		for(int j=0; j<Nout; ++j){
@@ -196,6 +203,7 @@ int main()
 		mtnt_file<< "\n";
 	}
 	mtnt_file.close();
+	 */
 	
 	return 0;
 }

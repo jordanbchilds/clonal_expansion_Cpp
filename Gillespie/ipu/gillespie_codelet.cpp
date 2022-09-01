@@ -7,6 +7,7 @@
 #include <ipudef.h>
 #include <ipu_builtins.h>
 #include <VectorListTypes.hpp>
+#include <chrono>
 
 using namespace poplar;
 using namespace std;
@@ -24,7 +25,8 @@ public:
     Input<float> conOne_rates;
 	Input<float> conTwo_rates;
 
-    Output<Vector<int>> out;
+    // Output<Vector<int>> out;
+	Output<float> out;
 	
 	struct sim_network {
 		float Tmax;
@@ -132,7 +134,7 @@ public:
 			if( tt>=target ){
 				count += 1;
 				target += step_out;
-				*(out_array+count*n_species) = x[0];
+				*(out_array+count*n_species) = x[0];//
 				*(out_array+count*n_species+1) = x[1];
 			}
 			int r = rand_react(hazards);
@@ -188,14 +190,22 @@ public:
 		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
 		
+		auto start = chrono::high_resolution_clock::now();
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		auto end = chrono::high_resolution_clock::now();
 		
+		auto time = chrono::duration_cast<chrono::microseconds>(end-start);
+		
+		*out = time.count();
+		
+		/*
 		int index = 0;
 		for(int i=0; i<spn.Nout; ++i){
 			out[index] = output[i][0];
 			out[index+1] = output[i][1];
 			index += 2;
 		}
+		 */
 		return true;
 	}
 };
