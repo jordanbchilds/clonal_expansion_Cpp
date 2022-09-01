@@ -162,9 +162,6 @@ int main()
 	// prog.add(PrintTensor("output", output));
 	// Create the engine
 	Engine engine(graph, prog);
-	
-	engine.hostSyncTimeout = 700;
-	
 	engine.load(device);
 
 	auto start = std::chrono::system_clock::now();
