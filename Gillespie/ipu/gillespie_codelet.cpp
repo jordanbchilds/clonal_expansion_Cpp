@@ -202,7 +202,6 @@ public:
 			out[index+1] = output[i][1];
 			index += 2;
 		}
-		
 		return true;
 	}
 };
