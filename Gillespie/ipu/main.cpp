@@ -189,8 +189,8 @@ int main()
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 	
 	std::ofstream outfile ("ipu_copyNum.txt");
-	for(int i=0; i<datasetSize; ++i){
-		outfile << cpu_vector[i] << std::endl;
+	for(int i=0; i<datasetSize; i+=2){
+		outfile << cpu_vector[i] << " " << cpu_vector[i+1] << std::endl;
 	}
 	outfile.close();
 
