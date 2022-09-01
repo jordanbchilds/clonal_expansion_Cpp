@@ -109,7 +109,7 @@ int main()
 		reactTwo_ratesVals[i] =  rate_dist(generator);
 		reactThree_ratesVals[i] =  rate_dist(generator);
 		reactFour_ratesVals[i] =  rate_dist(generator);
-		reactFive_ratesVals[i] =  rate_dist(generator);
+		reactFive_ratesVals[i] =  0.0 ;
 		conOne_ratesVals[i] = con_dist(generator);
 		conTwo_ratesVals[i] = con_dist(generator);
     }

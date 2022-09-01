@@ -132,7 +132,7 @@ public:
 			if( tt>=target ){
 				count += 1;
 				target += step_out;
-				*(out_array+count*n_species) = x[0];//
+				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
 			}
 			int r = rand_react(hazards);
