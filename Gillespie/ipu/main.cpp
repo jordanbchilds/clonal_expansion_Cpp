@@ -184,9 +184,7 @@ int main()
 		for(int j=0; j<Nout; ++j){
 			wild_file<< cpu_vector[ i*2*Nout + 2*j ] << "\t" ;
 		}
-		wild_file<< "\n\n";
-		wild_file<< " new line ladies!!! ";
-		wild_file<< "\n\n";
+		wild_file<< "\n";
 	}
 	wild_file.close();
 	
@@ -195,9 +193,7 @@ int main()
 		for(int j=0; j<Nout; ++j){
 			mtnt_file<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "\t" ;
 		}
-		mtnt_file<< "\n\n";
-		mtnt_file<< " new line ladies!!! ";
-		mtnt_file<< "\n\n";
+		mtnt_file<< "\n";
 	}
 	mtnt_file.close();
 	
