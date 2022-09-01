@@ -6,8 +6,6 @@
 #include <ipu_vector_math>
 #include <ipudef.h>
 #include <ipu_builtins.h>
-#include <VectorListTypes.hpp>
-#include <chrono>
 
 using namespace poplar;
 using namespace std;
@@ -25,8 +23,8 @@ public:
     Input<float> conOne_rates;
 	Input<float> conTwo_rates;
 
-    // Output<Vector<int>> out;
-	Output<float> out;
+    Output<Vector<int>> out;
+	//Output<float> out;
 	
 	struct sim_network {
 		float Tmax;
