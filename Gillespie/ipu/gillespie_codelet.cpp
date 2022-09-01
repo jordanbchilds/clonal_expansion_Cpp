@@ -24,9 +24,9 @@ public:
     poplar::Input<float> conOne_rates;
 	poplar::Input<float> conTwo_rates;
 	
-    //poplar::Output<Vector<float>> out;
+    Vector<<Output<Vector<int>>> out;
 	//poplar::Output<int> out;
-	poplar::Output<VectorList<int, ONE_PTR, 1, false>> out;
+	//poplar::Output<VectorList<int, ONE_PTR, 1, false>> out;
 	
 	struct sim_network {
 		float Tmax;
