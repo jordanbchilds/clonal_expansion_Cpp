@@ -35,7 +35,7 @@ int main()
 	int tileInt;
 
 	float tmax = 120.0*365.0*24.0*3600.0; // 120 years in seconds
-	float stepOut = 5.1*365.0*24.0*3600.0; // 1 year in seconds
+	float stepOut = 365.0*24.0*3600.0; // 1 year in seconds
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
 	// Create the DeviceManager which is used to discover devices
@@ -123,11 +123,7 @@ int main()
 	for (int i = 0; i < datasetSize; ++i)
 	{
 		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
-		int tileInt = std::floor(
-			float(roundCount) / float(threadsPerTile)
-			);
-		// std::cout << "theadsPerIPU=" << int(numberOfTiles * threadsPerTile) << "i="<< i << " roundCount=" << roundCount << " tileInt=" << tileInt << std::endl;
-
+		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		graph.setTileMapping(w_init[i], tileInt);
 		graph.setTileMapping(m_init[i], tileInt);
 		graph.setTileMapping(reactOne_rates[i], tileInt);
@@ -138,10 +134,7 @@ int main()
 		
 		graph.setTileMapping(conOne_rates[i], tileInt);
 		graph.setTileMapping(conTwo_rates[i], tileInt);
-		
-		// graph.setTileMapping(w_popDyn[i], tileInt);
-		// graph.setTileMapping(m_popDyn[i], tileInt);
-		
+
 		graph.setTileMapping(output[i], tileInt);
 
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
@@ -164,7 +157,7 @@ int main()
 	
 	
 	// to be able to read the output
-	graph.createHostRead("output-read", output);
+	// graph.createHostRead("output-read", output);
 	
 	// Add a step to execute the compute set
 	prog.add(Execute(computeSet));
@@ -184,7 +177,7 @@ int main()
 
 	std::cout << "Completed computation at " << std::ctime(&end_time)
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
-	
+	/*
 	std::vector<int> cpu_vector(datasetSize);
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 	
@@ -193,6 +186,6 @@ int main()
 		outfile << cpu_vector[i] << " " << cpu_vector[i+1] << std::endl;
 	}
 	outfile.close();
-
+	*/
 	return 0;
 }
