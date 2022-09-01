@@ -26,7 +26,7 @@ public:
 	
     //poplar::Output<Vector<float>> out;
 	poplar::Output<int> out;
-	poplar::Output<VectorList<int, 1, false>> out;
+	poplar::Output<VectorList<int, {100,2},1, false>> out;
 	
 	struct sim_network {
 		float Tmax;
