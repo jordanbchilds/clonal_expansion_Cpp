@@ -26,7 +26,7 @@ using namespace poplar::program;
 
 int main()
 {
-	const int numberOfCores = 2; // access to POD16
+	const int numberOfCores = 1; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
 
@@ -182,7 +182,7 @@ int main()
 	std::ofstream wild_file ("ipu_wldCount.txt");
 	for(int i=0; i<datasetSize; ++i){
 		for(int j=0; j<Nout; ++j){
-			wild_file<< cpu_vector[ i*2*Nout + 2*j ] << "," ;
+			wild_file<< cpu_vector[ i*2*Nout + 2*j ] << "\t" ;
 		}
 		wild_file<< "\n\n";
 		wild_file<< " new line ladies!!! ";
@@ -193,7 +193,7 @@ int main()
 	std::ofstream mtnt_file ("ipu_mntCount.txt");
 	for(int i=0; i<datasetSize; ++i){
 		for(int j=0; j<Nout; ++j){
-			mtnt_file<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "," ;
+			mtnt_file<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "\t" ;
 		}
 		mtnt_file<< "\n\n";
 		mtnt_file<< " new line ladies!!! ";
