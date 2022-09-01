@@ -163,7 +163,7 @@ int main()
 	// Create the engine
 	Engine engine(graph, prog);
 	
-	target.hostSyncTimeout = 0;
+	engine.hostSyncTimeout = 0;
 	
 	engine.load(device);
 
