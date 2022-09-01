@@ -197,7 +197,7 @@ public:
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
 		int index = 0;
-		for(int i=0; i<spn.Nout; ++1){
+		for(int i=0; i<spn.Nout; ++i){
 			out[index] = output[i][0];
 			out[index+1] = output[i][1];
 			index += 2;
