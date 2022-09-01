@@ -129,9 +129,9 @@ public:
 				haz_total += h_i;
 			}
 			if(haz_total<1e-10){
-				for(count<Nout; ++count){
-					*(out_array+count*n_species) = x[0];
-					*(out_array+count*n_species+1) = x[1];
+				for(int i=count; i<Nout; i+=2){
+					*(out_array+i*n_species) = x[0];
+					*(out_array+i*n_species+1) = x[1];
 				}
 				break;
 			}
