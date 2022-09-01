@@ -24,7 +24,7 @@ public:
     poplar::Input<float> conOne_rates;
 	poplar::Input<float> conTwo_rates;
 	
-    Vector<<Output<Vector<int>>> dummy;
+    Vector<Output<Vector<int>>> out;
 	//poplar::Output<int> out;
 	//poplar::Output<VectorList<int, ONE_PTR, 1, false>> out;
 	
