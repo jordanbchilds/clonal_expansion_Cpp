@@ -101,7 +101,7 @@ int main()
     for (int i = 0; i < datasetSize; ++i){
 		//w_initVals[i] = w_initBoss;
 		int c0 = CN_dist(generator);
-		float h0 = ML_dist(generator)
+		float h0 = ML_dist(generator);
 		
 		w_initVals[i] =  round( c0*(1.0-h0) );
 		m_initVals[i] = round( c0*h0 );
