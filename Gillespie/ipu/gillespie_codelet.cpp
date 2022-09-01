@@ -52,35 +52,27 @@ public:
 	
 	float rand_unif(float lower=0.0, float upper=1.0){
 		float unif_01 = (float) (__builtin_ipu_urand32()) / (float) (4294967295) ; // 4,294,967,295 is the max value of an unsigned iteger... I think.
-		float unif = unif_01*(upper-lower) + lower;
-		return unif;
+		return unif_01*(upper-lower) + lower;
 	}
 	
 	double rand_exp(float lambda){
-		// float unif_01 = (__builtin_ipu_urand_f32()+1.0)/2.0;
 		float unif_01 = rand_unif();
 		return -1.0*log(1.0-unif_01)/lambda;
 	}
 	
-	int rand_react(float* weights=nullptr){
-		float norm; // normalising constant
+	int rand_react(float* weights){
+		float norm = 0.0; // normalising constant
 		float cumWeights[5];
-		if( weights!=nullptr ){ // if weights given
-			norm = 0.0;
-			for(int i=0; i<5; ++i)
-				norm += *(weights+i);
-			
-			for(int i=0; i<5; ++i){
-				float cc = 0.0;
-				for(int j=0; j<=i; ++j)
-					cc += *(weights+j)/norm;
-				cumWeights[i] = cc;
-			}
-		} else { // weights not given, equal probability
-			norm = 5.0;
-			for(int i=0; i<5; ++i)
-				cumWeights[i] = (i+1)/norm;
+		for(int i=0; i<5; ++i)
+			norm += *(weights+i);
+		
+		for(int i=0; i<5; ++i){
+			float cc = 0.0;
+			for(int j=0; j<=i; ++j)
+				cc += *(weights+j)/norm;
+			cumWeights[i] = cc;
 		}
+
 		float u = rand_unif() ;
 		if( 0<=u && u<cumWeights[0] ){
 			return 0;
@@ -109,10 +101,8 @@ public:
 		int* Pre_pt = simnet.Pre;
 		
 		int x[2];
-		for(int i=0; i<n_species; ++i){
-			x[i] = *(x_init+i);
-			*(out_array+i) = x[i];
-		}
+		x[0] = *x_init; x[1] = *(x_init+1);
+		*out_array = x[0]; *(out_array+1) = x[1];
 		
 		int count = 0;
 		float target = step_out;
@@ -120,12 +110,15 @@ public:
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
 		float temp_rates[5];
-		for(int i=2; i<n_reactions; ++i)
-			temp_rates[i] = *(rates+i);
+		
+		temp_rates[2] = *(rates+2);
+		temp_rates[3] = *(rates+3);
+		temp_rates[4] = *(rates+4);
 
 		while( count<=Nout ){
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
+			
 			float hazards[5];
 			float haz_total = 0.0;
 			for(int i=0; i<n_reactions; ++i){
@@ -139,13 +132,14 @@ public:
 			if( tt>=target ){
 				count += 1;
 				target += step_out;
-				for(int j=0; j<n_species; ++j)
-					*( out_array+count*n_species+j ) = x[j];
+				*(out_array+count*n_species) = x[0];
+				*(out_array+count*n_species+1) = x[1];
 			}
 			int r = rand_react(hazards);
-			for(int j=0; j<n_species; ++j)
-				x[j] += *( S_pt + r*n_species + j );
 			
+			x[0]  += *( S_pt + r*n_species );
+			x[1]  += *( S_pt + r*n_species + 1 );
+
 			copyNum = x[0]+x[1];
 			if( count>simnet.Nout || copyNum==0 )
 				break;
