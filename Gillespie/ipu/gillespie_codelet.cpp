@@ -25,7 +25,7 @@ public:
 	
     //poplar::Output<Vector<float>> out;
 	poplar::Output<int> out;
-	poplar::Output<VectorList<int, COMPACT_DELTAN>>> out;
+	poplar::Output<VectorList<int>>> out;
 	
 	struct sim_network {
 		float Tmax;
