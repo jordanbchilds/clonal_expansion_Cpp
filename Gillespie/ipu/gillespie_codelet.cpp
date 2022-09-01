@@ -198,7 +198,7 @@ public:
 		
 		for(int i=0; i<spn.Nout; i+=2){
 			out[i] = output[i/2][0];
-			out[i+1] = outpu[i/2][1];
+			out[i+1] = output[i/2][1];
 		}
 		
 		return true;
