@@ -184,7 +184,7 @@ int main()
 		for(int j=0; j<datasetSize; ++j){
 			wild_file<< cpu_vector[j*Nout+i] << " " ;
 		}
-		std::cout<<std::endl;
+		wild_file<< "\n";
 	}
 	wild_file.close();
 	
@@ -193,7 +193,7 @@ int main()
 		for(int j=0; j<datasetSize; ++j){
 			mtnt_file<< cpu_vector[j*Nout+i+1] << " " ;
 		}
-		std::cout<<std::endl;
+		mtnt_file<< "\n";
 	}
 	mtnt_file.close();
 	
