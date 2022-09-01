@@ -179,23 +179,23 @@ int main()
 	std::vector<int> cpu_vector(datasetSize * Nout * 2);
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 	
-	std::ofstream outfile ("ipu_wldCount.txt");
+	std::ofstream wild_file ("ipu_wldCount.txt");
 	for(int i=0; i<Nout; ++i){
 		for(int j=0; j<datasetSize; ++j){
-			outfile<< cpu_vector[j*Nout+i] << " " ;
+			wild_file<< cpu_vector[j*Nout+i] << " " ;
 		}
 		std::cout<<std::endl;
 	}
-	outfile.close();
+	wild_file.close();
 	
-	std::ofstream outfile ("ipu_mntCount.txt");
+	std::ofstream mtnt_file ("ipu_mntCount.txt");
 	for(int i=0; i<Nout; ++i){
 		for(int j=0; j<datasetSize; ++j){
 			outfile<< cpu_vector[j*Nout+i+1] << " " ;
 		}
 		std::cout<<std::endl;
 	}
-	outfile.close();
+	mtnt_file.close();
 	
 	return 0;
 }
