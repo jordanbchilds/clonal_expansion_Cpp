@@ -191,7 +191,7 @@ int main()
 	std::ofstream mtnt_file ("ipu_mntCount.txt");
 	for(int i=0; i<Nout; ++i){
 		for(int j=0; j<datasetSize; ++j){
-			outfile<< cpu_vector[j*Nout+i+1] << " " ;
+			mtnt_file<< cpu_vector[j*Nout+i+1] << " " ;
 		}
 		std::cout<<std::endl;
 	}
