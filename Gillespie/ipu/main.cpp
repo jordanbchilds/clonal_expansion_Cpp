@@ -14,6 +14,8 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <random>
+#include <boost/math/distributions/beta.hpp>
 
 #include <poplar/Engine.hpp>
 #include <poplar/Graph.hpp>
