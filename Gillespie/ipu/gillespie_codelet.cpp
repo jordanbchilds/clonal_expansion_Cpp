@@ -196,6 +196,11 @@ public:
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
+		for(int i=0; i<spn.Nout; i+=2){
+			out[i] = output[i/2][0];
+			out[i+1] = outpu[i/2][1];
+		}
+		
 		return true;
 	}
 };
