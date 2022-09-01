@@ -198,12 +198,10 @@ public:
 		
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
-		*out = output[spn.Nout-1][0]+output[spn.Nout-1][1];
-		
-		/*
-		for(int i=0; i<spn.Nout; ++i)
-			out_ptr[i] = output[spn.Nout-1][0]+output[spn.Nout-1][1] ;
-		*/
+		for(int i=0; i<spn.Nout; ++i){
+			out[i][0] = output[i][0];
+			out[i][1] = output[i][1];
+		}
 		return true;
 	}
 };
