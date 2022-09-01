@@ -187,23 +187,17 @@ public:
 		
 		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
-		
-		auto start = chrono::high_resolution_clock::now();
+
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-		auto end = chrono::high_resolution_clock::now();
-		
-		auto time = chrono::duration_cast<chrono::microseconds>(end-start);
 		
 		*out = time.count();
 		
-		/*
 		int index = 0;
 		for(int i=0; i<spn.Nout; ++i){
 			out[index] = output[i][0];
 			out[index+1] = output[i][1];
 			index += 2;
 		}
-		 */
 		return true;
 	}
 };
