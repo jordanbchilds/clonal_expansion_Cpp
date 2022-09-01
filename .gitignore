@@ -12,3 +12,5 @@ random/.makefileok
 Gillespie/ipu_mntCount.txt
 *.filepart
 Gillespie/ipu_wldCount.txt
+*.png
+*.txt
