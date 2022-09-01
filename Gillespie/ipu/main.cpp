@@ -26,7 +26,7 @@ using namespace poplar::program;
 
 int main()
 {
-	const int numberOfCores = 16; // access to POD16
+	const int numberOfCores = 1; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
 
@@ -175,20 +175,27 @@ int main()
 	std::cout << "Completed computation at " << std::ctime(&end_time)
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
 	
-	/*
-	// std::vector<int> cpu_vector(datasetSize * Nout * 2);
-	int cpu_output[datasetSize][Nout][2];
-	// engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 	
-	engine.readTensor("output-read", &cpu_output[0][0], &cpu_output[Nout-1][1]);
+	std::vector<int> cpu_vector(datasetSize * Nout * 2);
+	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 	
-	std::ofstream outfile ("ipu_copyNum.txt");
-	for(int i=0; i<datasetSize; ++i){
-		for(int j=0; j<Nout; ++j){
-			outfile << cpu_output[i][j][0] << " " << cpu_output[i][j][1] << std::endl;
+	std::ofstream outfile ("ipu_wldCount.txt");
+	for(int i=0; i<spn.Nout; ++i){
+		for(int j=0; j<datasetSize; ++j){
+			outfile<< cpu_vector[j*Nout+i] << " " ;
 		}
+		std::cout<<std::endl;
 	}
 	outfile.close();
-	*/
+	
+	std::ofstream outfile ("ipu_mntCount.txt");
+	for(int i=0; i<spn.Nout; ++i){
+		for(int j=0; j<datasetSize; ++j){
+			outfile<< cpu_vector[j*Nout+i+1] << " " ;
+		}
+		std::cout<<std::endl;
+	}
+	outfile.close();
+	
 	return 0;
 }
