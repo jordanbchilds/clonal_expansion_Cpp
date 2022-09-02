@@ -40,33 +40,6 @@ struct myTheta {
 	unsigned mInit;
 } ;
 
-/*
-myTheta check_limits(myTheta theta, float* limits_array){
-	bool inSupport = true;
-	for(int i=0; i<9; ++i){
-		inSupport &= (
-	}
-	re
-}
-*/
-
-myTheta perturb(myTheta theta_star){
-	myTheta theta_ss;
-	theta_ss.rep_wld = theta_star.rep_wld + runif(1e-4);
-	theta_ss.rep_mnt = theta_star.rep_mnt + runif(1e-4);
-	theta_ss.deg_wld = theta_star.deg_wld + runif(1e-4);
-	theta_ss.deg_mnt = theta_star.deg_mnt + runif(1e-4);
-	theta_ss.muation = theta_star.mutation ;
-	
-	theta_ss.con_above = theta_star.con_above + runif(1e-4);
-	theta_ss.con_abouse = theta_star.con_below +runif(1e-4);
-	
-	theta_ss.wInit = theta_star.wInit + runif_disc(25) ;
-	theta_ss.mInit = theta_star.wInit + runif_disc(25) ;
-	
-	return theta_ss;
-}
-
 int runif_disc(unsigned h){
 	return  rand() % h;
 }
@@ -108,6 +81,33 @@ int rdisc(unsigned n, float* weights){
 		}
 	}
 	return -1; // requires a return outside the loop
+}
+
+/*
+myTheta check_limits(myTheta theta, float* limits_array){
+	bool inSupport = true;
+	for(int i=0; i<9; ++i){
+		inSupport &= (
+	}
+	re
+}
+*/
+
+myTheta perturb(myTheta theta_star){
+	myTheta theta_ss;
+	theta_ss.rep_wld = theta_star.rep_wld + runif(1e-4);
+	theta_ss.rep_mnt = theta_star.rep_mnt + runif(1e-4);
+	theta_ss.deg_wld = theta_star.deg_wld + runif(1e-4);
+	theta_ss.deg_mnt = theta_star.deg_mnt + runif(1e-4);
+	theta_ss.muation = theta_star.mutation ;
+	
+	theta_ss.con_above = theta_star.con_above + runif(1e-4);
+	theta_ss.con_abouse = theta_star.con_below +runif(1e-4);
+	
+	theta_ss.wInit = theta_star.wInit + runif_disc(25) ;
+	theta_ss.mInit = theta_star.wInit + runif_disc(25) ;
+	
+	return theta_ss;
 }
 
 void create_graph(float* theta, long unsigned datasetSize){
