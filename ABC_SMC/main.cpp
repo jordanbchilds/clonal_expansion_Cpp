@@ -99,67 +99,15 @@ myTheta perturb(myTheta theta_star){
 	theta_ss.rep_mnt = theta_star.rep_mnt + runif(1e-4);
 	theta_ss.deg_wld = theta_star.deg_wld + runif(1e-4);
 	theta_ss.deg_mnt = theta_star.deg_mnt + runif(1e-4);
-	theta_ss.muation = theta_star.mutation ;
+	theta_ss.mutation = theta_star.mutation ;
 	
 	theta_ss.con_above = theta_star.con_above + runif(1e-4);
-	theta_ss.con_abouse = theta_star.con_below +runif(1e-4);
+	theta_ss.con_below = theta_star.con_below +runif(1e-4);
 	
 	theta_ss.wInit = theta_star.wInit + runif_disc(25) ;
 	theta_ss.mInit = theta_star.wInit + runif_disc(25) ;
 	
 	return theta_ss;
-}
-
-void create_graph(float* theta, long unsigned datasetSize){
-	// iterate through tiles on the IPU, map simulations to each thread (6) on each tile
-	for (int i = 0; i < datasetSize; ++i)
-	{
-		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
-		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
-		graph.setTileMapping(w_init[i], tileInt);
-		graph.setTileMapping(m_init[i], tileInt);
-		graph.setTileMapping(reactOne_rates[i], tileInt);
-		graph.setTileMapping(reactTwo_rates[i], tileInt);
-		graph.setTileMapping(reactThree_rates[i], tileInt);
-		graph.setTileMapping(reactFour_rates[i], tileInt);
-		graph.setTileMapping(reactFive_rates[i], tileInt);
-		
-		graph.setTileMapping(conOne_rates[i], tileInt);
-		graph.setTileMapping(conTwo_rates[i], tileInt);
-
-		graph.setTileMapping(output[i], tileInt);
-
-		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
-		graph.setTileMapping(vtx, tileInt);
-
-		graph.connect(vtx["w_init"], w_init[i]);
-		graph.connect(vtx["m_init"], m_init[i]);
-		graph.connect(vtx["reactOne_rates"], reactOne_rates[i]);
-		graph.connect(vtx["reactTwo_rates"], reactTwo_rates[i]);
-		graph.connect(vtx["reactThree_rates"], reactThree_rates[i]);
-		graph.connect(vtx["reactFour_rates"], reactFour_rates[i]);
-		graph.connect(vtx["reactFive_rates"], reactFive_rates[i]);
-		graph.connect(vtx["conOne_rates"], conOne_rates[i]);
-		graph.connect(vtx["conTwo_rates"], conTwo_rates[i]);
-
-		graph.connect(vtx["out"], output[i]);
-	}
-
-	// to be able to read the output
-	graph.createHostRead("output-read", output);
-	
-	// Add a step to execute the compute set
-	prog.add(Execute(computeSet));
-	// Add a step to print out sim results
-	// prog.add(PrintTensor("output", output));
-	// Create the engine
-	Engine engine(graph, prog);
-	engine.load(device);
-
-	auto start = std::chrono::system_clock::now();
-	// Run the control program
-	engine.run(0);
-	auto end = std::chrono::system_clock::now();
 }
 
 int main()
@@ -169,6 +117,58 @@ int main()
 	const int threadsPerTile = 6;
 
 	 long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ; // 16 cores with 1472 tiles with 6 threads = 141,321 simulataneous simulations (thats a whole lotta simulations)
+	
+	
+	void create_graph(float* theta, long unsigned datasetSize){
+	// iterate through tiles on the IPU, map simulations to each thread (6) on each tile
+		for (int i = 0; i < datasetSize; ++i){
+			 int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
+			 int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
+			 graph.setTileMapping(w_init[i], tileInt);
+			 graph.setTileMapping(m_init[i], tileInt);
+			 graph.setTileMapping(reactOne_rates[i], tileInt);
+			 graph.setTileMapping(reactTwo_rates[i], tileInt);
+			 graph.setTileMapping(reactThree_rates[i], tileInt);
+			 graph.setTileMapping(reactFour_rates[i], tileInt);
+			 graph.setTileMapping(reactFive_rates[i], tileInt);
+			 
+			 graph.setTileMapping(conOne_rates[i], tileInt);
+			 graph.setTileMapping(conTwo_rates[i], tileInt);
+
+			 graph.setTileMapping(output[i], tileInt);
+
+			 VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
+			 graph.setTileMapping(vtx, tileInt);
+
+			 graph.connect(vtx["w_init"], w_init[i]);
+			 graph.connect(vtx["m_init"], m_init[i]);
+			 graph.connect(vtx["reactOne_rates"], reactOne_rates[i]);
+			 graph.connect(vtx["reactTwo_rates"], reactTwo_rates[i]);
+			 graph.connect(vtx["reactThree_rates"], reactThree_rates[i]);
+			 graph.connect(vtx["reactFour_rates"], reactFour_rates[i]);
+			 graph.connect(vtx["reactFive_rates"], reactFive_rates[i]);
+			 graph.connect(vtx["conOne_rates"], conOne_rates[i]);
+			 graph.connect(vtx["conTwo_rates"], conTwo_rates[i]);
+
+			 graph.connect(vtx["out"], output[i]);
+		}
+
+		// to be able to read the output
+		graph.createHostRead("output-read", output);
+
+		// Add a step to execute the compute set
+		prog.add(Execute(computeSet));
+		// Add a step to print out sim results
+		// prog.add(PrintTensor("output", output));
+		// Create the engine
+		Engine engine(graph, prog);
+		engine.load(device);
+
+		auto start = std::chrono::system_clock::now();
+		// Run the control program
+		engine.run(0);
+		auto end = std::chrono::system_clock::now();
+	}
 	 
 	 int tileInt;
 
