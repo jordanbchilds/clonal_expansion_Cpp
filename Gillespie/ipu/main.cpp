@@ -84,6 +84,8 @@ int main()
   
 	int w_initBoss = 50000;
 	int m_initBoss = 50000;
+	
+	int copyNum_0 = 1e5;
     float reactOne_ratesBoss = 3.06e-8;
 	float reactTwo_ratesBoss = 3.06e-8;
 	float reactThree_ratesBoss = 3.06e-8;
@@ -95,8 +97,8 @@ int main()
 	std::default_random_engine generator;
 	std::normal_distribution<float> rate_dist(3.06e-8,5e-9);
 	std::normal_distribution<float> con_dist(2e-3, 5e-4);
-	std::uniform_real_distribution<float> ML_dist(0.05,0.15);
-	std::normal_distribution<float> CN_dist(1000, 100);
+	std::uniform_real_distribution<float> ML_dist(0.45,0.55);
+	std::normal_distribution<float> CN_dist(copyNum_0, 1000);
 	
     for (int i = 0; i < datasetSize; ++i){
 		//w_initVals[i] = w_initBoss;
