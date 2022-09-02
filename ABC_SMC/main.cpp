@@ -248,6 +248,10 @@ int main()
 	Tensor con_rates = graph.addVariable(FLOAT, {datasetSize, 2}, "con_rates");
 
 	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
+	
+	for(int i=0; i<Ntheta; ++i){
+		popDyn[i] = {100,100};
+	}
 	/*
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	const int Nabc = 10;
