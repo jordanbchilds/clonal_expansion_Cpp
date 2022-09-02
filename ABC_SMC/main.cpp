@@ -243,15 +243,16 @@ int main()
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	*/
-	Tensor popDyn = graph.addVariable(INT, {datasetSize, 2}, "popDyn") ;
+	Tensor popDyn = graph.addVariable(INT, {datasetSize}, "popDyn") ;
 	Tensor react_rates = graph.addVariable(FLOAT, {datasetSize, 5,2}, "react_rates") ;
 	Tensor con_rates = graph.addVariable(FLOAT, {datasetSize, 2}, "con_rates");
 
 	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
 	
 	for(int i=0; i<Ntheta; ++i){
-		popDyn[i] = {100,100};
+		popDyn[i] = 100;
 	}
+	
 	/*
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	const int Nabc = 10;
