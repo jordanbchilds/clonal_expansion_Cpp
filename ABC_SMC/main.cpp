@@ -40,13 +40,15 @@ struct myTheta {
 	unsigned mInit;
 } ;
 
+/*
 myTheta check_limits(myTheta theta, float* limits_array){
-	inSupport = true;
+	bool inSupport = true;
 	for(int i=0; i<9; ++i){
 		inSupport &= (
 	}
-	
+	re
 }
+*/
 
 myTheta perturb(myTheta theta_star){
 	myTheta theta_ss;
@@ -61,6 +63,8 @@ myTheta perturb(myTheta theta_star){
 	
 	theta_ss.wInit = theta_star.wInit + runif_disc(25) ;
 	theta_ss.mInit = theta_star.wInit + runif_disc(25) ;
+	
+	return theta_ss;
 }
 
 int runif_disc(unsigned h){
@@ -180,7 +184,7 @@ int main()
 	 std::cout << "Trying to attach to IPU\n";
 	 auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
 		 return device.attach();
-	 });
+	});
 	 if (it == devices.end()) {
 		 std::cerr << "Error attaching to device\n";
 		 return -1;
