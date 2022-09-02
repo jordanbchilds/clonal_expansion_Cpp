@@ -109,108 +109,106 @@ myTheta perturb(myTheta theta_star){
 	
 	return theta_ss;
 }
+/*
+void create_graph(float* theta, long unsigned datasetSize){
+// iterate through tiles on the IPU, map simulations to each thread (6) on each tile
+	for (int i = 0; i < datasetSize; ++i){
+		 int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
+		 int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
+		 graph.setTileMapping(w_init[i], tileInt);
+		 graph.setTileMapping(m_init[i], tileInt);
+		 graph.setTileMapping(reactOne_rates[i], tileInt);
+		 graph.setTileMapping(reactTwo_rates[i], tileInt);
+		 graph.setTileMapping(reactThree_rates[i], tileInt);
+		 graph.setTileMapping(reactFour_rates[i], tileInt);
+		 graph.setTileMapping(reactFive_rates[i], tileInt);
+		 
+		 graph.setTileMapping(conOne_rates[i], tileInt);
+		 graph.setTileMapping(conTwo_rates[i], tileInt);
 
+		 graph.setTileMapping(output[i], tileInt);
+
+		 VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
+		 graph.setTileMapping(vtx, tileInt);
+
+		 graph.connect(vtx["w_init"], w_init[i]);
+		 graph.connect(vtx["m_init"], m_init[i]);
+		 graph.connect(vtx["reactOne_rates"], reactOne_rates[i]);
+		 graph.connect(vtx["reactTwo_rates"], reactTwo_rates[i]);
+		 graph.connect(vtx["reactThree_rates"], reactThree_rates[i]);
+		 graph.connect(vtx["reactFour_rates"], reactFour_rates[i]);
+		 graph.connect(vtx["reactFive_rates"], reactFive_rates[i]);
+		 graph.connect(vtx["conOne_rates"], conOne_rates[i]);
+		 graph.connect(vtx["conTwo_rates"], conTwo_rates[i]);
+
+		 graph.connect(vtx["out"], output[i]);
+	}
+
+	// to be able to read the output
+	graph.createHostRead("output-read", output);
+
+	// Add a step to execute the compute set
+	prog.add(Execute(computeSet));
+	// Add a step to print out sim results
+	// prog.add(PrintTensor("output", output));
+	// Create the engine
+	Engine engine(graph, prog);
+	engine.load(device);
+
+	auto start = std::chrono::system_clock::now();
+	// Run the control program
+	engine.run(0);
+	auto end = std::chrono::system_clock::now();
+}
+*/
 int main()
 {
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
 
-	 long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ; // 16 cores with 1472 tiles with 6 threads = 141,321 simulataneous simulations (thats a whole lotta simulations)
-	
-	
-	void create_graph(float* theta, long unsigned datasetSize){
-	// iterate through tiles on the IPU, map simulations to each thread (6) on each tile
-		for (int i = 0; i < datasetSize; ++i){
-			 int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
-			 int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
-			 graph.setTileMapping(w_init[i], tileInt);
-			 graph.setTileMapping(m_init[i], tileInt);
-			 graph.setTileMapping(reactOne_rates[i], tileInt);
-			 graph.setTileMapping(reactTwo_rates[i], tileInt);
-			 graph.setTileMapping(reactThree_rates[i], tileInt);
-			 graph.setTileMapping(reactFour_rates[i], tileInt);
-			 graph.setTileMapping(reactFive_rates[i], tileInt);
-			 
-			 graph.setTileMapping(conOne_rates[i], tileInt);
-			 graph.setTileMapping(conTwo_rates[i], tileInt);
+	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
+	int tileInt;
 
-			 graph.setTileMapping(output[i], tileInt);
+	float tmax = 120.0*365.0; // 120 years in seconds
+	float stepOut = 365.0; // 1 year in seconds
+	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 
-			 VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
-			 graph.setTileMapping(vtx, tileInt);
+	// Create the DeviceManager which is used to discover devices
+	auto manager = DeviceManager::createDeviceManager();
+	// Attempt to attach to a single IPU:
+	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
 
-			 graph.connect(vtx["w_init"], w_init[i]);
-			 graph.connect(vtx["m_init"], m_init[i]);
-			 graph.connect(vtx["reactOne_rates"], reactOne_rates[i]);
-			 graph.connect(vtx["reactTwo_rates"], reactTwo_rates[i]);
-			 graph.connect(vtx["reactThree_rates"], reactThree_rates[i]);
-			 graph.connect(vtx["reactFour_rates"], reactFour_rates[i]);
-			 graph.connect(vtx["reactFive_rates"], reactFive_rates[i]);
-			 graph.connect(vtx["conOne_rates"], conOne_rates[i]);
-			 graph.connect(vtx["conTwo_rates"], conTwo_rates[i]);
-
-			 graph.connect(vtx["out"], output[i]);
-		}
-
-		// to be able to read the output
-		graph.createHostRead("output-read", output);
-
-		// Add a step to execute the compute set
-		prog.add(Execute(computeSet));
-		// Add a step to print out sim results
-		// prog.add(PrintTensor("output", output));
-		// Create the engine
-		Engine engine(graph, prog);
-		engine.load(device);
-
-		auto start = std::chrono::system_clock::now();
-		// Run the control program
-		engine.run(0);
-		auto end = std::chrono::system_clock::now();
-	}
-	 
-	 int tileInt;
-
-	 float tmax = 120.0*365.0*24.0*3600.0; // 120 years in seconds
-	 float stepOut = 365.0*24.0*3600.0; // 1 year in seconds
-	 long unsigned int Nout = (int) (tmax/stepOut + 1.0);
-	 
-	 // Create the DeviceManager which is used to discover devices
-	 auto manager = DeviceManager::createDeviceManager();
-	 // Attempt to attach to a single IPU:
-	 auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
-	 
-	 std::cout << "Trying to attach to IPU\n";
-	 auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
-		 return device.attach();
+	std::cout << "Trying to attach to IPU\n";
+	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
+		return device.attach();
 	});
-	 if (it == devices.end()) {
-		 std::cerr << "Error attaching to device\n";
-		 return -1;
-	 }
-	 auto device = std::move(*it);
-	 std::cout << "Attached to IPU " << device.getId() << std::endl;
-	 Target target = device.getTarget();
+	if (it == devices.end()) {
+	    std::cerr << "Error attaching to device\n";
+		return -1;
+	}
+	auto device = std::move(*it);
+	std::cout << "Attached to IPU " << device.getId() << std::endl;
+	Target target = device.getTarget();
 
-	 // Create the Graph object
-	 Graph graph(target);
+	// Create the Graph object
+	Graph graph(target);
 
-	 // Add codelets to the graph
-	 graph.addCodelets("gillespie_codelet.cpp");
-	 // Create a control program that is a sequence of steps
-	 Sequence prog;
-		
+	// Add codelets to the graph
+	graph.addCodelets("gillespie_codelet.cpp");
+	// Create a control program that is a sequence of steps
+	Sequence prog;
+
 	/*
-	 DEFINE PRIOR DISTRIBUTIONS
-	 only used for first sample
-	 */
+	DEFINE PRIOR DISTRIBUTIONS
+	only used for first sample
+	*/
 	std::default_random_engine generator;
 	std::normal_distribution<float> rate_dist(3.06e-8,5e-9);
 	std::normal_distribution<float> con_dist(2e-3, 5e-4);
 	std::uniform_real_distribution<float> ML_dist(0.45,0.55);
 	std::normal_distribution<float> CN_dist(1e4, 250);
-	
+
 	const unsigned Ntheta = 1000;
 	myTheta param_space[Ntheta];
 	/*
@@ -223,10 +221,10 @@ int main()
 		param_space[i].deg_wld = rate_dist(generator);
 		param_space[i].deg_mnt = rate_dist(generator);
 		param_space[i].mutation = 0.0;
-		
+
 		param_space[i].con_above = con_dist(generator);
 		param_space[i].con_below = con_dist(generator);
-		
+
 		int c0 = CN_dist(generator);
 		float h0 = ML_dist(generator);
 		param_space[i].wInit = round( c0*(1.0-h0) );
@@ -241,14 +239,14 @@ int main()
 	Tensor reactThree_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactThree_ratesVals);
 	Tensor reactFour_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFour_ratesVals);
 	Tensor reactFive_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFive_ratesVals);
-	
+
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
-	 */
+	*/
 	Tensor popDyn = graph.addVariable(INT, {datasetSize, 2}, "popDyn") ;
 	Tensor react_rates = graph.addVariable(FLOAT, {datasetSize, 5,2}, "react_rates") ;
 	Tensor con_rates = graph.addVariable(FLOAT, {datasetSize, 2}, "con_rates");
-	
+
 	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
 	/*
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
@@ -258,17 +256,16 @@ int main()
 	myTheta param_state[Ntheta];
 
 	for(int i=0; i<Nabc; ++i){
-		weights[i] = 1.0;
-		// sample from some priors for inital state
+	    weights[i] = 1.0;
 	}
 
 	for(int t=0; t<Nabc; ++t){
-		int i = 0;
+	    int i = 0;
 		while( i<Ntheta ){
 			unsigned index = rdisc(Ntheta, weights);
 			myTheta theta_star = perturb(*(param_state+index));
-			
-			// create_graph();
+
+		// create_graph();
 		}
 	}
 
@@ -276,9 +273,9 @@ int main()
 	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
 
 	std::cout << "Completed computation at " << std::ctime(&end_time)
-			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
+	<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
 	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
-								   
+
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
 	std::ofstream wild_file ("ipu_wldCount.txt");
@@ -298,6 +295,6 @@ int main()
 		mtnt_file<< "\n";
 	}
 	mtnt_file.close();
-	 */
+	*/
 	return 0;
 }
