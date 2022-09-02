@@ -243,9 +243,9 @@ int main()
 	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	*/
-	Tensor popDyn = graph.addVariable(INT, {datasetSize}, "popDyn") ;
+	Tensor popDyn = graph.addConstant(INT, {datasetSize}, "popDyn") ;
 	
-	Tensor popDyn = graph.addVariable(INT, {datasetSize}, "popDyn") ;
+	Tensor popDyn = graph.addConstant(INT, {datasetSize}, "popDyn") ;
 	Tensor react_rates = graph.addVariable(FLOAT, {datasetSize, 5,2}, "react_rates") ;
 	Tensor con_rates = graph.addVariable(FLOAT, {datasetSize, 2}, "con_rates");
 
