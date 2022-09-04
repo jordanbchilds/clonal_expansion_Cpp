@@ -180,6 +180,9 @@ int main()
 	
 	// Run the control program
 	engine.run(0);
+	
+	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
+	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
 	auto start = std::chrono::system_clock::now();
 	
@@ -208,8 +211,6 @@ int main()
 
 	std::cout << "Completed computation at " << std::ctime(&end_time)
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
-	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
-	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 	
 	return 0;
 }
