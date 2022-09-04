@@ -50,13 +50,12 @@ public:
 		return result;
 	}
 	
-	float rand_unif(float lower=0.0, float upper=1.0){
-		float unif_01 = (float) (__builtin_ipu_urand32()) / (float) (4294967295) ; // 4,294,967,295 is the max value of an unsigned iteger... I think.
-		return unif_01*(upper-lower) + lower;
+	float runif_01(){
+		return (float) (__builtin_ipu_urand32()) / (float) (4294967295);
 	}
 	
 	double rand_exp(float lambda){
-		float unif_01 = rand_unif();
+		float unif_01 = runif_01();
 		return -1.0*log(1.0-unif_01)/lambda;
 	}
 	
@@ -73,7 +72,7 @@ public:
 			cumWeights[i] = cc;
 		}
 
-		float u = rand_unif() ;
+		float u = runif_01() ;
 		if( 0<=u && u<cumWeights[0] ){
 			return 0;
 		} else {
