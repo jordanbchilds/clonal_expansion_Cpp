@@ -85,7 +85,7 @@ int main()
 	int w_initBoss = 500;
 	int m_initBoss = 500;
 	
-	int copyNum_0 = 1e5;
+	int copyNum_0 = 1e3;
     float reactOne_ratesBoss = 3.06e-8;
 	float reactTwo_ratesBoss = 3.06e-8;
 	float reactThree_ratesBoss = 3.06e-8;
