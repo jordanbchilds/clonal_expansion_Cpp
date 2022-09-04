@@ -82,8 +82,8 @@ int main()
 	float conOne_ratesVals[datasetSize];
 	float conTwo_ratesVals[datasetSize];
   
-	int w_initBoss = 50000;
-	int m_initBoss = 50000;
+	int w_initBoss = 500;
+	int m_initBoss = 500;
 	
 	int copyNum_0 = 1e5;
     float reactOne_ratesBoss = 3.06e-8;
