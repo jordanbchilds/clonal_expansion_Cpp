@@ -111,8 +111,8 @@ myTheta perturb(myTheta theta_star){
 
 enum Progs {
 	WRITE_INPUTS,
-	CUSTOM_PROG,
-	READ_RESULTS
+	CUSTOM_PROG
+	//READ_RESULTS
 };
 
 std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
@@ -128,21 +128,19 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
 	long unsigned nParam = 9;
-	// Create Tensor of params to be passed to tile
-	Tensor theta = graph.addVariable(FLOAT, {nParam}, "a");
 	
-	// Tensor to stoer output from each tile
+	Tensor theta = graph.addVariable(FLOAT, {nParam}, "a");
 	Tensor output = graph.addVariable(INT, {datasetSize,Nout*2}, "output");
-	// In order to do any computation we need a compute set and a compute
-	// vertex that is placed in that compute set:
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
 	// Map tensors to tiles
 	for(int i=0; i<datasetSize; ++i){
+		
 		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		
 		graph.setTileMapping(theta, tileInt);
+		graph.setTileMapping(output[i], tileInt);
 		
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
 		graph.setTileMapping(vtx, tileInt);
@@ -157,60 +155,51 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 
 	// Create streams that allow reading and writing of the variables:
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
-	auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
-	auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
+	//auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
+	//auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
 	std::vector<Program> progs;
 
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
-	progs[WRITE_INPUTS] = Sequence({program::Copy(param_stream, theta),program::Copy(output_inStream, output)});
+	progs[WRITE_INPUTS] = program::Copy(param_stream);
 
 	// Program that executes custom vertex in compute set 1:
 	progs[CUSTOM_PROG] = Execute(computeSet);
 
 	// Add a program to read back the result:
-	progs[READ_RESULTS] = Copy(output, output_outStream);
+	//nprogs[READ_RESULTS] = Copy(output, output_outStream);
 
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, poplar::Device &device, poplar::Executable &exe) {
+void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::Device &device, poplar::Executable &exe) {
+	
+	const int numberOfCores = 16; // access to POD16
+	const int numberOfTiles = 1472;
+	const int threadsPerTile = 6;
 
+	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
+	
 	poplar::Engine engine(std::move(exe));
 	engine.load(device);
 	
-	int output[datasetSize][Nout][2] = {0};
+	//int output[datasetSize][Nout][2] = {0};
 
 	engine.connectStream("param_stream", theta_ptr, theta_ptr+nParam);
-	engine.connectStream("output_inStream", y.data());
-	engine.connectStream("output_outStream", zInit.data());
+	//engine.connectStream("output_inStream", &output, &output[datasetSize][Nout][2]);
 
 	// Run using custom vertex:
-	engine.connectStream("read_z",  zResult1.data());
+	//engine.connectStream("output_outStream",  zResult1.data());
 	engine.run(WRITE_INPUTS);
 	engine.run(CUSTOM_PROG);
-	engine.run(READ_RESULTS);
+	//engine.run(READ_RESULTS);
 
-	// Check both methods give same result:
-	for (auto i = 0u; i< zResult1.size(); ++i) {
-		if (zResult1[i] != zResult2[i]) {
-			throw std::runtime_error("Results do not match");
-		}
-	}
-	std::cerr << "Results match.\n";
-
-	if (options.profile) {
-		// Retrieve and save profiling information from the engine:
-		std::ofstream of(options.profileName);
-		engine.printProfileSummary(of, {{"showExecutionSteps", "true"}});
-	}
 }
 
 
-int main()
-{
+int main() {
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
@@ -276,7 +265,6 @@ int main()
 	<< "Time to create "<< Ntheta<<" graphs: " << elapsed_seconds.count() << "s" << std::endl;
 	
 	/*
-	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	const int Nabc = 10;
 	float thresholds[Nabc];
 	float weights[Ntheta];
@@ -291,8 +279,6 @@ int main()
 		while( i<Ntheta ){
 			unsigned index = rdisc(Ntheta, weights);
 			myTheta theta_star = perturb(*(param_state+index));
-
-		// create_graph();
 		}
 	}
 
@@ -305,23 +291,14 @@ int main()
 
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
-	std::ofstream wild_file ("ipu_wldCount.txt");
+	std::ofstream myFile ("filename.txt");
 	for(int i=0; i<datasetSize; ++i){
 		for(int j=0; j<Nout; ++j){
-			wild_file<< cpu_vector[ i*2*Nout + 2*j ] << "\t" ;
+			myfile<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "\t" ;
 		}
-		wild_file<< "\n";
+		myFile<< "\n";
 	}
-	wild_file.close();
-
-	std::ofstream mtnt_file ("ipu_mntCount.txt");
-	for(int i=0; i<datasetSize; ++i){
-		for(int j=0; j<Nout; ++j){
-			mtnt_file<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "\t" ;
-		}
-		mtnt_file<< "\n";
-	}
-	mtnt_file.close();
+	myFile.close();
 	*/
 	return 0;
 }

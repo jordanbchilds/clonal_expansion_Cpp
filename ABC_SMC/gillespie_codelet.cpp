@@ -13,7 +13,8 @@ using namespace std;
 class sim_network_vertex : public poplar::Vertex
 {
 public:
-	Input<int> w_init;
+	Input<vector<float>> model_params ;
+	/*
 	Input<int> m_init;
     Input<float> reactOne_rates;
 	Input<float> reactTwo_rates;
@@ -22,7 +23,7 @@ public:
 	Input<float> reactFive_rates;
     Input<float> conOne_rates;
 	Input<float> conTwo_rates;
-
+	 */
     Output<Vector<int>> out;
 	
 	struct sim_network {
@@ -177,14 +178,11 @@ public:
 		spn.Stoi = S_ptr;
 		
 		int x_init[Nspecies];
-		x_init[0] = w_init;
-		x_init[1] = m_init;
+		x_init[0] = model_params[0];
+		x_init[1] = model_params[1];
 		float react_rates[Nreact];
-		react_rates[0] = reactOne_rates;
-		react_rates[1] = reactTwo_rates;
-		react_rates[2] = reactThree_rates;
-		react_rates[3] = reactFour_rates;
-		react_rates[4] = reactFive_rates;
+		for(int i=0; i<5; ++i)
+			react_rates[i] = model_params[2+i];
 		float con_rates[2];
 		con_rates[0] = conOne_rates;
 		con_rates[1] = conTwo_rates;
