@@ -191,7 +191,7 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 	engine.run(WRITE_INPUTS);
 	engine.run(CUSTOM_PROG);
 	//engine.run(READ_RESULTS);
-	
+	/*
 	cout<< "Engine ran successfully (?)" << endl;
 	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
@@ -213,8 +213,7 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 		mtnt_file<< "\n";
 	}
 	mtnt_file.close();
-	
-
+	*/
 }
 
 
