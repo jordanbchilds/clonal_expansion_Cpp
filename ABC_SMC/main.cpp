@@ -169,10 +169,7 @@ poplar::program::Program buildGraphAndPrograms( poplar::Graph &graph ) {
 
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
-	progs[WRITE_INPUTS] = program::Sequence(
-											{program::Copy(input_stream, theta),
-											 program::Copy(output_inStream, output)}
-											);
+	progs[WRITE_INPUTS] = program::Sequence({program::Copy(input_stream, theta),program::Copy(output_inStream, output)});
 
 	// Program that executes custom vertex in compute set 1:
 	progs[CUSTOM_PROG] = program::Execute(computeSet);
