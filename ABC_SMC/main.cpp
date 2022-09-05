@@ -161,7 +161,7 @@ poplar::program::Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	// Create streams that allow reading and writing of the variables:
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
 	auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
-	auto output_soutStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
+	auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// auto stream4 = g.addDeviceToHostFIFO("read_z",  FLOAT, v3.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
