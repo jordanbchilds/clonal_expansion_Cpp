@@ -22,8 +22,7 @@
 #include <chrono>
 #include <ctime>
 
-using namespace poplar;
-using namespace poplar::program;
+// using namespace poplar;
 
 struct myTheta {
 	float rep_wld;
@@ -162,14 +161,13 @@ poplar::program::Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
 	auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
 	auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
-	// auto stream4 = g.addDeviceToHostFIFO("read_z",  FLOAT, v3.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
 	program::Program progs;
 
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
-	progs[WRITE_INPUTS] = program::Sequence({program::Copy(input_stream, theta),program::Copy(output_inStream, output)});
+	progs[WRITE_INPUTS] = program::Sequence({program::Copy(param_stream, theta),program::Copy(output_inStream, output)});
 
 	// Program that executes custom vertex in compute set 1:
 	progs[CUSTOM_PROG] = program::Execute(computeSet);
