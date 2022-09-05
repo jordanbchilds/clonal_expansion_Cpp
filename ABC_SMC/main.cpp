@@ -130,9 +130,8 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
-	graph.addCodelets("gillespie_codelets.cpp");
+	graph.addCodelets("gillespie_codelet.cpp");
 
-	
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "a");
 	Tensor output = graph.addVariable(INT, {datasetSize,Nout*2}, "output");
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
