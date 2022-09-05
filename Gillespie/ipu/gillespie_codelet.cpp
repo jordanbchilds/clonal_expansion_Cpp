@@ -90,7 +90,6 @@ public:
 	}
 
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
-		
 		int Nout = simnet.Nout;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;

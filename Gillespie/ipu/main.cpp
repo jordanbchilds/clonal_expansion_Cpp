@@ -28,6 +28,7 @@ using namespace poplar::program;
 
 int main()
 {
+	auto start = std::chrono::system_clock::now();
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
@@ -177,15 +178,15 @@ int main()
 	// Create the engine
 	Engine engine(graph, prog);
 	engine.load(device);
+	auto end = std::chrono::system_clock::now();
 	
 	// Run the control program
 	engine.run(0);
 	
+	
 	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
-	auto start = std::chrono::system_clock::now();
-	
 	std::ofstream wild_file ("ipu_wldCount.txt");
 	for(int i=0; i<datasetSize; ++i){
 		for(int j=0; j<Nout; ++j){
@@ -203,8 +204,6 @@ int main()
 		mtnt_file<< "\n";
 	}
 	mtnt_file.close();
-	
-	auto end = std::chrono::system_clock::now();
 
 	std::chrono::duration<double> elapsed_seconds = end-start;
 	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
