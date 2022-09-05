@@ -127,7 +127,6 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
 	long unsigned nParam = 9;
-	
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
@@ -153,6 +152,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	}
 	// Create streams that allow reading and writing of the variables:
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
+	std::cout<< "write_theta Stream created" <<std::endl;
 	//auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
 	//auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
@@ -180,6 +180,7 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 
 	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
 	
+	std::cout<< "Initializing engine" <<std::endl;
 	Engine engine(graph, prog);
 	engine.load(device);
 	
