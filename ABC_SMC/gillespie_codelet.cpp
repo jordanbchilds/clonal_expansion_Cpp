@@ -178,14 +178,14 @@ public:
 		spn.Stoi = S_ptr;
 		
 		int x_init[Nspecies];
-		x_init[0] = model_params[0];
-		x_init[1] = model_params[1];
+		x_init[0] = theta[0];
+		x_init[1] = theta[1];
 		float react_rates[Nreact];
 		for(int i=0; i<5; ++i)
-			react_rates[i] = model_params[2+i];
+			react_rates[i] = theta[2+i];
 		float con_rates[2];
-		con_rates[0] = conOne_rates;
-		con_rates[1] = conTwo_rates;
+		con_rates[0] = theta[7];
+		con_rates[1] = theta[8];
 		
 		int output[spn.Nout][spn.n_species];
 		int* output_ptr = &output[0][0];
