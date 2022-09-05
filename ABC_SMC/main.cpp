@@ -164,6 +164,7 @@ std::vector<poplar::program::Program> buildGraphAndPrograms(poplar::Graph &g ) {
 
 	// Create streams that allow reading and writing of the variables:
 	auto input_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
+	auto ouput_stream = graph.addDeviceToHostFIFO("read_output", FLOAT, datasetSize*Nout*2);
 	// auto stream4 = g.addDeviceToHostFIFO("read_z",  FLOAT, v3.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
@@ -179,7 +180,7 @@ std::vector<poplar::program::Program> buildGraphAndPrograms(poplar::Graph &g ) {
 	progs[CUSTOM_PROG] = program::Execute(cs1);
 
 	// Add a program to read back the result:
-	progs[READ_RESULTS] = program::Copy(, output_stream);
+	progs[READ_RESULTS] = program::Copy(output, output_stream);
 
 	// return progs;
 }
@@ -220,9 +221,6 @@ int main()
 	}
 	
 	auto start = std::chrono::system_clock::now();
-	for(int i=0; i<Ntheta; ++i){
-		create_graph(param_space[i]) ;
-	}
 	auto end = std::chrono::system_clock::now();
 	
 	std::chrono::duration<double> elapsed_seconds = end-start;
