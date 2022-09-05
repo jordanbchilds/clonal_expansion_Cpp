@@ -222,7 +222,7 @@ int main() {
 	std::vector<Program> progs;
 	
 	progs = buildGraphAndPrograms(graph);
-	cout<< "buildGraphAndPrograms complete" <endl;
+	cout<< "buildGraphAndPrograms complete" <<endl;
 	int nParam = 9;
 	float Tmax = 120.0*365.0*24.0*3600.0 ;
 	float step_out = 365.0*24.0*3600.0 ;
