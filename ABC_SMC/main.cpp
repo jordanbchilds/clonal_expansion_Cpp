@@ -173,15 +173,13 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 
 	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
 	
-
+	auto start1 = std::chrono::system_clock::now();
 	Engine engine(graph, prog);
 	engine.load(device);
-
-	//int output[datasetSize][Nout][2] = {0};
-	auto start1 = std::chrono::system_clock::now();
+	auto end1 = std::chrono::system_clock::now();
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	engine.run(WRITE_INPUTS);
-	auto end1 = std::chrono::system_clock::now();
+	
 	
 	std::chrono::duration<double> elapsed_seconds1 = end1-start1;
 	std::cout << "engine.connectStream time: " << elapsed_seconds1.count() << "s" << std::endl;
