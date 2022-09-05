@@ -29,6 +29,7 @@ using namespace poplar::program;
 int main()
 {
 	auto start = std::chrono::system_clock::now();
+	
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
@@ -112,7 +113,7 @@ int main()
 		reactTwo_ratesVals[i] =  reactTwo_ratesBoss ; //rate_dist(generator);
 		reactThree_ratesVals[i] =  reactThree_ratesBoss ; //rate_dist(generator);
 		reactFour_ratesVals[i] =  reactFour_ratesBoss ; //rate_dist(generator);
-		reactFive_ratesVals[i] =  0.0 ;
+		reactFive_ratesVals[i] =  reactFive_ratesBoss ;
 		conOne_ratesVals[i] = conOne_ratesBoss ; //con_dist(generator);
 		conTwo_ratesVals[i] = conTwo_ratesBoss ; //con_dist(generator);
     }
@@ -178,11 +179,10 @@ int main()
 	// Create the engine
 	Engine engine(graph, prog);
 	engine.load(device);
-	auto end = std::chrono::system_clock::now();
+	
 	
 	// Run the control program
 	engine.run(0);
-	
 	
 	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
@@ -204,6 +204,8 @@ int main()
 		mtnt_file<< "\n";
 	}
 	mtnt_file.close();
+	
+	auto end = std::chrono::system_clock::now();
 
 	std::chrono::duration<double> elapsed_seconds = end-start;
 	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
