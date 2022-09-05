@@ -184,7 +184,7 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 	auto end1 = std::chrono::system_clock::now();
 	
 	std::chrono::duration<double> elapsed_seconds1 = end1-start1;
-	std::cout << "engine.connectStream time: " << elapsed_seconds.count() << "s" << std::endl;
+	std::cout << "engine.connectStream time: " << elapsed_seconds1.count() << "s" << std::endl;
 	
 	
 	auto start = std::chrono::system_clock::now();
