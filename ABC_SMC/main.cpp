@@ -242,8 +242,8 @@ int main() {
 	
 	cout<< "buildGraphAndPrograms complete" <<endl;
 	int nParam = 9;
-	float Tmax = 120.0*365.0*24.0*3600.0 ;
-	float step_out = 365.0*24.0*3600.0 ;
+	float Tmax = 120.0*365.0 ;
+	float step_out = 365.0 ;
 	long unsigned Nout = (long unsigned) Tmax/step_out + 1.0;
 	
 	
