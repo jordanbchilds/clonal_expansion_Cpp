@@ -128,6 +128,11 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	
 	long unsigned nParam = 9;
 	
+
+	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
+	graph.addCodelets("gillespie_codelets.cpp");
+
+	
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "a");
 	Tensor output = graph.addVariable(INT, {datasetSize,Nout*2}, "output");
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
@@ -147,11 +152,6 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 		graph.connect(vtx["theta"], theta);
 		graph.connect(vtx["out"], output[i]);
 	}
-		
-
-	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
-	graph.addCodelets("gillespie_codelets.cpp");
-
 	// Create streams that allow reading and writing of the variables:
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
 	//auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
