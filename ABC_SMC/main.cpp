@@ -256,8 +256,8 @@ int main() {
 	executeGraphProgram(theta_ptr, nParam, Nout, device, progs, graph);
 	auto end = std::chrono::system_clock::now();
 	
-	std::cout << "Completed computation at " << std::ctime(&end_time)
-	<< "Execution time: " << elapsed_seconds.count() << "s" << std::endl;
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::cout << "Execution time: " << elapsed_seconds.count() << "s" << std::endl;
 	
 
 	/*
