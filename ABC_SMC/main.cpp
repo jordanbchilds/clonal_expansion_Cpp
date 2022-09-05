@@ -15,7 +15,6 @@
 #include <fstream>
 #include <cmath>
 #include <random>
-#include <boost/math/distributions/beta.hpp>
 
 #include <poplar/Engine.hpp>
 #include <poplar/Graph.hpp>
@@ -133,13 +132,13 @@ std::vector<poplar::program::Program> buildGraphAndPrograms( poplar::Graph &grap
 	
 	std::size_t nParam = 9;
 	// Create Tensor of params to be passed to tile
-	Tensor theta = gaph.addVariable(FLOAT, {nParam}, "a");
+	Tensor theta = graph.addVariable(FLOAT, {nParam}, "a");
 	
 	// Tensor to stoer output from each tile
 	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
 	// In order to do any computation we need a compute set and a compute
 	// vertex that is placed in that compute set:
-	ComputeSet cs1 = graph.addComputeSet("cs1");
+	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
 	// Map tensors to tiles
 	for(int i=0; i<datasetSize; ++i){
@@ -151,7 +150,7 @@ std::vector<poplar::program::Program> buildGraphAndPrograms( poplar::Graph &grap
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
 		graph.setTileMapping(vtx, tileInt);
 		
-		graph.connect(vtx["theta"], theta)
+		graph.connect(vtx["theta"], theta);
 		graph.connect(vtx["out"], output[i]);
 	}
 		
@@ -161,16 +160,19 @@ std::vector<poplar::program::Program> buildGraphAndPrograms( poplar::Graph &grap
 
 	// Create streams that allow reading and writing of the variables:
 	auto input_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
-	auto ouput_stream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.);
+	auto output_stream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// auto stream4 = g.addDeviceToHostFIFO("read_z",  FLOAT, v3.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
-	progs[WRITE_INPUTS] = program::Sequence( program::Copy(input_stream, theta) );
+	progs[WRITE_INPUTS] = program::Sequence(
+											{program::Copy(input_stream, theta),
+											 program::Copy(output_stream, output)}
+											);
 
 	// Program that executes custom vertex in compute set 1:
-	progs[CUSTOM_PROG] = program::Execute(cs1);
+	progs[CUSTOM_PROG] = program::Execute(computeSet);
 
 	// Add a program to read back the result:
 	progs[READ_RESULTS] = program::Copy(output, output_stream);
