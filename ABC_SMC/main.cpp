@@ -114,7 +114,7 @@ enum Progs {
 	WRITE_INPUTS,
 	CUSTOM_PROG,
 	READ_RESULTS
-}
+};
 
 std::vector<poplar::program::Program> buildGraphAndPrograms(poplar::Graph &g ) {
 	// Use the namespace here to make graph construction code less verbose:
@@ -181,7 +181,7 @@ std::vector<poplar::program::Program> buildGraphAndPrograms(poplar::Graph &g ) {
 	// Add a program to read back the result:
 	progs[READ_RESULTS] = program::Copy(, output_stream);
 
-	return progs;
+	// return progs;
 }
 
 
