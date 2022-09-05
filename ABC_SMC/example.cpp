@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <vector>
 
-#include "utils.h"
+#include "utils.cpp"
 
 #include <popops/Reduce.hpp>
 #include <popops/codelets.hpp>
