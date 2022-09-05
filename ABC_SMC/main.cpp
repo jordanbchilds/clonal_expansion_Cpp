@@ -112,6 +112,45 @@ myTheta perturb(myTheta theta_star){
 
 void create_graph(float* theta, long unsigned datasetSize){
 // iterate through tiles on the IPU, map simulations to each thread (6) on each tile
+	const int numberOfCores = 16; // access to POD16
+	const int numberOfTiles = 1472;
+	const int threadsPerTile = 6;
+
+	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
+	int tileInt;
+
+	float tmax = 120.0*365.0; // 120 years in seconds
+	float stepOut = 365.0; // 1 year in seconds
+	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
+
+	// Create the DeviceManager which is used to discover devices
+	auto manager = DeviceManager::createDeviceManager();
+	// Attempt to attach to a single IPU:
+	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
+
+	// std::cout << "Trying to attach to IPU\n";
+	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
+		return device.attach();
+	});
+	if (it == devices.end()) {
+		std::cerr << "Error attaching to device\n";
+		return -1;
+	}
+	auto device = std::move(*it);
+	// std::cout << "Attached to IPU " << device.getId() << std::endl;
+
+	float reactOnes_rates[datasetSize];
+	float reactTwo_rates[datasetSize];
+	float reactThree_rates[datasetSize];
+	float reactFour_rates[datasetSize];
+	float reactFive_rates[datasetSize];
+	
+	float conOne_rates[datasetSize];
+	float conTwo_rates[datasetSize];
+	
+	int w_initVals[datasetSize];
+	int m_initVals[datasetSize];
+	
 	for(int i=0; i<datasetSize; ++i){
 		reactOne_rates[i] = *(theta);
 		reactTwo_rates[i] = *(theta+1);
@@ -134,6 +173,17 @@ void create_graph(float* theta, long unsigned datasetSize){
 	Tensor reactFive_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFive_ratesVals);
 	Tensor conOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
+	
+	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}. "output")
+	Target target = device.getTarget();
+	
+	// Create the Graph object
+	Graph graph(target);
+
+	// Add codelets to the graph
+	graph.addCodelets("gillespie_codelet.cpp");
+	// Create a control program that is a sequence of steps
+	Sequence prog;
 	
 	for (int i = 0; i < datasetSize; ++i){
 		 int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
@@ -187,42 +237,6 @@ void create_graph(float* theta, long unsigned datasetSize){
 
 int main()
 {
-	const int numberOfCores = 16; // access to POD16
-	const int numberOfTiles = 1472;
-	const int threadsPerTile = 6;
-
-	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
-	int tileInt;
-
-	float tmax = 120.0*365.0; // 120 years in seconds
-	float stepOut = 365.0; // 1 year in seconds
-	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
-
-	// Create the DeviceManager which is used to discover devices
-	auto manager = DeviceManager::createDeviceManager();
-	// Attempt to attach to a single IPU:
-	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
-
-	std::cout << "Trying to attach to IPU\n";
-	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
-		return device.attach();
-	});
-	if (it == devices.end()) {
-	    std::cerr << "Error attaching to device\n";
-		return -1;
-	}
-	auto device = std::move(*it);
-	std::cout << "Attached to IPU " << device.getId() << std::endl;
-	Target target = device.getTarget();
-
-	// Create the Graph object
-	Graph graph(target);
-
-	// Add codelets to the graph
-	graph.addCodelets("gillespie_codelet.cpp");
-	// Create a control program that is a sequence of steps
-	Sequence prog;
-
 	/*
 	DEFINE PRIOR DISTRIBUTIONS
 	only used for first sample
