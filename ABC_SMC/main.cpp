@@ -22,7 +22,8 @@
 #include <chrono>
 #include <ctime>
 
-// using namespace poplar;
+using namespace poplar;
+using namespace poplar::program;
 
 struct myTheta {
 	float rep_wld;
@@ -114,10 +115,7 @@ enum Progs {
 	READ_RESULTS
 };
 
-poplar::program::Program buildGraphAndPrograms( poplar::Graph &graph ) {
-	// Use the namespace here to make graph construction code less verbose:
-	using namespace poplar;
-	
+Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
@@ -163,17 +161,17 @@ poplar::program::Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
-	program::Program progs;
+	Program progs;
 
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
-	progs[WRITE_INPUTS] = program::Sequence({program::Copy(param_stream, theta),program::Copy(output_inStream, output)});
+	progs[WRITE_INPUTS] = Sequence({program::Copy(param_stream, theta),program::Copy(output_inStream, output)});
 
 	// Program that executes custom vertex in compute set 1:
-	progs[CUSTOM_PROG] = program::Execute(computeSet);
+	progs[CUSTOM_PROG] = Execute(computeSet);
 
 	// Add a program to read back the result:
-	progs[READ_RESULTS] = program::Copy(output, output_outStream);
+	progs[READ_RESULTS] = Copy(output, output_outStream);
 
 	return progs;
 }
