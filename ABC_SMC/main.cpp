@@ -112,7 +112,6 @@ myTheta perturb(myTheta theta_star){
 enum Progs {
 	WRITE_INPUTS,
 	CUSTOM_PROG
-	//READ_RESULTS
 };
 
 std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
@@ -174,7 +173,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::Device &device, poplar::Executable &exe) {
+void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::Device &device, std::vector<Program> prog, poplar::Graph &graph) {
 	
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
@@ -182,7 +181,7 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 
 	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
 	
-	poplar::Engine engine(std::move(exe));
+	Engine engine(graph, prog));
 	engine.load(device);
 	
 	//int output[datasetSize][Nout][2] = {0};
@@ -205,28 +204,34 @@ int main() {
 	const int threadsPerTile = 6;
 
 	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
-	auto manager = DeviceManager::createDeviceManager(); // Create the DeviceManager which is used to discover devices
-	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores); // Attempt to attach to a single IPU
+	
+	auto manager = DeviceManager::createDeviceManager();
+	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
 	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
 		return device.attach();
 	});
 	auto device = std::move(*it);
+	
 	std::cout << "Attached to IPU " << device.getId() << std::endl;
 	Target target = device.getTarget();
 
 	// Create the Graph object
 	Graph graph(target);
-
-	// Add codelets to the graph
-	graph.addCodelets("gillespie_codelet.cpp");
-
-	// Create a control program that is a sequence of steps
-	Sequence prog;
+	
+	std::vector<Program> progs;
+	
+	progs = buildGraphAndPrograms(graph);
+	
+	float theta = {500.0, 500.0, 3.06-8, 3.06-8, 3.06-8, 3.06-8, 0.0, 2.0e-3, 2.0e-3}
+	float* theta_ptr = &theta[0][0];
+	
+	executeGraphProgram(theta_ptr, nParam, Nout, device, progs, graph)
 	
 	/*
+	
 	DEFINE PRIOR DISTRIBUTIONS
 	only used for first sample
-	*/
+	
 	std::default_random_engine generator;
 	std::normal_distribution<float> rate_dist(3.06e-8,5e-9);
 	std::normal_distribution<float> con_dist(2e-3, 5e-4);
@@ -235,10 +240,10 @@ int main() {
 
 	const unsigned Ntheta = 1000;
 	myTheta param_space[Ntheta];
-	/*
+	
 	GENERATE INITIAL PROPOSED PARAMETERS
 	fill param_space array with initial params
-	*/
+	
 	for(int i=0; i<Ntheta; ++i){
 		param_space[i].rep_wld = rate_dist(generator);
 		param_space[i].rep_mnt = rate_dist(generator);
@@ -264,7 +269,7 @@ int main() {
 	std::cout << "Completed computation at " << std::ctime(&end_time)
 	<< "Time to create "<< Ntheta<<" graphs: " << elapsed_seconds.count() << "s" << std::endl;
 	
-	/*
+	
 	const int Nabc = 10;
 	float thresholds[Nabc];
 	float weights[Ntheta];
