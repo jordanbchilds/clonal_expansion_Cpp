@@ -246,7 +246,7 @@ int main() {
 	float* theta_ptr = &theta[0];
 	
 	auto start = std::chrono::system_clock::now();
-	executeGraphProgram(theta_ptr, nParam, Nout, device, graph); // progs,
+	executeGraphProgram(theta_ptr, nParam, Nout, device, engine); // progs,
 	auto end = std::chrono::system_clock::now();
 	
 	std::chrono::duration<double> elapsed_seconds = end-start;
