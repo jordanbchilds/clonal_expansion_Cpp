@@ -175,22 +175,24 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 	
 	auto start1 = std::chrono::system_clock::now();
 	Engine engine(graph, prog);
-	engine.load(device);
 	auto end1 = std::chrono::system_clock::now();
+	auto start = std::chrono::system_clock::now();
+	engine.load(device);
+	auto end = std::chrono::system_clock::now();
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	engine.run(WRITE_INPUTS);
 	
 	
 	std::chrono::duration<double> elapsed_seconds1 = end1-start1;
-	std::cout << "engine.connectStream time: " << elapsed_seconds1.count() << "s" << std::endl;
+	std::cout << "Engine define time: " << elapsed_seconds1.count() << "s" << std::endl;
 	
 	
-	auto start = std::chrono::system_clock::now();
+	
 	engine.run(CUSTOM_PROG);
-	auto end = std::chrono::system_clock::now();
+	
 	
 	std::chrono::duration<double> elapsed_seconds = end-start;
-	std::cout << "Simulation time: " << elapsed_seconds.count() << "s" << std::endl;
+	std::cout << "engine.load time: " << elapsed_seconds.count() << "s" << std::endl;
 	
 	//engine.run(READ_RESULTS);
 	/*
