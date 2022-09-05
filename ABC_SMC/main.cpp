@@ -116,8 +116,7 @@ enum Progs {
 	READ_RESULTS
 }
 
-std::vector<poplar::program::Program>
-buildGraphAndPrograms(poplar::Graph &g ) {
+std::vector<poplar::program::Program> buildGraphAndPrograms(poplar::Graph &g ) {
 	// Use the namespace here to make graph construction code less verbose:
 	using namespace poplar;
 	
