@@ -159,14 +159,14 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
 	std::vector<Program> progs;
-
+	cout<< "define progs" << endl;
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
 	progs[WRITE_INPUTS] = Copy(param_stream, theta);
 
 	// Program that executes custom vertex in compute set 1:
 	progs[CUSTOM_PROG] = Execute(computeSet);
-
+	cout<< "fill progs" << endl;
 	// Add a program to read back the result:
 	//nprogs[READ_RESULTS] = Copy(output, output_outStream);
 	cout<< "return buildGraphAndPrograms" << endl;
