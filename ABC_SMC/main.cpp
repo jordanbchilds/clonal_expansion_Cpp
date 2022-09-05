@@ -110,7 +110,7 @@ myTheta perturb(myTheta theta_star){
 	return theta_ss;
 }
 
-void create_graph(float* theta, long unsigned datasetSize){
+void create_graph(myTheta theta){
 // iterate through tiles on the IPU, map simulations to each thread (6) on each tile
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
@@ -138,29 +138,40 @@ void create_graph(float* theta, long unsigned datasetSize){
 	}
 	auto device = std::move(*it);
 	// std::cout << "Attached to IPU " << device.getId() << std::endl;
-
-	float reactOnes_rates[datasetSize];
-	float reactTwo_rates[datasetSize];
-	float reactThree_rates[datasetSize];
-	float reactFour_rates[datasetSize];
-	float reactFive_rates[datasetSize];
 	
-	float conOne_rates[datasetSize];
-	float conTwo_rates[datasetSize];
+	Target target = device.getTarget();
+	
+	// Create the Graph object
+	Graph graph(target);
+
+	// Add codelets to the graph
+	graph.addCodelets("gillespie_codelet.cpp");
+	// Create a control program that is a sequence of steps
+	Sequence prog;
+	
+
+	float reactOnes_ratesVals[datasetSize];
+	float reactTwo_ratesVals[datasetSize];
+	float reactThree_ratesVals[datasetSize];
+	float reactFour_ratesVals[datasetSize];
+	float reactFive_ratesVals[datasetSize];
+	
+	float conOne_ratesVals[datasetSize];
+	float conTwo_ratesVals[datasetSize];
 	
 	int w_initVals[datasetSize];
 	int m_initVals[datasetSize];
 	
 	for(int i=0; i<datasetSize; ++i){
-		reactOne_rates[i] = *(theta);
-		reactTwo_rates[i] = *(theta+1);
-		reactThree_rates[i] = *(theta+2);
-		reactFour_rates[i] = *(theta+3);
-		reactFive_rates[i] = *(theta+4);
-		conOne_ratesVals[i] = *(theta+5);
-		conTwo_ratesVals[i] = *(theta+6);
-		w_initVals[i] = *(theta+7);
-		m_initVals[i] = *(theta+8);
+		reactOne_ratesVals[i] = theta.rep_wld;
+		reactTwo_ratesVals[i] = theta.rep_mnt;
+		reactThree_ratesVals[i] = theta.deg_wld;
+		reactFour_ratesVals[i] = theta.deg.mnt;
+		reactFive_ratesVals[i] = theta.mutation;
+		conOne_ratesVals[i] = theta.con_above;
+		conTwo_ratesVals[i] = theta.con_below;
+		w_initVals[i] = theta.wInit;
+		m_initVals[i] = theta.mInit;
 	}
 	
 	// Add steps to initialize the variables
@@ -175,16 +186,7 @@ void create_graph(float* theta, long unsigned datasetSize){
 	Tensor conTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	
 	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}. "output")
-	Target target = device.getTarget();
-	
-	// Create the Graph object
-	Graph graph(target);
 
-	// Add codelets to the graph
-	graph.addCodelets("gillespie_codelet.cpp");
-	// Create a control program that is a sequence of steps
-	Sequence prog;
-	
 	for (int i = 0; i < datasetSize; ++i){
 		 int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		 int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
