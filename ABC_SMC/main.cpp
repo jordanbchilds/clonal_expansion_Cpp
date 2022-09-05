@@ -165,14 +165,13 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::Device &device, poplar::Engine &engine) { // std::vector<Program> progs, poplar::Graph &graph,
+void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout,  poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 
 	//auto start1 = std::chrono::system_clock::now();
 	//Engine engine(graph, progs);
 	//auto end1 = std::chrono::system_clock::now();
 	//auto start = std::chrono::system_clock::now();
-	
-	engine.load(device);
+
 	//auto end = std::chrono::system_clock::now();
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	
@@ -234,7 +233,7 @@ int main() {
 	progs = buildGraphAndPrograms(graph);
 	
 	Engine engine(graph, progs);
-	
+	engine.load(device);
 	//cout<< "buildGraphAndPrograms complete" <<endl;
 	int nParam = 9;
 	float Tmax = 120.0*365.0 ;
@@ -246,7 +245,7 @@ int main() {
 	float* theta_ptr = &theta[0];
 	
 	auto start = std::chrono::system_clock::now();
-	executeGraphProgram(theta_ptr, nParam, Nout, device, engine); // progs,
+	executeGraphProgram(theta_ptr, nParam, Nout, engine); // device, progs,
 	auto end = std::chrono::system_clock::now();
 	
 	std::chrono::duration<double> elapsed_seconds = end-start;
