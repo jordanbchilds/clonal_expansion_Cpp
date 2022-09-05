@@ -159,8 +159,9 @@ poplar::program::Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	graph.addCodelets("gillespie_codelets.cpp");
 
 	// Create streams that allow reading and writing of the variables:
-	auto input_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
-	auto output_stream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
+	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
+	auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
+	auto output_soutStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// auto stream4 = g.addDeviceToHostFIFO("read_z",  FLOAT, v3.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
@@ -170,14 +171,14 @@ poplar::program::Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	// copies for efficiency:
 	progs[WRITE_INPUTS] = program::Sequence(
 											{program::Copy(input_stream, theta),
-											 program::Copy(output_stream, output)}
+											 program::Copy(output_inStream, output)}
 											);
 
 	// Program that executes custom vertex in compute set 1:
 	progs[CUSTOM_PROG] = program::Execute(computeSet);
 
 	// Add a program to read back the result:
-	progs[READ_RESULTS] = program::Copy(output, output_stream);
+	progs[READ_RESULTS] = program::Copy(output, output_outStream);
 
 	return progs;
 }
