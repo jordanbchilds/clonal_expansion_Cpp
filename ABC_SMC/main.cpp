@@ -115,7 +115,7 @@ enum Progs {
 	READ_RESULTS
 };
 
-Program buildGraphAndPrograms( poplar::Graph &graph ) {
+std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
