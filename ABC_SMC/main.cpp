@@ -169,7 +169,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 
 	// Add a program to read back the result:
 	//nprogs[READ_RESULTS] = Copy(output, output_outStream);
-
+	cout<< "return buildGraphAndPrograms" << endl;
 	return progs;
 }
 
@@ -220,8 +220,8 @@ int main() {
 	Graph graph(target);
 	
 	std::vector<Program> progs;
-	
 	progs = buildGraphAndPrograms(graph);
+	
 	cout<< "buildGraphAndPrograms complete" <<endl;
 	int nParam = 9;
 	float Tmax = 120.0*365.0*24.0*3600.0 ;
