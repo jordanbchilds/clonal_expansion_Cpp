@@ -116,7 +116,7 @@ enum Progs {
 	READ_RESULTS
 };
 
-std::vector<poplar::program::Program> buildGraphAndPrograms(poplar::Graph &g ) {
+std::vector<poplar::program::Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	// Use the namespace here to make graph construction code less verbose:
 	using namespace poplar;
 	
@@ -131,16 +131,16 @@ std::vector<poplar::program::Program> buildGraphAndPrograms(poplar::Graph &g ) {
 	float stepOut = 365.0; // 1 year in seconds
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
-	auto manager = DeviceManager::createDeviceManager(); // Create the DeviceManager which is used to discover devices
-	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores); // Attempt to attach to a single IPU
-
 	std::size_t nParam = 9;
 	// Create Tensor of params to be passed to tile
 	Tensor theta = gaph.addVariable(FLOAT, {nParam}, "a");
 	
 	// Tensor to stoer output from each tile
 	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
-
+	// In order to do any computation we need a compute set and a compute
+	// vertex that is placed in that compute set:
+	ComputeSet cs1 = graph.addComputeSet("cs1");
+	
 	// Map tensors to tiles
 	for(int i=0; i<datasetSize; ++i){
 		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
@@ -155,26 +155,19 @@ std::vector<poplar::program::Program> buildGraphAndPrograms(poplar::Graph &g ) {
 		graph.connect(vtx["out"], output[i]);
 	}
 		
-	// In order to do any computation we need a compute set and a compute
-	// vertex that is placed in that compute set:
-	ComputeSet cs1 = graph.addComputeSet("cs1");
-	
+
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelets.cpp");
 
 	// Create streams that allow reading and writing of the variables:
 	auto input_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
-	auto ouput_stream = graph.addDeviceToHostFIFO("read_output", FLOAT, datasetSize*Nout*2);
+	auto ouput_stream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.);
 	// auto stream4 = g.addDeviceToHostFIFO("read_z",  FLOAT, v3.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
-	// Now can start constructing the programs. Construct a vector of
-	// separate programs that can be called individually:
-	std::vector<program::Program> progs(Progs::NUM_PROGRAMS);
-
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
-	progs[WRITE_INPUTS] = program::Sequence({ program::Copy(input_strem, theta) } );
+	progs[WRITE_INPUTS] = program::Sequence( program::Copy(input_stream, theta) );
 
 	// Program that executes custom vertex in compute set 1:
 	progs[CUSTOM_PROG] = program::Execute(cs1);
@@ -182,12 +175,31 @@ std::vector<poplar::program::Program> buildGraphAndPrograms(poplar::Graph &g ) {
 	// Add a program to read back the result:
 	progs[READ_RESULTS] = program::Copy(output, output_stream);
 
-	// return progs;
+	return progs;
 }
 
 
 int main()
 {
+
+	auto manager = DeviceManager::createDeviceManager(); // Create the DeviceManager which is used to discover devices
+	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores); // Attempt to attach to a single IPU
+	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
+		return device.attach();
+	});
+	auto device = std::move(*it);
+	std::cout << "Attached to IPU " << device.getId() << std::endl;
+	Target target = device.getTarget();
+
+	// Create the Graph object
+	Graph graph(target);
+
+	// Add codelets to the graph
+	graph.addCodelets("gillespie_codelet.cpp");
+
+	// Create a control program that is a sequence of steps
+	Sequence prog;
+	
 	/*
 	DEFINE PRIOR DISTRIBUTIONS
 	only used for first sample
