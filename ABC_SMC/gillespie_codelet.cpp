@@ -13,7 +13,7 @@ using namespace std;
 class sim_network_vertex : public poplar::Vertex
 {
 public:
-	Input<vector<float>> model_params ;
+	Input<Vector<float>> theta ;
 	/*
 	Input<int> m_init;
     Input<float> reactOne_rates;
