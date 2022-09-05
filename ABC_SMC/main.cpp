@@ -275,7 +275,7 @@ int main()
 	
 	auto start = std::chrono::system_clock::now();
 	for(int i=0; i<Ntheta; ++i){
-		create_graph(param_space[i], datasetSize)
+		create_graph(param_space[i]) ;
 	}
 	auto end = std::chrono::system_clock::now();
 	
