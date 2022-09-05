@@ -192,6 +192,7 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 	engine.run(CUSTOM_PROG);
 	//engine.run(READ_RESULTS);
 	
+	cout<< "Engine ran successfully (?)" << endl;
 	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
@@ -247,10 +248,8 @@ int main() {
 	long unsigned Nout = (long unsigned) Tmax/step_out + 1.0;
 	
 	
-	float theta[nParam] = {500.0, 500.0, 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0, 2.0e-3, 2.0e-3};
+	float theta[nParam] = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2.0e-3, 2.0e-3};
 	float* theta_ptr = &theta[0];
-	
-
 	
 	auto start = std::chrono::system_clock::now();
 	executeGraphProgram(theta_ptr, nParam, Nout, device, progs, graph);
