@@ -228,12 +228,15 @@ int main() {
 	float step_out = 365.0 ;
 	long unsigned Nout = (long unsigned) Tmax/step_out + 1.0;
 	
-	
-	float theta[nParam] = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2.0e-3, 2.0e-3};
+	float tt[nParam] = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2.0e-3, 2.0e-3};
+	float theta[nParam] ;
 	float* theta_ptr = &theta[0];
 	
 	auto start = std::chrono::system_clock::now();
 	for(int i=0; i<5; ++i)
+		for(int k=0; k<nParam; ++k)
+			*(theta_ptr_k) = tt[k];
+	
 		executeGraphProgram(theta_ptr, nParam, Nout, engine); // device, progs,
 	auto end = std::chrono::system_clock::now();
 	
