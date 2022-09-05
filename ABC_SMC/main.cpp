@@ -191,6 +191,28 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 	engine.run(WRITE_INPUTS);
 	engine.run(CUSTOM_PROG);
 	//engine.run(READ_RESULTS);
+	
+	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
+	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
+
+	std::ofstream wild_file ("ipu_wldCount.txt");
+	for(int i=0; i<datasetSize; ++i){
+		for(int j=0; j<Nout; ++j){
+			wild_file<< cpu_vector[ i*2*Nout + 2*j ] << "\t" ;
+		}
+		wild_file<< "\n";
+	}
+	wild_file.close();
+	
+	std::ofstream mtnt_file ("ipu_mntCount.txt");
+	for(int i=0; i<datasetSize; ++i){
+		for(int j=0; j<Nout; ++j){
+			mtnt_file<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "\t" ;
+		}
+		mtnt_file<< "\n";
+	}
+	mtnt_file.close();
+	
 
 }
 
@@ -234,42 +256,10 @@ int main() {
 	executeGraphProgram(theta_ptr, nParam, Nout, device, progs, graph);
 	auto end = std::chrono::system_clock::now();
 	
-	std::chrono::duration<double> elapsed_seconds = end-start;
-	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-
 	std::cout << "Completed computation at " << std::ctime(&end_time)
-	<< "Time to create "<< Ntheta<<" graphs: " << elapsed_seconds.count() << "s" << std::endl;
+	<< "Execution time: " << elapsed_seconds.count() << "s" << std::endl;
 	
-	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
-	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
-	std::ofstream wild_file ("ipu_wldCount.txt");
-	for(int i=0; i<datasetSize; ++i){
-		for(int j=0; j<Nout; ++j){
-			wild_file<< cpu_vector[ i*2*Nout + 2*j ] << "\t" ;
-		}
-		wild_file<< "\n";
-	}
-	wild_file.close();
-	
-	std::ofstream mtnt_file ("ipu_mntCount.txt");
-	for(int i=0; i<datasetSize; ++i){
-		for(int j=0; j<Nout; ++j){
-			mtnt_file<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "\t" ;
-		}
-		mtnt_file<< "\n";
-	}
-	mtnt_file.close();
-	
-	auto end = std::chrono::system_clock::now();
-
-	std::chrono::duration<double> elapsed_seconds = end-start;
-	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
-
-	std::cout << "Completed computation at " << std::ctime(&end_time)
-			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
-	
-	
 	/*
 	
 	DEFINE PRIOR DISTRIBUTIONS
