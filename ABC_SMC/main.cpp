@@ -154,19 +154,14 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	}
 	// Create streams that allow reading and writing of the variables:
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
-	std::cout<< "write_theta Stream created" <<std::endl;
 	//auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
 	//auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
-	std::vector<Program> progs(Progs::NUM_PROGRAMS);
-	cout<< "define progs" << endl;
-
+	std::vector<Program> progs(Progs::NUM_PROGRAMS); // I HAVE NOT IDEA WHAT NUM_PROGRAMS IS/DOES
 	progs[WRITE_INPUTS] = Copy(param_stream, theta);
 	progs[CUSTOM_PROG] = Execute(computeSet);
-	cout<< "fill progs" << endl;
 
-	cout<< "return buildGraphAndPrograms" << endl;
 	return progs;
 }
 
@@ -181,12 +176,12 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 
 	Engine engine(graph, prog);
 	engine.load(device);
-	cout<< "engine loaded" <<endl;
+
 	//int output[datasetSize][Nout][2] = {0};
 
-	engine.connectStream("param_stream", theta_ptr, theta_ptr+nParam);
+	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	//engine.connectStream("output_inStream", &output, &output[datasetSize][Nout][2]);
-	cout<< "param_stream created" <<endl;
+	cout<< "write_theta created" <<endl;
 	// Run using custom vertex:
 	//engine.connectStream("output_outStream",  zResult1.data());
 	engine.run(WRITE_INPUTS);
