@@ -127,12 +127,12 @@ Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	float stepOut = 365.0; // 1 year in seconds
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
-	std::size_t nParam = 9;
+	int nParam = 9;
 	// Create Tensor of params to be passed to tile
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "a");
 	
 	// Tensor to stoer output from each tile
-	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
+	Tensor output = graph.addVariable(INT, {datasetSize,Nout*2}, "output");
 	// In order to do any computation we need a compute set and a compute
 	// vertex that is placed in that compute set:
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
@@ -161,19 +161,51 @@ Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
-	Program progs;
+	std::vector<program::Program> Program progs;
 
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
-	Progs[WRITE_INPUTS] = Sequence({program::Copy(param_stream, theta),program::Copy(output_inStream, output)});
+	progs[WRITE_INPUTS] = Sequence({program::Copy(param_stream, theta),program::Copy(output_inStream, output)});
 
 	// Program that executes custom vertex in compute set 1:
-	Progs[CUSTOM_PROG] = Execute(computeSet);
+	progs[CUSTOM_PROG] = Execute(computeSet);
 
 	// Add a program to read back the result:
-	Progs[READ_RESULTS] = Copy(output, output_outStream);
+	progs[READ_RESULTS] = Copy(output, output_outStream);
 
 	return progs;
+}
+
+void executeGraphProgram(float* theta_ptr, int nParam, poplar::Device &device, poplar::Executable &exe) {
+
+	poplar::Engine engine(std::move(exe));
+	engine.load(device);
+	
+	int output[datasetSize][Nout][2] = {0};
+
+	engine.connectStream("param_stream", theta_ptr, theta_ptr+nParam);
+	engine.connectStream("output_inStream", y.data());
+	engine.connectStream("output_outStream", zInit.data());
+
+	// Run using custom vertex:
+	engine.connectStream("read_z",  zResult1.data());
+	engine.run(WRITE_INPUTS);
+	engine.run(CUSTOM_PROG);
+	engine.run(READ_RESULTS);
+
+	// Check both methods give same result:
+	for (auto i = 0u; i< zResult1.size(); ++i) {
+		if (zResult1[i] != zResult2[i]) {
+			throw std::runtime_error("Results do not match");
+		}
+	}
+	std::cerr << "Results match.\n";
+
+	if (options.profile) {
+		// Retrieve and save profiling information from the engine:
+		std::ofstream of(options.profileName);
+		engine.printProfileSummary(of, {{"showExecutionSteps", "true"}});
+	}
 }
 
 
