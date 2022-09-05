@@ -127,7 +127,7 @@ Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	float stepOut = 365.0; // 1 year in seconds
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 	
-	int nParam = 9;
+	long unsigned nParam = 9;
 	// Create Tensor of params to be passed to tile
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "a");
 	
@@ -161,7 +161,7 @@ Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
-	std::vector<program::Program> Program progs;
+	std::vector<Program> progs;
 
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
