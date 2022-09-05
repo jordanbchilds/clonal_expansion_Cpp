@@ -109,9 +109,32 @@ myTheta perturb(myTheta theta_star){
 	
 	return theta_ss;
 }
-/*
+
 void create_graph(float* theta, long unsigned datasetSize){
 // iterate through tiles on the IPU, map simulations to each thread (6) on each tile
+	for(int i=0; i<datasetSize; ++i){
+		reactOne_rates[i] = *(theta);
+		reactTwo_rates[i] = *(theta+1);
+		reactThree_rates[i] = *(theta+2);
+		reactFour_rates[i] = *(theta+3);
+		reactFive_rates[i] = *(theta+4);
+		conOne_ratesVals[i] = *(theta+5);
+		conTwo_ratesVals[i] = *(theta+6);
+		w_initVals[i] = *(theta+7);
+		m_initVals[i] = *(theta+8);
+	}
+	
+	// Add steps to initialize the variables
+	Tensor w_init = graph.addConstant<int>(INT, {datasetSize}, w_initVals);
+	Tensor m_init = graph.addConstant<int>(INT, {datasetSize}, m_initVals);
+	Tensor reactOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactOne_ratesVals);
+	Tensor reactTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactTwo_ratesVals);
+	Tensor reactThree_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactThree_ratesVals);
+	Tensor reactFour_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFour_ratesVals);
+	Tensor reactFive_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFive_ratesVals);
+	Tensor conOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
+	Tensor conTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
+	
 	for (int i = 0; i < datasetSize; ++i){
 		 int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		 int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
@@ -154,13 +177,14 @@ void create_graph(float* theta, long unsigned datasetSize){
 	// Create the engine
 	Engine engine(graph, prog);
 	engine.load(device);
-
+	/*
 	auto start = std::chrono::system_clock::now();
 	// Run the control program
 	engine.run(0);
 	auto end = std::chrono::system_clock::now();
+	 */
 }
-*/
+
 int main()
 {
 	const int numberOfCores = 16; // access to POD16
@@ -230,30 +254,18 @@ int main()
 		param_space[i].wInit = round( c0*(1.0-h0) );
 		param_space[i].mInit = round( c0*h0 );
 	}
-	/*
-	Add steps to initialize the variables
-	Tensor w_init = graph.addVariable(INT, {datasetSize}, w_initVals);
-	Tensor m_init = graph.addVariable(INT, {datasetSize}, m_initVals);
-	Tensor reactOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactOne_ratesVals);
-	Tensor reactTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactTwo_ratesVals);
-	Tensor reactThree_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactThree_ratesVals);
-	Tensor reactFour_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFour_ratesVals);
-	Tensor reactFive_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFive_ratesVals);
-
-	Tensor conOne_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
-	Tensor conTwo_rates= graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
-	*/
-	Tensor popDyn = graph.addConstant(INT, {datasetSize}, "popDyn") ;
 	
-	Tensor popDyn = graph.addConstant(INT, {datasetSize}, "popDyn") ;
-	Tensor react_rates = graph.addVariable(FLOAT, {datasetSize, 5,2}, "react_rates") ;
-	Tensor con_rates = graph.addVariable(FLOAT, {datasetSize, 2}, "con_rates");
-
-	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
-	
+	auto start = std::chrono::system_clock::now();
 	for(int i=0; i<Ntheta; ++i){
-		popDyn[i] = 100;
+		create_graph(param_space[i], datasetSize)
 	}
+	auto end = std::chrono::system_clock::now();
+	
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+	std::cout << "Completed computation at " << std::ctime(&end_time)
+	<< "Time to create "<< Ntheta<<" graphs: " << elapsed_seconds.count() << "s" << std::endl;
 	
 	/*
 	ComputeSet computeSet = graph.addComputeSet("computeSet");

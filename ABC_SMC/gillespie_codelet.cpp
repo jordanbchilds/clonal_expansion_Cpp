@@ -24,7 +24,6 @@ public:
 	Input<float> conTwo_rates;
 
     Output<Vector<int>> out;
-	//Output<float> out;
 	
 	struct sim_network {
 		float Tmax;
