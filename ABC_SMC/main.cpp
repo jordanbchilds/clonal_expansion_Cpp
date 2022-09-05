@@ -165,35 +165,23 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::Device &device, std::vector<Program> prog, poplar::Graph &graph) {
-	
-	const int numberOfCores = 16; // access to POD16
-	const int numberOfTiles = 1472;
-	const int threadsPerTile = 6;
+void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::Device &device, Engine engine;) { // std::vector<Program> progs, poplar::Graph &graph,
 
-	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
-	
-	auto start1 = std::chrono::system_clock::now();
-	Engine engine(graph, prog);
-	auto end1 = std::chrono::system_clock::now();
-	auto start = std::chrono::system_clock::now();
+	//auto start1 = std::chrono::system_clock::now();
+	//Engine engine(graph, progs);
+	//auto end1 = std::chrono::system_clock::now();
+	//auto start = std::chrono::system_clock::now();
 	engine.load(device);
-	auto end = std::chrono::system_clock::now();
+	//auto end = std::chrono::system_clock::now();
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
+	
 	engine.run(WRITE_INPUTS);
 	
-	
-	std::chrono::duration<double> elapsed_seconds1 = end1-start1;
-	std::cout << "Engine define time: " << elapsed_seconds1.count() << "s" << std::endl;
-	
-	
-	
+	//std::chrono::duration<double> elapsed_seconds1 = end1-start1;
+	//std::cout << "Engine define time: " << elapsed_seconds1.count() << "s" << std::endl;
+
 	engine.run(CUSTOM_PROG);
-	
-	
-	std::chrono::duration<double> elapsed_seconds = end-start;
-	std::cout << "engine.load time: " << elapsed_seconds.count() << "s" << std::endl;
-	
+
 	//engine.run(READ_RESULTS);
 	/*
 	cout<< "Engine ran successfully (?)" << endl;
@@ -244,6 +232,8 @@ int main() {
 	std::vector<Program> progs;
 	progs = buildGraphAndPrograms(graph);
 	
+	Engine engine(graph, progs);
+	
 	//cout<< "buildGraphAndPrograms complete" <<endl;
 	int nParam = 9;
 	float Tmax = 120.0*365.0 ;
@@ -255,7 +245,7 @@ int main() {
 	float* theta_ptr = &theta[0];
 	
 	auto start = std::chrono::system_clock::now();
-	executeGraphProgram(theta_ptr, nParam, Nout, device, progs, graph);
+	executeGraphProgram(theta_ptr, nParam, Nout, graph); // device, progs, 
 	auto end = std::chrono::system_clock::now();
 	
 	std::chrono::duration<double> elapsed_seconds = end-start;
