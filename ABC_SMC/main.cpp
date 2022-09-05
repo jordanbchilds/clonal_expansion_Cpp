@@ -181,15 +181,15 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 
 	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
 	
-	std::cout<< "Initializing engine" <<std::endl;
+
 	Engine engine(graph, prog);
 	engine.load(device);
-	
+	cout<< "engine loaded" <<endl;
 	//int output[datasetSize][Nout][2] = {0};
 
 	engine.connectStream("param_stream", theta_ptr, theta_ptr+nParam);
 	//engine.connectStream("output_inStream", &output, &output[datasetSize][Nout][2]);
-
+	cout<< "param_stream created" <<endl;
 	// Run using custom vertex:
 	//engine.connectStream("output_outStream",  zResult1.data());
 	engine.run(WRITE_INPUTS);
