@@ -155,12 +155,8 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	// to be able to read the output
 	graph.createHostRead("output-read", output);
 	
-	
 	// Create streams that allow reading and writing of the variables:
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
-	//auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
-	//auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
-	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
 	std::vector<Program> progs(Progs::NUM_PROGRAMS); // I HAVE NOT IDEA WHAT NUM_PROGRAMS IS/DOES
 	progs[WRITE_INPUTS] = Copy(param_stream, theta);
@@ -189,7 +185,15 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 	// Run using custom vertex:
 	//engine.connectStream("output_outStream",  zResult1.data());
 	engine.run(WRITE_INPUTS);
+	
+	
+	auto start = std::chrono::system_clock::now();
 	engine.run(CUSTOM_PROG);
+	auto end = std::chrono::system_clock::now();
+	
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::cout << "Execution time: " << elapsed_seconds.count() << "s" << std::endl;
+	
 	//engine.run(READ_RESULTS);
 	/*
 	cout<< "Engine ran successfully (?)" << endl;
