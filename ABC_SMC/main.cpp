@@ -178,13 +178,13 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 	engine.load(device);
 
 	//int output[datasetSize][Nout][2] = {0};
-
+	auto start = std::chrono::system_clock::now();
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
-	//engine.connectStream("output_inStream", &output, &output[datasetSize][Nout][2]);
-	cout<< "write_theta created" <<endl;
-	// Run using custom vertex:
-	//engine.connectStream("output_outStream",  zResult1.data());
 	engine.run(WRITE_INPUTS);
+	auto end = std::chrono::system_clock::now();
+	
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::cout << "engine.connectStream time: " << elapsed_seconds.count() << "s" << std::endl;
 	
 	
 	auto start = std::chrono::system_clock::now();
@@ -192,7 +192,7 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 	auto end = std::chrono::system_clock::now();
 	
 	std::chrono::duration<double> elapsed_seconds = end-start;
-	std::cout << "Execution time: " << elapsed_seconds.count() << "s" << std::endl;
+	std::cout << "Simulation time: " << elapsed_seconds.count() << "s" << std::endl;
 	
 	//engine.run(READ_RESULTS);
 	/*
@@ -244,7 +244,7 @@ int main() {
 	std::vector<Program> progs;
 	progs = buildGraphAndPrograms(graph);
 	
-	cout<< "buildGraphAndPrograms complete" <<endl;
+	//cout<< "buildGraphAndPrograms complete" <<endl;
 	int nParam = 9;
 	float Tmax = 120.0*365.0 ;
 	float step_out = 365.0 ;
@@ -259,7 +259,7 @@ int main() {
 	auto end = std::chrono::system_clock::now();
 	
 	std::chrono::duration<double> elapsed_seconds = end-start;
-	std::cout << "Execution time: " << elapsed_seconds.count() << "s" << std::endl;
+	std::cout << "executeGraphProgram time: " << elapsed_seconds.count() << "s" << std::endl;
 	
 
 	/*
