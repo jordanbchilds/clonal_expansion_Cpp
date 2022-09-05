@@ -98,22 +98,22 @@ int main()
 	std::normal_distribution<float> rate_dist(3.06e-8,5e-9);
 	std::normal_distribution<float> con_dist(2e-3, 5e-4);
 	std::uniform_real_distribution<float> ML_dist(0.45,0.55);
-	std::normal_distribution<float> CN_dist(copyNum_0, 1000);
+	std::normal_distribution<float> CN_dist(copyNum_0, 100);
 	
     for (int i = 0; i < datasetSize; ++i){
 		//w_initVals[i] = w_initBoss;
 		int c0 = CN_dist(generator);
 		float h0 = ML_dist(generator);
 		
-		w_initVals[i] =  round( c0*(1.0-h0) );
-		m_initVals[i] = round( c0*h0 );
-		reactOne_ratesVals[i] =  rate_dist(generator);
-		reactTwo_ratesVals[i] =  rate_dist(generator);
-		reactThree_ratesVals[i] =  rate_dist(generator);
-		reactFour_ratesVals[i] =  rate_dist(generator);
+		w_initVals[i] =  w_initBoss ; //round( c0*(1.0-h0) );
+		m_initVals[i] = m_initBoss ; //round( c0*h0 );
+		reactOne_ratesVals[i] =  reactOne_ratesBoss ; //rate_dist(generator);
+		reactTwo_ratesVals[i] =  reactTwo_ratesBoss ; //rate_dist(generator);
+		reactThree_ratesVals[i] =  reactThree_ratesBoss ; //rate_dist(generator);
+		reactFour_ratesVals[i] =  reactFour_ratesBoss ; //rate_dist(generator);
 		reactFive_ratesVals[i] =  0.0 ;
-		conOne_ratesVals[i] = con_dist(generator);
-		conTwo_ratesVals[i] = con_dist(generator);
+		conOne_ratesVals[i] = conOne_ratesBoss ; //con_dist(generator);
+		conTwo_ratesVals[i] = conTwo_ratesBoss ; //con_dist(generator);
     }
 	
 	// Add steps to initialize the variables
