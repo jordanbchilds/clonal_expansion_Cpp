@@ -115,7 +115,7 @@ enum Progs {
 	READ_RESULTS
 };
 
-std::vector<poplar::program::Program> buildGraphAndPrograms( poplar::Graph &graph ) {
+poplar::program::Program buildGraphAndPrograms( poplar::Graph &graph ) {
 	// Use the namespace here to make graph construction code less verbose:
 	using namespace poplar;
 	
@@ -164,18 +164,20 @@ std::vector<poplar::program::Program> buildGraphAndPrograms( poplar::Graph &grap
 	// auto stream4 = g.addDeviceToHostFIFO("read_z",  FLOAT, v3.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
+	program::Program progs;
+
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
-	Progs[WRITE_INPUTS] = program::Sequence(
+	progs[WRITE_INPUTS] = program::Sequence(
 											{program::Copy(input_stream, theta),
 											 program::Copy(output_stream, output)}
 											);
 
 	// Program that executes custom vertex in compute set 1:
-	Progs[CUSTOM_PROG] = program::Execute(computeSet);
+	progs[CUSTOM_PROG] = program::Execute(computeSet);
 
 	// Add a program to read back the result:
-	Progs[READ_RESULTS] = program::Copy(output, output_stream);
+	progs[READ_RESULTS] = program::Copy(output, output_stream);
 
 	return progs;
 }
