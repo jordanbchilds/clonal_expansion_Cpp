@@ -152,6 +152,10 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 		graph.connect(vtx["theta"], theta);
 		graph.connect(vtx["out"], output[i]);
 	}
+	// to be able to read the output
+	graph.createHostRead("output-read", output);
+	
+	
 	// Create streams that allow reading and writing of the variables:
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
 	//auto output_inStream = graph.addHostToDeviceFIFO("write_output", FLOAT, output.numElements());
@@ -224,7 +228,47 @@ int main() {
 	float theta[nParam] = {500.0, 500.0, 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0, 2.0e-3, 2.0e-3};
 	float* theta_ptr = &theta[0];
 	
+
+	
+	auto start = std::chrono::system_clock::now();
 	executeGraphProgram(theta_ptr, nParam, Nout, device, progs, graph);
+	auto end = std::chrono::system_clock::now();
+	
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+	std::cout << "Completed computation at " << std::ctime(&end_time)
+	<< "Time to create "<< Ntheta<<" graphs: " << elapsed_seconds.count() << "s" << std::endl;
+	
+	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
+	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
+
+	std::ofstream wild_file ("ipu_wldCount.txt");
+	for(int i=0; i<datasetSize; ++i){
+		for(int j=0; j<Nout; ++j){
+			wild_file<< cpu_vector[ i*2*Nout + 2*j ] << "\t" ;
+		}
+		wild_file<< "\n";
+	}
+	wild_file.close();
+	
+	std::ofstream mtnt_file ("ipu_mntCount.txt");
+	for(int i=0; i<datasetSize; ++i){
+		for(int j=0; j<Nout; ++j){
+			mtnt_file<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "\t" ;
+		}
+		mtnt_file<< "\n";
+	}
+	mtnt_file.close();
+	
+	auto end = std::chrono::system_clock::now();
+
+	std::chrono::duration<double> elapsed_seconds = end-start;
+	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+
+	std::cout << "Completed computation at " << std::ctime(&end_time)
+			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
+	
 	
 	/*
 	
@@ -259,8 +303,7 @@ int main() {
 		param_space[i].mInit = round( c0*h0 );
 	}
 	
-	auto start = std::chrono::system_clock::now();
-	auto end = std::chrono::system_clock::now();
+
 	
 	std::chrono::duration<double> elapsed_seconds = end-start;
 	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
