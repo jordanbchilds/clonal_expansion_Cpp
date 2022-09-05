@@ -110,7 +110,7 @@ myTheta perturb(myTheta theta_star){
 	return theta_ss;
 }
 
-void create_graph(myTheta theta){
+int create_graph(myTheta theta){
 // iterate through tiles on the IPU, map simulations to each thread (6) on each tile
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
@@ -150,7 +150,7 @@ void create_graph(myTheta theta){
 	Sequence prog;
 	
 
-	float reactOnes_ratesVals[datasetSize];
+	float reactOne_ratesVals[datasetSize];
 	float reactTwo_ratesVals[datasetSize];
 	float reactThree_ratesVals[datasetSize];
 	float reactFour_ratesVals[datasetSize];
@@ -166,7 +166,7 @@ void create_graph(myTheta theta){
 		reactOne_ratesVals[i] = theta.rep_wld;
 		reactTwo_ratesVals[i] = theta.rep_mnt;
 		reactThree_ratesVals[i] = theta.deg_wld;
-		reactFour_ratesVals[i] = theta.deg.mnt;
+		reactFour_ratesVals[i] = theta.deg_mnt;
 		reactFive_ratesVals[i] = theta.mutation;
 		conOne_ratesVals[i] = theta.con_above;
 		conTwo_ratesVals[i] = theta.con_below;
@@ -185,8 +185,10 @@ void create_graph(myTheta theta){
 	Tensor conOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
 	Tensor conTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
 	
-	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}. "output")
+	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
 
+	ComputeSet computeSet = graph.addComputeSet("computeSet");
+	
 	for (int i = 0; i < datasetSize; ++i){
 		 int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		 int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
