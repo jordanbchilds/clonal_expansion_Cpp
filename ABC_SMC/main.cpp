@@ -231,7 +231,7 @@ int main() {
 	float theta[nParam] = {500.0, 500.0, 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0, 2.0e-3, 2.0e-3};
 	float* theta_ptr = &theta[0];
 	
-	executeGraphProgram(theta_ptr, nParam, Nout, device, progs, graph)
+	executeGraphProgram(theta_ptr, nParam, Nout, device, progs, graph);
 	
 	/*
 	
