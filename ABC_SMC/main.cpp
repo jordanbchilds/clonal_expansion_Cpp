@@ -112,7 +112,8 @@ myTheta perturb(myTheta theta_star){
 
 enum Progs {
 	WRITE_INPUTS,
-	CUSTOM_PROG
+	CUSTOM_PROG,
+	NUM_PROGRAMS
 };
 
 std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
@@ -158,17 +159,13 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph ) {
 	//auto output_outStream = graph.addDeviceToHostFIFO("read_output", FLOAT, output.numElements());
 	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
-	std::vector<Program> progs;
+	std::vector<Program> progs(Progs::NUM_PROGRAMS);
 	cout<< "define progs" << endl;
-	// Add program which initialises the inputs. Poplar is able to merge these
-	// copies for efficiency:
-	progs[WRITE_INPUTS] = Copy(param_stream, theta);
 
-	// Program that executes custom vertex in compute set 1:
+	progs[WRITE_INPUTS] = Copy(param_stream, theta);
 	progs[CUSTOM_PROG] = Execute(computeSet);
 	cout<< "fill progs" << endl;
-	// Add a program to read back the result:
-	//nprogs[READ_RESULTS] = Copy(output, output_outStream);
+
 	cout<< "return buildGraphAndPrograms" << endl;
 	return progs;
 }
