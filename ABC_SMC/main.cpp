@@ -181,7 +181,7 @@ void executeGraphProgram(float* theta_ptr, int nParam, unsigned Nout, poplar::De
 
 	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
 	
-	Engine engine(graph, prog));
+	Engine engine(graph, prog);
 	engine.load(device);
 	
 	//int output[datasetSize][Nout][2] = {0};
@@ -222,8 +222,14 @@ int main() {
 	
 	progs = buildGraphAndPrograms(graph);
 	
-	float theta = {500.0, 500.0, 3.06-8, 3.06-8, 3.06-8, 3.06-8, 0.0, 2.0e-3, 2.0e-3}
-	float* theta_ptr = &theta[0][0];
+	int nParam = 9;
+	float Tmax = 120.0*365.0*24.0*3600.0 ;
+	float step_out = 365.0*24.0*3600.0 ;
+	long unsigned Nout = (long unsigned) Tmax/step_out + 1.0;
+	
+	
+	float theta[nParam] = {500.0, 500.0, 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0, 2.0e-3, 2.0e-3};
+	float* theta_ptr = &theta[0];
 	
 	executeGraphProgram(theta_ptr, nParam, Nout, device, progs, graph)
 	
