@@ -166,16 +166,16 @@ std::vector<poplar::program::Program> buildGraphAndPrograms( poplar::Graph &grap
 
 	// Add program which initialises the inputs. Poplar is able to merge these
 	// copies for efficiency:
-	progs[WRITE_INPUTS] = program::Sequence(
+	Progs[WRITE_INPUTS] = program::Sequence(
 											{program::Copy(input_stream, theta),
 											 program::Copy(output_stream, output)}
 											);
 
 	// Program that executes custom vertex in compute set 1:
-	progs[CUSTOM_PROG] = program::Execute(computeSet);
+	Progs[CUSTOM_PROG] = program::Execute(computeSet);
 
 	// Add a program to read back the result:
-	progs[READ_RESULTS] = program::Copy(output, output_stream);
+	Progs[READ_RESULTS] = program::Copy(output, output_stream);
 
 	return progs;
 }
@@ -183,7 +183,11 @@ std::vector<poplar::program::Program> buildGraphAndPrograms( poplar::Graph &grap
 
 int main()
 {
+	const int numberOfCores = 16; // access to POD16
+	const int numberOfTiles = 1472;
+	const int threadsPerTile = 6;
 
+	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
 	auto manager = DeviceManager::createDeviceManager(); // Create the DeviceManager which is used to discover devices
 	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores); // Attempt to attach to a single IPU
 	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
