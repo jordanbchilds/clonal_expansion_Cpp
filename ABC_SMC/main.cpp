@@ -234,7 +234,7 @@ int main() {
 	
 	auto start = std::chrono::system_clock::now();
 	for(int i=0; i<5; ++i){
-		for(int k=0; k<nParam; ++k){ *(theta_ptr+k) = tt[k] };
+		for(int k=0; k<nParam; ++k){ *(theta_ptr+k) = tt[k]; }
 		executeGraphProgram(theta_ptr, nParam, Nout, engine); // device, progs,
 	}
 	auto end = std::chrono::system_clock::now();
