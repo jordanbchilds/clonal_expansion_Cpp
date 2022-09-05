@@ -84,9 +84,9 @@ int rdisc(unsigned n, float* weights){
 }
 
 /*
-myTheta check_limits(myTheta theta, float* limits_array){
+myTheta check_limits(myTheta theta, float* limits_array, int nParam){
 	bool inSupport = true;
-	for(int i=0; i<9; ++i){
+	for(int i=0; i<nParam; ++i){
 		inSupport &= (
 	}
 	re
@@ -110,8 +110,17 @@ myTheta perturb(myTheta theta_star){
 	return theta_ss;
 }
 
-int create_graph(myTheta theta){
-// iterate through tiles on the IPU, map simulations to each thread (6) on each tile
+enum Progs {
+	WRITE_INPUTS,
+	CUSTOM_PROG,
+	READ_RESULTS
+}
+
+std::vector<poplar::program::Program>
+buildGraphAndPrograms(poplar::Graph &g ) {
+	// Use the namespace here to make graph construction code less verbose:
+	using namespace poplar;
+	
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
@@ -122,122 +131,60 @@ int create_graph(myTheta theta){
 	float tmax = 120.0*365.0; // 120 years in seconds
 	float stepOut = 365.0; // 1 year in seconds
 	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
+	
+	auto manager = DeviceManager::createDeviceManager(); // Create the DeviceManager which is used to discover devices
+	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores); // Attempt to attach to a single IPU
 
-	// Create the DeviceManager which is used to discover devices
-	auto manager = DeviceManager::createDeviceManager();
-	// Attempt to attach to a single IPU:
-	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
-
-	// std::cout << "Trying to attach to IPU\n";
-	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
-		return device.attach();
-	});
-	if (it == devices.end()) {
-		std::cerr << "Error attaching to device\n";
-		return -1;
-	}
-	auto device = std::move(*it);
-	// std::cout << "Attached to IPU " << device.getId() << std::endl;
+	std::size_t nParam = 9;
+	// Create Tensor of params to be passed to tile
+	Tensor theta = gaph.addVariable(FLOAT, {nParam}, "a");
 	
-	Target target = device.getTarget();
-	
-	// Create the Graph object
-	Graph graph(target);
-
-	// Add codelets to the graph
-	graph.addCodelets("gillespie_codelet.cpp");
-	// Create a control program that is a sequence of steps
-	Sequence prog;
-	
-
-	float reactOne_ratesVals[datasetSize];
-	float reactTwo_ratesVals[datasetSize];
-	float reactThree_ratesVals[datasetSize];
-	float reactFour_ratesVals[datasetSize];
-	float reactFive_ratesVals[datasetSize];
-	
-	float conOne_ratesVals[datasetSize];
-	float conTwo_ratesVals[datasetSize];
-	
-	int w_initVals[datasetSize];
-	int m_initVals[datasetSize];
-	
-	for(int i=0; i<datasetSize; ++i){
-		reactOne_ratesVals[i] = theta.rep_wld;
-		reactTwo_ratesVals[i] = theta.rep_mnt;
-		reactThree_ratesVals[i] = theta.deg_wld;
-		reactFour_ratesVals[i] = theta.deg_mnt;
-		reactFive_ratesVals[i] = theta.mutation;
-		conOne_ratesVals[i] = theta.con_above;
-		conTwo_ratesVals[i] = theta.con_below;
-		w_initVals[i] = theta.wInit;
-		m_initVals[i] = theta.mInit;
-	}
-	
-	// Add steps to initialize the variables
-	Tensor w_init = graph.addConstant<int>(INT, {datasetSize}, w_initVals);
-	Tensor m_init = graph.addConstant<int>(INT, {datasetSize}, m_initVals);
-	Tensor reactOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactOne_ratesVals);
-	Tensor reactTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactTwo_ratesVals);
-	Tensor reactThree_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactThree_ratesVals);
-	Tensor reactFour_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFour_ratesVals);
-	Tensor reactFive_rates = graph.addConstant<float>(FLOAT, {datasetSize}, reactFive_ratesVals);
-	Tensor conOne_rates = graph.addConstant<float>(FLOAT, {datasetSize}, conOne_ratesVals);
-	Tensor conTwo_rates = graph.addConstant<float>(FLOAT, {datasetSize}, conTwo_ratesVals);
-	
+	// Tensor to stoer output from each tile
 	Tensor output = graph.addVariable(INT, {datasetSize, 2*Nout}, "output");
 
-	ComputeSet computeSet = graph.addComputeSet("computeSet");
-	
-	for (int i = 0; i < datasetSize; ++i){
-		 int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
-		 int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
-		 graph.setTileMapping(w_init[i], tileInt);
-		 graph.setTileMapping(m_init[i], tileInt);
-		 graph.setTileMapping(reactOne_rates[i], tileInt);
-		 graph.setTileMapping(reactTwo_rates[i], tileInt);
-		 graph.setTileMapping(reactThree_rates[i], tileInt);
-		 graph.setTileMapping(reactFour_rates[i], tileInt);
-		 graph.setTileMapping(reactFive_rates[i], tileInt);
-		 
-		 graph.setTileMapping(conOne_rates[i], tileInt);
-		 graph.setTileMapping(conTwo_rates[i], tileInt);
-
-		 graph.setTileMapping(output[i], tileInt);
-
-		 VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
-		 graph.setTileMapping(vtx, tileInt);
-
-		 graph.connect(vtx["w_init"], w_init[i]);
-		 graph.connect(vtx["m_init"], m_init[i]);
-		 graph.connect(vtx["reactOne_rates"], reactOne_rates[i]);
-		 graph.connect(vtx["reactTwo_rates"], reactTwo_rates[i]);
-		 graph.connect(vtx["reactThree_rates"], reactThree_rates[i]);
-		 graph.connect(vtx["reactFour_rates"], reactFour_rates[i]);
-		 graph.connect(vtx["reactFive_rates"], reactFive_rates[i]);
-		 graph.connect(vtx["conOne_rates"], conOne_rates[i]);
-		 graph.connect(vtx["conTwo_rates"], conTwo_rates[i]);
-
-		 graph.connect(vtx["out"], output[i]);
+	// Map tensors to tiles
+	for(int i=0; i<datasetSize; ++i){
+		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
+		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
+		
+		graph.setTileMapping(theta, tileInt);
+		
+		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
+		graph.setTileMapping(vtx, tileInt);
+		
+		graph.connect(vtx["theta"], theta)
+		graph.connect(vtx["out"], output[i]);
 	}
+		
+	// In order to do any computation we need a compute set and a compute
+	// vertex that is placed in that compute set:
+	ComputeSet cs1 = graph.addComputeSet("cs1");
+	
+	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
+	graph.addCodelets("gillespie_codelets.cpp");
 
-	// to be able to read the output
-	graph.createHostRead("output-read", output);
+	// Create streams that allow reading and writing of the variables:
+	auto input_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
+	// auto stream4 = g.addDeviceToHostFIFO("read_z",  FLOAT, v3.numElements());
+	// I DON'T THINK I NEED AN OUTPUT STREAM - OUTPUT ALREADY OUTPUT'ING
 
-	// Add a step to execute the compute set
-	prog.add(Execute(computeSet));
-	// Add a step to print out sim results
-	// prog.add(PrintTensor("output", output));
-	// Create the engine
-	Engine engine(graph, prog);
-	engine.load(device);
-	/*
-	auto start = std::chrono::system_clock::now();
-	// Run the control program
-	engine.run(0);
-	auto end = std::chrono::system_clock::now();
-	 */
+	// Now can start constructing the programs. Construct a vector of
+	// separate programs that can be called individually:
+	std::vector<program::Program> progs(Progs::NUM_PROGRAMS);
+
+	// Add program which initialises the inputs. Poplar is able to merge these
+	// copies for efficiency:
+	progs[WRITE_INPUTS] = program::Sequence({ program::Copy(input_strem, theta) } );
+
+	// Program that executes custom vertex in compute set 1:
+	progs[CUSTOM_PROG] = program::Execute(cs1);
+
+	// Add a program to read back the result:
+	progs[READ_RESULTS] = program::Copy(, output_stream);
+
+	return progs;
 }
+
 
 int main()
 {
