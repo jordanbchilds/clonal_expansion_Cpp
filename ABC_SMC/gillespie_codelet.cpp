@@ -14,12 +14,13 @@ class sim_network_vertex : public poplar::Vertex
 {
 public:
 	Input<Vector<float>> theta ;
+	Input<Vector<float>> times;
+	Input<int> nTimes;
     Output<Vector<int>> out;
 	
 	struct sim_network {
-		float Tmax;
-		float step_out;
-		int Nout;
+		float* times;
+		int nTimes;
 		int n_reactions;
 		int n_species;
 		int* Post;
@@ -81,34 +82,30 @@ public:
 	}
 
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
-		
-		int Nout = simnet.Nout;
+		int nTimes = simnet.nTimes;
+		float* times = simnet.times_ptr;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;
-		float step_out = simnet.step_out;
-		//float Tmax = simnet.Tmax;
 		int* S_pt = simnet.Stoi;
 		int* Pre_pt = simnet.Pre;
-		
+
 		int x[2];
 		x[0] = *x_init; x[1] = *(x_init+1);
-		*out_array = x[0]; *(out_array+1) = x[1];
-		
+
 		int count = 0;
-		float target = step_out;
 		float tt = 0.0;
+		// float target = *times;
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
+
 		float temp_rates[5];
-		
 		temp_rates[2] = *(rates+2);
 		temp_rates[3] = *(rates+3);
 		temp_rates[4] = *(rates+4);
 
-		while( count<=Nout ){
+		while( tt <= *(times+nTimes-1) ){
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
-			
 			float hazards[5];
 			float haz_total = 0.0;
 			for(int i=0; i<n_reactions; ++i){
@@ -118,35 +115,27 @@ public:
 				hazards[i] = h_i;
 				haz_total += h_i;
 			}
-			if(haz_total<1e-10){
-				for(int i=count; i<Nout; i+=2){
-					*(out_array+i*n_species) = x[0];
-					*(out_array+i*n_species+1) = x[1];
-				}
-				break;
-			}
+
 			tt += rand_exp(haz_total);
-			if( tt>=target ){
-				count += 1;
-				target += step_out;
+
+			while( tt >= *(times+count) && count<nTimes){
+				cout<< count << " ";
 				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
+				count += 1;
 			}
+
 			int r = rand_react(hazards);
-			
 			x[0]  += *( S_pt + r*n_species );
 			x[1]  += *( S_pt + r*n_species + 1 );
-
 			copyNum = x[0]+x[1];
-			/*
-			 Escape if the copy number becomes too high. To hopefully reduce simulation time.
-			 We set the cut off as 2 times larger than the target copy number. This can (and should change).
-			 The output array is then filled with the current population vector, as it is assumed that this is sufficiently far from the data that it will be rejected in inference.
-			 */
-			if(copyNum>=2*C0){
-				*(out_array+i*n_species) = x[0];
-				*(out_array+i*n_species+1) = x[1];
-				break;
+
+			if(copyNum>2*C0 || copyNum==0){
+				for(int i=count; i<nTimes; ++i){
+					*(out_array+i*n_species) = 0;
+					*(out_array+i*n_species+1) = 0;
+				}
+				tt = 1e99;
 			}
 		}
 	}
@@ -166,11 +155,16 @@ public:
 			for(int j=0; j<Nspecies; ++j)
 				S_mat[i][j] = Post_mat[i][j] - Pre_mat[i][j];
 		}
-
+		
+		float times[nTimes];
+		for(int i=0; i<nTimes; ++i){
+			times[i] = *(times+i);
+		}
+		
 		sim_network spn;
-		spn.Tmax = 120.0*365.0; // 120 years in seconds
-		spn.step_out = 365.0; // 1 year in seconds
-		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out+1);
+		spn.times = &times[0];
+		spn.Tmax = times[nTimes];
+		spn.nTimes = nTimes;
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
 		spn.Post = Post_ptr;
@@ -187,13 +181,13 @@ public:
 		con_rates[0] = theta[7];
 		con_rates[1] = theta[8];
 		
-		int output[spn.Nout][spn.n_species];
+		int output[spn.nTimes][spn.n_species];
 		int* output_ptr = &output[0][0];
 
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 
 		int index = 0;
-		for(int i=0; i<spn.Nout; ++i){
+		for(int i=0; i<spn.nTimes; ++i){
 			out[index] = output[i][0];
 			out[index+1] = output[i][1];
 			index += 2;
