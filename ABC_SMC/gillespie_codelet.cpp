@@ -14,16 +14,6 @@ class sim_network_vertex : public poplar::Vertex
 {
 public:
 	Input<Vector<float>> theta ;
-	/*
-	Input<int> m_init;
-    Input<float> reactOne_rates;
-	Input<float> reactTwo_rates;
-	Input<float> reactThree_rates;
-	Input<float> reactFour_rates;
-	Input<float> reactFive_rates;
-    Input<float> conOne_rates;
-	Input<float> conTwo_rates;
-	 */
     Output<Vector<int>> out;
 	
 	struct sim_network {
@@ -148,6 +138,16 @@ public:
 			x[1]  += *( S_pt + r*n_species + 1 );
 
 			copyNum = x[0]+x[1];
+			/*
+			 Escape if the copy number becomes too high. To hopefully reduce simulation time.
+			 We set the cut off as 2 times larger than the target copy number. This can (and should change).
+			 The output array is then filled with the current population vector, as it is assumed that this is sufficiently far from the data that it will be rejected in inference.
+			 */
+			if(copyNum>=2*C0){
+				*(out_array+i*n_species) = x[0];
+				*(out_array+i*n_species+1) = x[1];
+				break;
+			}
 		}
 	}
 
