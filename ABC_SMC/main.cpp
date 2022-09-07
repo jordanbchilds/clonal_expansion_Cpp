@@ -284,7 +284,7 @@ int main() {
 
 	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
 	float Tmax = 120.0*365.0 ;
-	float theta[nParam] ;
+	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3}
 	float* theta_ptr = &theta[0];
 	const unsigned Ntheta = 1;
 						  
@@ -292,7 +292,7 @@ int main() {
 	/*
 	GENERATE INITIAL PROPOSED PARAMETERS
 	fill param_space array with initial params
-	*/
+	
 	for(int i=0; i<Ntheta; ++i){
 		int c0 = CN_dist(generator);
 		float h0 = ML_dist(generator);
@@ -307,7 +307,7 @@ int main() {
 		param_space[i][7] = con_dist(generator);
 		param_space[i][8] = con_dist(generator);
 	}
-	/* FOR ABC SMC (one day you'll get there, stay positive!)
+	FOR ABC SMC (one day you'll get there, stay positive!)
 	const int Nabc = 10;
 	float thresholds[Nabc];
 	float weights[Ntheta];
@@ -319,9 +319,11 @@ int main() {
 	// float threshold;
 
 	for(int i=0; i<Ntheta; ++i){
+		/*
 		for(int k=0; k<nParam; ++k){
 			*(theta_ptr+k) = param_space[i][k];
 		}
+		*/
 		
 		executeGraphProgram(theta_ptr, nParam, &times[0], &nTimes, engine);
 		
