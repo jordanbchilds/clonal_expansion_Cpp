@@ -136,7 +136,7 @@ enum Progs {
 	NUM_PROGRAMS
 };
 
-std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int nParam, long unsigned int nTimes, const int numberOfCores, const int, numberOfTiles, const int threadsPerTile) {
+std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int nParam, long unsigned int nTimes, const int numberOfCores, const int numberOfTiles, const int threadsPerTile) {
 	
 	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
 	int tileInt;
