@@ -342,7 +342,7 @@ int main() {
 				copy_number[t][k] = cpu_vector[k*2*nTimes + 2*t] + cpu_vector[k*2*nTimes + 2*t + 1];
 				cout << copy_number[t][k] << " " ;
 				mutation_load[t][k] = cpu_vector[k*2*nTimes + 2*t + 1] / copy_number[t][k];
-				cout << mutation_load[y][k] << " ";
+				cout << mutation_load[t][k] << " ";
 			}
 			cout << endl;
 			
