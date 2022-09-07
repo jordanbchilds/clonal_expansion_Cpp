@@ -21,13 +21,13 @@ public:
 	
 	struct sim_network {
 		const float* times_ptr;
-		float Tmax;
-		int nTimes;
-		int n_reactions;
-		int n_species;
-		int* Post;
-		int* Pre;
-		int* Stoi;
+		const float Tmax;
+		const int nTimes;
+		const int n_reactions;
+		const int n_species;
+		const int* Post;
+		const int* Pre;
+		const int* Stoi;
 	};
 	
 	unsigned choose(unsigned n, unsigned k){
@@ -85,13 +85,13 @@ public:
 
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
-		int nTimes = simnet.nTimes;
-		float Tmax = simnet.Tmax;
+		const int nTimes = simnet.nTimes;
+		const float Tmax = simnet.Tmax;
 		const float* times = simnet.times_ptr;
-		int n_species = simnet.n_species;
-		int n_reactions = simnet.n_reactions;
-		int* S_pt = simnet.Stoi;
-		int* Pre_pt = simnet.Pre;
+		const int n_species = simnet.n_species;
+		const int n_reactions = simnet.n_reactions;
+		const int* S_pt = simnet.Stoi;
+		const int* Pre_pt = simnet.Pre;
 
 		int x[2];
 		x[0] = *x_init;
@@ -140,7 +140,7 @@ public:
 					*(out_array+i*n_species) = 0;
 					*(out_array+i*n_species+1) = 0;
 				}
-				break;
+				tt = 1e99;
 			}
 		}
 	}
@@ -149,12 +149,12 @@ public:
 	{
 		const int Nreact = 5;
 		const int Nspecies = 2;
-		int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
-		int* Pre_ptr = &Pre_mat[0][0];
-		int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
-		int* Post_ptr = &Post_mat[0][0];
+		const int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
+		const int* Pre_ptr = &Pre_mat[0][0];
+		const int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
+		const int* Post_ptr = &Post_mat[0][0];
 		int S_mat[Nreact][Nspecies];
-		int* S_ptr = &S_mat[0][0];
+		const int* S_ptr = &S_mat[0][0];
 		
 		for(int i=0; i<Nreact; ++i){
 			for(int j=0; j<Nspecies; ++j)
