@@ -140,7 +140,7 @@ public:
 					*(out_array+i*n_species) = 0;
 					*(out_array+i*n_species+1) = 0;
 				}
-				tt = 1e99;
+				break;
 			}
 		}
 	}
