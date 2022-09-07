@@ -158,10 +158,12 @@ public:
 				S_mat[i][j] = Post_mat[i][j] - Pre_mat[i][j];
 		}
 		
+		/*
 		float times[Nout];
 		for(int i=0; i<Nout; ++i){
 			times[i] = *(times+i);
 		}
+		*/
 		
 		sim_network spn;
 		spn.times_ptr = &times[0];
