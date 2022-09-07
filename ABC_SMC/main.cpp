@@ -340,12 +340,8 @@ int main() {
 			
 			for(int k=0; k<totalThreads; ++k){
 				copy_number[t][k] = cpu_vector[k*2*nTimes + 2*t] + cpu_vector[k*2*nTimes + 2*t + 1];
-				cout << copy_number[t][k] << " ";
 				mutation_load[t][k] = cpu_vector[k*2*nTimes + 2*t + 1] / copy_number[t][k];
-				cout << mutation_load[t][k] << " ";
 			}
-			cout << "\n" ;
-			/*
 			sim_summ[0][t][0] = myMean(mutation_load[t], totalThreads);
 			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
 			
@@ -357,7 +353,6 @@ int main() {
 			cout << sim_summ[0][t][1] << " " ;
 			cout << sim_summ[1][t][1] << " ";
 			cout<<endl;
-			 */
 		}
 		
 		/*
