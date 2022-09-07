@@ -21,6 +21,7 @@ public:
 	
 	struct sim_network {
 		const float* times_ptr;
+		float Tmax;
 		int nTimes;
 		int n_reactions;
 		int n_species;
@@ -85,6 +86,7 @@ public:
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
 		int nTimes = simnet.nTimes;
+		float Tmax = simnet.Tmax;
 		const float* times = simnet.times_ptr;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;
@@ -106,7 +108,7 @@ public:
 		temp_rates[3] = *(rates+3);
 		temp_rates[4] = *(rates+4);
 
-		while( tt <= *(times+nTimes-1) ){
+		while( tt <= Tmax ){
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
 			float hazards[5];
@@ -121,7 +123,7 @@ public:
 
 			tt += rand_exp(haz_total);
 
-			if( tt >= *(times+count) && count<nTimes){
+			while( tt >= *(times+count) && count<nTimes){
 				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
 				count += 1;
@@ -167,6 +169,7 @@ public:
 		*/
 		
 		sim_network spn;
+		spn.Tmax = &Tmax[2];
 		spn.times_ptr = &times[0];
 		spn.nTimes = 3;
 		spn.n_reactions = Nreact;
