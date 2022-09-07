@@ -344,7 +344,7 @@ int main() {
 			}
 			
 			for(int i=0; i<totalThreads; ++i)
-				cout << copy_numer[t][i] << " " ;
+				cout << copy_number[t][i] << " " ;
 			cout<<endl;
 			for(int i=0; i<totalThreads; ++i)
 				cout << mutation_load[t][i] << " ";
