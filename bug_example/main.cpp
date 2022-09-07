@@ -70,7 +70,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
     auto stream = graph.addHostToDeviceFIFO("write_x", FLOAT, x_len);
 	
 	std::vector<Program> progs(Progs::NUM_PROGRAMS); // I HAVE NOT IDEA WHAT NUM_PROGRAMS IS/DOES - but without it the empire falls
-	progs[WRITE_INPUTS] = Sequence( Copy(stream, vec) );
+	progs[WRITE_INPUTS] = Sequence( {Copy(stream, vec)} );
 	progs[CUSTOM_PROG] = Execute(computeSet);
 						  
 	return progs;
