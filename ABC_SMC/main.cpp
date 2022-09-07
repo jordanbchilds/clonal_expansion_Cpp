@@ -98,6 +98,11 @@ double myMean(float* vec_ptr, int len){
 	double m =  sum / len;
 }
 
+double myMean(int* vec_ptr, int len){
+	double sum = std::accumulate(&vec_ptr[0], &vec_ptr[len], 0.0);
+	double m =  sum / len;
+}
+
 double myStdDev(float* vec_ptr, int len, double mean){
 		double accum = 0.0;
 				std::for_each (vec_ptr, vec_ptr+len, [&](const double d) {
@@ -124,7 +129,8 @@ enum Progs {
 	NUM_PROGRAMS
 };
 
-std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, int nTimes ) {
+std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int nParam, long unsigned int nTimes ) {
+	
 	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;
 	const int threadsPerTile = 6;
@@ -134,7 +140,6 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, in
 
 	float tmax = 120.0*365.0; // 120 years in seconds
 	float stepOut = 365.0; // 1 year in seconds
-	long unsigned int Nout = (int) (tmax/stepOut + 1.0);
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
@@ -148,11 +153,13 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, in
 	for(int i=0; i<datasetSize; ++i){
 		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
-		graph.setTileMapping(nTimes, tileInt);
+		graph.setTileMapping(Nout, tileInt);
 		graph.setTileMapping(times, tileInt);
 		graph.setTileMapping(theta, tileInt);
 		graph.setTileMapping(output[i], tileInt);
+		
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
+		
 		graph.setTileMapping(vtx, tileInt);
 		graph.connect(vtx["Nout"], Nout);
 		graph.connect(vtx["times"], times);
@@ -177,7 +184,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, in
 
 void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, int nTimes, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 	
-    engine.connectStream("write_nTimes", &nTimes, &nTimes)
+	engine.connectStream("write_nTimes", &nTimes, &nTimes);
 	engine.connectStream("write_dataTimes", outTimes_ptr, outTime_ptr+nTimes);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	
@@ -189,8 +196,8 @@ void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, int 
 int main() {
 	// READ IN THE DATA AND CALCULATE SUMMARY STATISTICS ARRAY
 	// define input size - not ideal but we make do.
-	 int nTimes = 3;
-	 int nObs = 1000;
+	 long unsigned int nTimes = 3;
+	 long unsigned int nObs = 1000;
 	 
 	 float ml_flat[nTimes*nObs];
 	 int cn_flat[nTimes*nObs];
@@ -253,7 +260,7 @@ int main() {
 	std::cout << "Attached to IPU " << device.getId() << std::endl;
 	Target target = device.getTarget();
 
-	int nParam = 9;
+	long unsigned int nParam = 9;
 	
 	// Create the Graph object
 	Graph graph(target);
@@ -307,28 +314,31 @@ int main() {
 	}
 	*/
 	// float threshold;
-	float mutation_load[nTimes][datasetSize];
-	float copy_number[nTimes][datasetSize];
+
 	for(int i=0; i<Ntheta; ++i){
 		for(int k=0; k<nParam; ++k){ *(theta_ptr+k) = param_space[i][k]; }
 				
 		executeGraphProgram(theta_ptr, nParam, &times[0], nTimes, engine);
-		std::vector<int> cpu_vector( datasetSize * Nout * 2 );
+		std::vector<int> cpu_vector( totalThreads * nTimes * 2 );
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
 		float sim_summ[2][nTimes][2];
 		for(int t=0; t<nTimes; ++t){
-			for(int i=0; i<datasetSize; ++i){
+			float mutation_load[nTimes][totalThreads];
+			float copy_number[nTimes][totalThreads];
+			
+			for(int i=0; i<totalThreads; ++i){
 				copy_number[t][i] = cpu_vector[i*2*nTimes + 2*t] + cpu_vector[i*2*nTimes + 2*t + 1];
 				mutation_load[t][i] = cpu_vector[i*2*nTimes + 2*t + 1] / copy_number[t][i];
 			}
-			sim_summ[0][t][0] = myMean(mutation_load[t], datasetSize);
-			sim_summ[0][t][1] = myStdDev(mutation_load[t], datasetSize, sim_summ[0][t][0]);
-			sim_summ[1][t][0] = myMean(copy_number[t], datasetSize);
-			sim_summ[1][t][1] = myStdDev(copy_number[t], datasetSize, sim_summ[1][t][0]);
+			sim_summ[0][t][0] = myMean(mutation_load[t], totalThreads);
+			sim_summ[0][t][1] = myStdDev(mutation_load[t], totalThreads, sim_summ[0][t][0]);
+			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
+			sim_summ[1][t][1] = myStdDev(copy_number[t], totalThreads, sim_summ[1][t][0]);
 		}
 		double d = squared_dist(sim_summ, data_summ, nTimes, 2);
 		cout<< d <<endl;
 	}
+	
 	return 0;
 }
