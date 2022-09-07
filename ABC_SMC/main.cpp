@@ -289,7 +289,7 @@ int main() {
 	std::uniform_real_distribution<float> ML_dist(0.2,0.6);
 	std::normal_distribution<float> CN_dist(1e3, 100);
 
-	float times[nTimes] = {25.0,55.0,65.0};
+	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
 	float Tmax = 120.0*365.0 ;
 	float theta[nParam] ;
 	float* theta_ptr = &theta[0];
@@ -329,7 +329,9 @@ int main() {
 		for(int k=0; k<nParam; ++k){ *(theta_ptr+k) = param_space[i][k]; }
 				
 		executeGraphProgram(theta_ptr, nParam, &times[0], &nTimes, engine);
+		
 		std::vector<int> cpu_vector( totalThreads * nTimes * 2 );
+		
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
 		float sim_summ[2][nTimes][2];
@@ -347,7 +349,7 @@ int main() {
 			sim_summ[1][t][1] = myStdDev(copy_number[t], totalThreads, sim_summ[1][t][0]);
 		}
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
-		cout<< d <<endl;
+		cout<< d << endl;
 	}
 	
 	return 0;
