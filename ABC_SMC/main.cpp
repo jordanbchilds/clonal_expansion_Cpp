@@ -113,7 +113,7 @@ double myStdDev(float* vec_ptr, int len, double mean){
 
 double myStdDev(int* vec_ptr, int len, double mean){
 		double accum = 0.0;
-				std::for_each (vec_ptr, vec_ptr+len, [&](const double d) {
+		std::for_each (vec_ptr, vec_ptr+len, [&](const double d) {
 		   accum += (d - mean) * (d - mean);
 	   });
 	return sqrt(accum / len-1);
@@ -333,7 +333,7 @@ int main() {
 		
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 		
-		float sim_summ[2][nTimes][2] ;
+		double sim_summ[2][nTimes][2] ;
 		
 		for(int t=0; t<nTimes; ++t){
 			float mutation_load[nTimes][totalThreads];
@@ -350,8 +350,11 @@ int main() {
 			sim_summ[0][t][1] = myStdDev(mutation_load[t], totalThreads, sim_summ[0][t][0]);
 			sim_summ[1][t][1] = myStdDev(copy_number[t], totalThreads, sim_summ[1][t][0]);
 			
+			cout << sim_summ[0][t][0] << " ";
+			cout << sim_summ[1][t][0] << " ";
 			cout << sim_summ[0][t][1] << " " ;
 			cout << sim_summ[1][t][1] << " ";
+			
 			cout<<endl;
 		}
 		
