@@ -141,15 +141,14 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
 	int tileInt;
 
-	float tmax = 120.0*365.0; // 120 years in seconds
-	float stepOut = 365.0; // 1 year in seconds
-
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
 	//Tensor Nout = graph.addVariable(INT, {1});
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "data_times");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "model_params");
-	Tensor output = graph.addVariable(INT, {datasetSize, nTimes*2}, "output");
+	
+	Tensor output = graph.addVariable(INT, {datasetSize, nParam+nTimes}, "output");
+	
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
 	// Map tensors to tiles
@@ -329,6 +328,12 @@ int main() {
 		std::vector<int> cpu_vector( totalThreads * nTimes * 2 ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 		
+		for(int i=0; i<(nParam+nTimes); ++i){
+			for(int j=0; j<datasetSize; ++j){
+				cout << cpu_vector[ i*(nParam+nTimes) + j ] << " ";
+			}
+		}
+		/*
 		double sim_summ[2][nTimes][2] ;
 		for(int t=0; t<nTimes; ++t){
 			float mutation_load[nTimes][totalThreads];
@@ -343,7 +348,7 @@ int main() {
 			cout << endl;
 		}
 		
-		/*
+		
 		float sim_summ[2][nTimes][2];
 		for(int t=0; t<nTimes; ++t){
 			float mutation_load[nTimes][totalThreads];

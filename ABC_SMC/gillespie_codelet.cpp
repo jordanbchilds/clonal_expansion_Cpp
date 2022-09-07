@@ -190,7 +190,14 @@ public:
 		
 		int output[spn.nTimes][spn.n_species];
 		int* output_ptr = &output[0][0];
-
+		
+		for(int i=0; i<9; ++i){
+			out[i] = theta[i];
+		}
+		for(int i=0; i<3; ++i){
+			out[i+9] = times[i];
+		}
+		/*
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 
 		int index = 0;
@@ -199,6 +206,7 @@ public:
 			out[index+1] = output[i][1];
 			index += 2;
 		}
+		 */
 		return true;
 	}
 };
