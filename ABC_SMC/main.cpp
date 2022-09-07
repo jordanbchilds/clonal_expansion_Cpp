@@ -176,7 +176,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
 	
 	std::vector<Program> progs(Progs::NUM_PROGRAMS); // I HAVE NOT IDEA WHAT NUM_PROGRAMS IS/DOES - but without it the empire falls
-	progs[WRITE_INPUTS] = Sequence( {Copy(param_stream, theta), copy(times_stream, times)});
+	progs[WRITE_INPUTS] = Sequence( {Copy(param_stream, theta), Copy(times_stream, times)});
 	progs[CUSTOM_PROG] = Execute(computeSet);
 						  
 	return progs;
