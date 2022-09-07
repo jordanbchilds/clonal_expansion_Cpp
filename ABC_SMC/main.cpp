@@ -136,12 +136,8 @@ enum Progs {
 	NUM_PROGRAMS
 };
 
-std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int nParam, long unsigned int nTimes ) {
+std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int nParam, long unsigned int nTimes, const int numberOfCores, const int, numberOfTiles, const int threadsPerTile) {
 	
-	const int numberOfCores = 16; // access to POD16
-	const int numberOfTiles = 1472;
-	const int threadsPerTile = 6;
-
 	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
 	int tileInt;
 
@@ -251,14 +247,12 @@ int main() {
 		 data_summ[1][t][1] = myStdDev(copy_num[t], nObs, data_summ[1][t][0]);
 	 }
 	 
-	const int numberOfCores = 2; // access to POD16
+	const int numberOfCores = 16; // access to POD16
 	const int numberOfTiles = 1472;// 1472;
 	const int threadsPerTile = 6;
+	
 	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
-
-	// const unsigned Nsim = 1e5;
-	// int thetaIter = int(totalThreads/Nsim);
-
+	
 	auto manager = DeviceManager::createDeviceManager();
 	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
 	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
@@ -273,7 +267,7 @@ int main() {
 	
 	// Create the Graph object
 	Graph graph(target);
-	std::vector<Program> progs = buildGraphAndPrograms(graph, nParam, nTimes);
+	std::vector<Program> progs = buildGraphAndPrograms(graph, nParam, nTimes, numberOfCores, numberOfTiles, threadsPerTile);
 	Engine engine(graph, progs);
 	engine.load(device);
 						  
