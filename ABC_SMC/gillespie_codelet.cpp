@@ -123,7 +123,7 @@ public:
 
 			tt += rand_exp(haz_total);
 
-			while( tt >= *(times+count) && count<nTimes){
+			if( tt >= *(times+count) ){
 				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
 				count += 1;

@@ -283,7 +283,6 @@ int main() {
 	std::normal_distribution<float> CN_dist(1e3, 100);
 
 	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
-	float Tmax = 120.0*365.0 ;
 	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3} ;
 	float* theta_ptr = &theta[0];
 	const unsigned Ntheta = 1;
