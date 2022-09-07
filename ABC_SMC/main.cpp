@@ -333,7 +333,11 @@ int main() {
 		std::vector<int> cpu_vector( totalThreads * nTimes * 2 );
 		
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
-
+		
+		for(int i=0; i<6; ++i)
+			cout << cpu_vector[i] << endl;
+		
+		/*
 		float sim_summ[2][nTimes][2];
 		for(int t=0; t<nTimes; ++t){
 			float mutation_load[nTimes][totalThreads];
@@ -350,6 +354,7 @@ int main() {
 		}
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		cout<< d << endl;
+		 */
 	}
 	
 	return 0;
