@@ -100,7 +100,7 @@ double myMean(float* vec_ptr, int len){
 
 double myMean(int* vec_ptr, int len){
 	double sum = std::accumulate(&vec_ptr[0], &vec_ptr[len], 0.0);
-	double m =  sum / len;
+	double m =  (double) sum / (double) len;
 }
 
 double myStdDev(float* vec_ptr, int len, double mean){
@@ -120,7 +120,6 @@ double myStdDev(int* vec_ptr, int len, double mean){
 }
 
 double squared_dist(float* x_ptr, float* y_ptr, int nrow, int ncol){
-	
 	double distance = 0.0;
 	for(int i=0; i<nrow; ++i){
 		for(int j=0; j<ncol; ++j){
@@ -344,11 +343,15 @@ int main() {
 				copy_number[t][k] = cpu_vector[k*2*nTimes + 2*t] + cpu_vector[k*2*nTimes + 2*t + 1];
 				mutation_load[t][k] = cpu_vector[k*2*nTimes + 2*t + 1] / copy_number[t][k];
 			}
+			
 			sim_summ[0][t][0] = myMean(mutation_load[t], totalThreads);
 			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
-
-			cout << sim_summ[0][t][0] << " " ;
-			cout << sim_summ[1][t][0] << " ";
+			
+			sim_summ[0][t][1] = myStdDev(mutation_load[t], totalThreads, sim_summ[0][t][0]);
+			sim_summ[1][t][1] = myStdDev(copy_number[t], totalThreads, sim_summ[1][t][0]);
+			
+			cout << sim_summ[0][t][1] << " " ;
+			cout << sim_summ[1][t][1] << " ";
 			cout<<endl;
 		}
 		
