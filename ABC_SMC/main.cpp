@@ -248,7 +248,7 @@ int main() {
 	 
 	const int numberOfCores = 1; // access to POD16
 	const int numberOfTiles = 1;// 1472;
-	const int threadsPerTile = 6;
+	const int threadsPerTile = 1;
 	
 	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
 	
