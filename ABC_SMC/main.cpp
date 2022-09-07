@@ -335,8 +335,9 @@ int main() {
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 		
 		for(int i=0; i<6; ++i)
-			cout << cpu_vector[i] << endl;
+			cout << cpu_vector[i] << " " ;
 		
+		cout<<endl;
 		/*
 		float sim_summ[2][nTimes][2];
 		for(int t=0; t<nTimes; ++t){
