@@ -147,6 +147,7 @@ public:
 
 	bool compute()
 	{
+		/*
 		const int Nreact = 5;
 		const int Nspecies = 2;
 		int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
@@ -160,12 +161,12 @@ public:
 				S_mat[i][j] = Post_mat[i][j] - Pre_mat[i][j];
 		}
 		
-		/*
+		
 		float times[Nout];
 		for(int i=0; i<Nout; ++i){
 			times[i] = *(times+i);
 		}
-		*/
+		
 		
 		sim_network spn;
 		spn.Tmax = times[2];
@@ -189,6 +190,7 @@ public:
 		
 		int output[spn.nTimes][spn.n_species];
 		int* output_ptr = &output[0][0];
+		*/
 		
 		for(int i=0; i<9; ++i){
 			out[i] = theta[i];
@@ -196,6 +198,7 @@ public:
 		for(int i=0; i<3; ++i){
 			out[i+9] = times[i];
 		}
+		
 		/*
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 
