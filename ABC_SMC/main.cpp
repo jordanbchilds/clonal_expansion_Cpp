@@ -329,7 +329,7 @@ int main() {
 		
 		cout<<endl;
 		
-		executeGraphProgram(theta_ptr, nParam, &times[0], &nTimes, engine);
+		executeGraphProgram(theta_ptr, nParam, &times[0], nTimes, engine);
 		
 		std::vector<int> cpu_vector( totalThreads * (nParam+nTimes) ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
@@ -340,6 +340,7 @@ int main() {
 			}
 		}
 		cout << endl;
+
 		/*
 		double sim_summ[2][nTimes][2] ;
 		for(int t=0; t<nTimes; ++t){
