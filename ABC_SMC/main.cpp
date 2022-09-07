@@ -323,6 +323,11 @@ int main() {
 		}
 		*/
 		
+		for(int i=0; i<9; ++i)
+			cout << *(theta_ptr+i) << " " ;
+		
+		cout<<endl;
+		
 		executeGraphProgram(theta_ptr, nParam, &times[0], &nTimes, engine);
 		
 		std::vector<int> cpu_vector( totalThreads * (nParam+nTimes) ) ;
@@ -333,6 +338,7 @@ int main() {
 				cout << cpu_vector[ i*totalThreads + j ] << " ";
 			}
 		}
+		cout << endl;
 		/*
 		double sim_summ[2][nTimes][2] ;
 		for(int t=0; t<nTimes; ++t){
