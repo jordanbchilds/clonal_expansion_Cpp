@@ -111,7 +111,7 @@ int main() {
 	Engine engine(graph, progs);
 	engine.load(device);
 	
-	executeGraphProgram(x_ptr, x_len, engine);
+	executeGraphProgram(&x[0], x_len, engine);
 						  
 	std::vector<int> cpu_vector( totalThreads * x_len ) ;
 	
