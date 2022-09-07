@@ -20,7 +20,7 @@ public:
     Output<Vector<int>> out;
 	
 	struct sim_network {
-		float* times_ptr;
+		const float* times_ptr;
 		float Tmax;
 		int nTimes;
 		int n_reactions;
@@ -87,7 +87,7 @@ public:
 		
 		int nTimes = simnet.nTimes;
 		float Tmax = simnet.Tmax;
-		float* times = simnet.times_ptr;
+		const float* times = simnet.times_ptr;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;
 		int* S_pt = simnet.Stoi;
