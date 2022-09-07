@@ -330,7 +330,7 @@ int main() {
 		
 		for(int i=0; i<(nParam+nTimes); ++i){
 			for(int j=0; j<totalThreads; ++j){
-				cout << cpu_vector[ i*(nParam+nTimes) + j ] << " ";
+				cout << cpu_vector[ i*totalThreads + j ] << " ";
 			}
 		}
 		/*
