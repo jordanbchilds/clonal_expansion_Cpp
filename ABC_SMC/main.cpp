@@ -334,7 +334,8 @@ int main() {
 		
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 		
-		float sim_summ[2][nTimes][2]
+		float sim_summ[2][nTimes][2] ;
+		
 		for(int t=0; t<nTimes; ++t){
 			float mutation_load[nTimes][totalThreads];
 			float copy_number[nTimes][totalThreads];
