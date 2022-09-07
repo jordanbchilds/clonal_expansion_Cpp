@@ -191,7 +191,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, int* nTimes_ptr, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
+void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, long unsigned int* nTimes_ptr, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 	
 	int n = *nTimes_ptr;
 	engine.connectStream("write_nTimes", nTimes_ptr, nTimes_ptr+1);
