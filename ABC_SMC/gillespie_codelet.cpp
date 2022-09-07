@@ -169,9 +169,9 @@ public:
 		
 		
 		sim_network spn;
-		spn.Tmax = times[2];
+		spn.nTimes = times.size();
 		spn.times_ptr = &times[0];
-		spn.nTimes = 3;
+		spn.Tmax = times[times.size()-1];
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
 		spn.Post = Post_ptr;
