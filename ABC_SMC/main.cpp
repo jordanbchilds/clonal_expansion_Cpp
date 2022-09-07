@@ -151,7 +151,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
-	Tensor Nout = graph.addVariable(INT, {}, "n_times");
+	Tensor Nout = graph.addVariable(INT, {1});
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "data_times");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "model_params");
 	Tensor output = graph.addVariable(INT, {datasetSize, nTimes*2}, "output");
@@ -161,6 +161,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	for(int i=0; i<datasetSize; ++i){
 		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
+		
 		graph.setTileMapping(Nout, tileInt);
 		graph.setTileMapping(times, tileInt);
 		graph.setTileMapping(theta, tileInt);
