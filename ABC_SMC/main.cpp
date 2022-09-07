@@ -325,7 +325,7 @@ int main() {
 		
 		executeGraphProgram(theta_ptr, nParam, &times[0], &nTimes, engine);
 		
-		std::vector<int> cpu_vector( totalThreads * nTimes * 2 ) ;
+		std::vector<int> cpu_vector( totalThreads * (nParam+nTimes) ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 		
 		for(int i=0; i<(nParam+nTimes); ++i){
