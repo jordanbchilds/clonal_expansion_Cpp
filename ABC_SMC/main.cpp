@@ -247,8 +247,8 @@ int main() {
 		 data_summ[1][t][1] = myStdDev(copy_num[t], nObs, data_summ[1][t][0]);
 	 }
 	 
-	const int numberOfCores = 16; // access to POD16
-	const int numberOfTiles = 1472;// 1472;
+	const int numberOfCores = 1; // access to POD16
+	const int numberOfTiles = 1;// 1472;
 	const int threadsPerTile = 6;
 	
 	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
