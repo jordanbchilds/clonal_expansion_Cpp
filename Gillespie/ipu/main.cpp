@@ -175,18 +175,18 @@ int main()
 	// Add a step to execute the compute set
 	prog.add(Execute(computeSet));
 	// Add a step to print out sim results
-	// prog.add(PrintTensor("output", output));
+	prog.add(PrintTensor("output", output));
 	// Create the engine
 	Engine engine(graph, prog);
 	engine.load(device);
-	
 	
 	// Run the control program
 	engine.run(0);
 	
 	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
-
+	
+	/*
 	std::ofstream wild_file ("ipu_wldCount.txt");
 	for(int i=0; i<datasetSize; ++i){
 		for(int j=0; j<Nout; ++j){
@@ -212,6 +212,6 @@ int main()
 
 	std::cout << "Completed computation at " << std::ctime(&end_time)
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
-	
+	*/
 	return 0;
 }
