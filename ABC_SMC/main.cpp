@@ -329,9 +329,8 @@ int main() {
 				
 		executeGraphProgram(theta_ptr, nParam, &times[0], &nTimes, engine);
 		
-		std::vector<int> cpu_vector( totalThreads * nTimes * 2 );
-		
-		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
+		std::vector<int> cpu_vector( totalThreads * nTimes * 2 ) ;
+		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 		
 		double sim_summ[2][nTimes][2] ;
 		
@@ -341,9 +340,11 @@ int main() {
 			
 			for(int k=0; k<totalThreads; ++k){
 				copy_number[t][k] = cpu_vector[k*2*nTimes + 2*t] + cpu_vector[k*2*nTimes + 2*t + 1];
+				cout << copy_number[t][k] << " ";
 				mutation_load[t][k] = cpu_vector[k*2*nTimes + 2*t + 1] / copy_number[t][k];
+				cout << mutation_load[t][k] << " ";
 			}
-			
+			/*
 			sim_summ[0][t][0] = myMean(mutation_load[t], totalThreads);
 			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
 			
@@ -354,8 +355,8 @@ int main() {
 			cout << sim_summ[1][t][0] << " ";
 			cout << sim_summ[0][t][1] << " " ;
 			cout << sim_summ[1][t][1] << " ";
-			
 			cout<<endl;
+			 */
 		}
 		
 		/*
