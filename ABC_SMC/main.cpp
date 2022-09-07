@@ -151,7 +151,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
-	Tensor Nout = graph.addVariable(INT, {1});
+	//Tensor Nout = graph.addVariable(INT, {1});
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "data_times");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "model_params");
 	Tensor output = graph.addVariable(INT, {datasetSize, nTimes*2}, "output");
@@ -162,7 +162,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		
-		graph.setTileMapping(Nout, tileInt);
+		//graph.setTileMapping(Nout, tileInt);
 		graph.setTileMapping(times, tileInt);
 		graph.setTileMapping(theta, tileInt);
 		graph.setTileMapping(output[i], tileInt);
@@ -170,7 +170,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
 		
 		graph.setTileMapping(vtx, tileInt);
-		graph.connect(vtx["Nout"], Nout);
+		//graph.connect(vtx["Nout"], Nout);
 		graph.connect(vtx["times"], times);
 		graph.connect(vtx["theta"], theta);
 		graph.connect(vtx["out"], output[i]);
@@ -180,7 +180,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	graph.createHostRead("output-read", output);
 	
 	// Create streams that allow reading and writing of the variables:
-    auto nTimes_stream = graph.addHostToDeviceFIFO("write_nTimes", INT, 1);
+    //auto nTimes_stream = graph.addHostToDeviceFIFO("write_nTimes", INT, 1);
     auto times_stream = graph.addHostToDeviceFIFO("write_dataTimes", FLOAT, nTimes);
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
 	
@@ -194,7 +194,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, long unsigned int* nTimes_ptr, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 	
 	int n = *nTimes_ptr;
-	engine.connectStream("write_nTimes", nTimes_ptr, nTimes_ptr);
+	//engine.connectStream("write_nTimes", nTimes_ptr, nTimes_ptr);
 	engine.connectStream("write_dataTimes", outTimes_ptr, outTimes_ptr+*nTimes_ptr);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	

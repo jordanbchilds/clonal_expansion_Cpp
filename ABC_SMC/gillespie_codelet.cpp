@@ -15,7 +15,7 @@ class sim_network_vertex : public poplar::Vertex
 public:
 	Input<Vector<float>> theta ;
 	Input<Vector<float>> times;
-	Input<Vector<int>> Nout;
+	// Input<Vector<int>> Nout;
 	
     Output<Vector<int>> out;
 	
@@ -168,7 +168,7 @@ public:
 		
 		sim_network spn;
 		spn.times_ptr = &times[0];
-		spn.nTimes = Nout[0];
+		spn.nTimes = 3;
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
 		spn.Post = Post_ptr;
