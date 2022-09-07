@@ -151,7 +151,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
-	int Nout = graph.addVariable(INT, {1});
+	Tensor Nout = graph.addVariable(INT, {2});
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "data_times");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "model_params");
 	Tensor output = graph.addVariable(INT, {datasetSize, nTimes*2}, "output");
@@ -162,7 +162,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		
-		graph.setTileMapping(Nout, tileInt);
+		graph.setTileMapping(Nout[0], tileInt);
 		graph.setTileMapping(times, tileInt);
 		graph.setTileMapping(theta, tileInt);
 		graph.setTileMapping(output[i], tileInt);
@@ -170,7 +170,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
 		
 		graph.setTileMapping(vtx, tileInt);
-		graph.connect(vtx["Nout"], Nout);
+		graph.connect(vtx["Nout"], Nout[0]);
 		graph.connect(vtx["times"], times);
 		graph.connect(vtx["theta"], theta);
 		graph.connect(vtx["out"], output[i]);
