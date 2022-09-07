@@ -80,22 +80,22 @@ myTheta check_limits(myTheta theta, float* limits_array, int nParam){
 */
 
 void perturb( float* theta_star ){
-	*(theta_star) = theta_star.wInit + runif_disc(25) ;
-	*(theta_star+1) = theta_star.wInit + runif_disc(25) ;
+	*(theta_star) = *theta_star + runif_disc(25) ;
+	*(theta_star+1) = *(theta_star+1) + runif_disc(25) ;
 	
-	*(theta_star+2) = theta_star.rep_wld + runif(1e-5);
-	*(theta_star+3) = theta_star.rep_mnt + runif(1e-5);
-	*(theta_star+4) = theta_star.deg_wld + runif(1e-5);
-	*(theta_star+5) = theta_star.deg_mnt + runif(1e-5);
-	*(theta_star+6) = theta_star.mutation + runif(1e-6) ;
+	*(theta_star+2) = *(theta_star+2) + runif(1e-5);
+	*(theta_star+3) = *(theta_star+3) + runif(1e-5);
+	*(theta_star+4) = *(theta_star+4) + runif(1e-5);
+	*(theta_star+5) = *(theta_star+5) + runif(1e-5);
+	*(theta_star+6) = *(theta_star+6) + runif(1e-6) ;
 	
-	*(theta_star+7) = theta_star.con_above + runif(1e-5);
-	*(theta_star+8) = theta_star.con_below + runif(1e-5);
+	*(theta_star+7) = *(theta_star+7) + runif(1e-5);
+	*(theta_star+8) = *(theta_star+8) + runif(1e-5);
 }
 
 double myMean(float* vec_ptr, int len){
 	double sum = std::accumulate(&vec_ptr[0], &vec_ptr[len], 0.0);
-	double m =  sum / v.size();
+	double m =  sum / len;
 }
 
 double myStdDev(float* vec_ptr, int len, double mean){
@@ -115,7 +115,7 @@ double squared_dist(float* x_ptr, float* y_ptr, int nrow, int ncol){
 			distance += xy_diff*xy_diff;
 		}
 	}
-	return distance
+	return distance ;
 }
 
 enum Progs {
@@ -138,7 +138,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, in
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
-	Tensor nTimes = graph.addVariable(INT, {1}, "n_times");
+	Tensor Nout = graph.addVariable(INT, {1}, "n_times");
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "data_times");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "model_params");
 	Tensor output = graph.addVariable(INT, {datasetSize, Nout*2}, "output");
@@ -154,7 +154,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, in
 		graph.setTileMapping(output[i], tileInt);
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
 		graph.setTileMapping(vtx, tileInt);
-		graph.connect(vtx["nTimes", nTimes);
+		graph.connect(vtx["Nout"], Nout);
 		graph.connect(vtx["times"], times);
 		graph.connect(vtx["theta"], theta);
 		graph.connect(vtx["out"], output[i]);
@@ -177,41 +177,16 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, in
 
 void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, int nTimes, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 	
-    engine.connectStream("write_nTimes")
+    engine.connectStream("write_nTimes", &nTimes, &nTimes)
 	engine.connectStream("write_dataTimes", outTimes_ptr, outTime_ptr+nTimes);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	
 	engine.run(WRITE_INPUTS);
 	engine.run(CUSTOM_PROG);
-
-	/*
-	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
-	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
-
-	std::ofstream wild_file ("ipu_wldCount.txt");
-	for(int i=0; i<datasetSize; ++i){
-		for(int j=0; j<Nout; ++j){
-			wild_file<< cpu_vector[ i*2*Nout + 2*j ] << "\t" ;
-		}
-		wild_file<< "\n";
-	}
-	wild_file.close();
-	
-	std::ofstream mtnt_file ("ipu_mntCount.txt");
-	for(int i=0; i<datasetSize; ++i){
-		for(int j=0; j<Nout; ++j){
-			mtnt_file<< cpu_vector[ i*2*Nout + 2*j + 1 ] << "\t" ;
-		}
-		mtnt_file<< "\n";
-	}
-	mtnt_file.close();
-	*/
 }
 
 
 int main() {
-			  
-	
 	// READ IN THE DATA AND CALCULATE SUMMARY STATISTICS ARRAY
 	// define input size - not ideal but we make do.
 	 int nTimes = 3;
@@ -224,7 +199,7 @@ int main() {
 	 fstream ml_file("./mutation_load.txt", ios_base::in);
 	 if( ml_file.is_open() ){
 		 float a;
-		 while( input >> a ){
+		 while( ml_file >> a ){
 			 ml_flat[count] = a;
 			 count += 1;
 		 }
@@ -235,8 +210,8 @@ int main() {
 	 fstream cn_file("./copy_number.txt", ios_base::in);
 	 if( cn_file.is_open() ){
 		 int a;
-		 while( input >> a ){
-			 cn[count] = a;
+		 while( cn_file >> a ){
+			 cn_flat[count] = a;
 			 count += 1;
 		 }
 	 }
@@ -253,10 +228,10 @@ int main() {
 
 	 float data_summ[2][nTimes][2];
 	 for(int t=0; t<nTimes; ++t){
-		 data_summ[0][t][0] myMean(mut_load[t], nObs);
+		 data_summ[0][t][0] = myMean(mut_load[t], nObs);
 		 data_summ[0][t][1] = myStdDev(mut_load[t], nObs, data_summ[0][t][0]);
 
-		 data_summ[1][t][0] myMean(copy_num[t], nObs);
+		 data_summ[1][t][0] = myMean(copy_num[t], nObs);
 		 data_summ[1][t][1] = myStdDev(copy_num[t], nObs, data_summ[1][t][0]);
 	 }
 	 
@@ -278,6 +253,8 @@ int main() {
 	std::cout << "Attached to IPU " << device.getId() << std::endl;
 	Target target = device.getTarget();
 
+	int nParam = 9;
+	
 	// Create the Graph object
 	Graph graph(target);
 	std::vector<Program> progs = buildGraphAndPrograms(graph, nParam, nTimes);
@@ -295,8 +272,6 @@ int main() {
 	std::uniform_real_distribution<float> ML_dist(0.2,0.6);
 	std::normal_distribution<float> CN_dist(1e3, 100);
 
-	int nParam = 9;
-	int nTimes = 3;
 	float times[nTimes] = {25.0,55.0,65.0};
 	float Tmax = 120.0*365.0 ;
 	float theta[nParam] ;
@@ -338,6 +313,7 @@ int main() {
 		for(int k=0; k<nParam; ++k){ *(theta_ptr+k) = param_space[i][k]; }
 				
 		executeGraphProgram(theta_ptr, nParam, &times[0], nTimes, engine);
+		std::vector<int> cpu_vector( datasetSize * Nout * 2 );
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
 		float sim_summ[2][nTimes][2];
@@ -346,9 +322,9 @@ int main() {
 				copy_number[t][i] = cpu_vector[i*2*nTimes + 2*t] + cpu_vector[i*2*nTimes + 2*t + 1];
 				mutation_load[t][i] = cpu_vector[i*2*nTimes + 2*t + 1] / copy_number[t][i];
 			}
-			sim_summ[0][t][0] myMean(mutation_load[t], datasetSize);
+			sim_summ[0][t][0] = myMean(mutation_load[t], datasetSize);
 			sim_summ[0][t][1] = myStdDev(mutation_load[t], datasetSize, sim_summ[0][t][0]);
-			sim_summ[1][t][0] myMean(copy_number[t], datasetSize);
+			sim_summ[1][t][0] = myMean(copy_number[t], datasetSize);
 			sim_summ[1][t][1] = myStdDev(copy_number[t], datasetSize, sim_summ[1][t][0]);
 		}
 		double d = squared_dist(sim_summ, data_summ, nTimes, 2);
