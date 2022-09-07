@@ -15,7 +15,7 @@ class sim_network_vertex : public poplar::Vertex
 public:
 	Input<Vector<float>> theta ;
 	Input<Vector<float>> times;
-	Input<int> Nout;
+	Input<Vector<int>> Nout;
 	
     Output<Vector<int>> out;
 	
@@ -133,6 +133,7 @@ public:
 			copyNum = x[0]+x[1];
 
 			if(copyNum>2*C0 || copyNum==0){
+				// copyNum==0 is specific to this system Darren's general equiv was haz_total<1e-10
 				for(int i=count; i<nTimes; ++i){
 					*(out_array+i*n_species) = 0;
 					*(out_array+i*n_species+1) = 0;
@@ -167,7 +168,7 @@ public:
 		
 		sim_network spn;
 		spn.times_ptr = &times[0];
-		spn.nTimes = Nout;
+		spn.nTimes = Nout[0];
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
 		spn.Post = Post_ptr;
