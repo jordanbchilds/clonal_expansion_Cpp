@@ -162,7 +162,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		
-		graph.setTileMapping(Nout[0], tileInt);
+		graph.setTileMapping(Nout, tileInt);
 		graph.setTileMapping(times, tileInt);
 		graph.setTileMapping(theta, tileInt);
 		graph.setTileMapping(output[i], tileInt);
@@ -170,7 +170,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
 		
 		graph.setTileMapping(vtx, tileInt);
-		graph.connect(vtx["Nout"], Nout[0]);
+		graph.connect(vtx["Nout"], Nout);
 		graph.connect(vtx["times"], times);
 		graph.connect(vtx["theta"], theta);
 		graph.connect(vtx["out"], output[i]);
@@ -180,7 +180,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	graph.createHostRead("output-read", output);
 	
 	// Create streams that allow reading and writing of the variables:
-    auto nTimes_stream = graph.addHostToDeviceFIFO("write_nTimes", INT, 1);
+    auto nTimes_stream = graph.addHostToDeviceFIFO("write_nTimes", INT, 2);
     auto times_stream = graph.addHostToDeviceFIFO("write_dataTimes", FLOAT, nTimes);
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
 	
@@ -191,10 +191,10 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, int nTimes, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
+void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, int* nTimes_ptr, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 	
-	engine.connectStream("write_nTimes", &nTimes, &nTimes);
-	engine.connectStream("write_dataTimes", outTimes_ptr, outTimes_ptr+nTimes);
+	engine.connectStream("write_nTimes", nTimes_ptr, nTimes_ptr+1);
+	engine.connectStream("write_dataTimes", outTimes_ptr, outTimes_ptr+*nTimes);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	
 	engine.run(WRITE_INPUTS);
@@ -289,6 +289,7 @@ int main() {
 	std::normal_distribution<float> CN_dist(1e3, 100);
 
 	float times[nTimes] = {25.0,55.0,65.0};
+	int nTimes_vec[2] = {nTimes, nTimes};
 	float Tmax = 120.0*365.0 ;
 	float theta[nParam] ;
 	float* theta_ptr = &theta[0];
@@ -327,7 +328,7 @@ int main() {
 	for(int i=0; i<Ntheta; ++i){
 		for(int k=0; k<nParam; ++k){ *(theta_ptr+k) = param_space[i][k]; }
 				
-		executeGraphProgram(theta_ptr, nParam, &times[0], nTimes, engine);
+		executeGraphProgram(theta_ptr, nParam, &times[0], &nTimes_vec[0], engine);
 		std::vector<int> cpu_vector( totalThreads * nTimes * 2 );
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
 
