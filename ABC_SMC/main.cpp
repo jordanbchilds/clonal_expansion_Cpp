@@ -151,7 +151,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
-	Tensor Nout = graph.addVariable(INT, {0}, "n_times");
+	Tensor Nout = graph.addVariable(INT, 1, "n_times");
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "data_times");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "model_params");
 	Tensor output = graph.addVariable(INT, {datasetSize, nTimes*2}, "output");
