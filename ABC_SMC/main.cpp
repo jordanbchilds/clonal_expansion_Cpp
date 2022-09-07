@@ -108,7 +108,7 @@ double myStdDev(float* vec_ptr, int len, double mean){
 				std::for_each (vec_ptr, vec_ptr+len, [&](const double d) {
 		   accum += (d - mean) * (d - mean);
 	   });
-	return sqrt(accum / len-1);
+	return sqrt( accum / (len-1));
 }
 
 double myStdDev(int* vec_ptr, int len, double mean){
@@ -116,7 +116,7 @@ double myStdDev(int* vec_ptr, int len, double mean){
 		std::for_each (vec_ptr, vec_ptr+len, [&](const double d) {
 		   accum += (d - mean) * (d - mean);
 	   });
-	return sqrt(accum / len-1);
+	return sqrt(accum / (len-1) );
 }
 
 double squared_dist(float* x_ptr, float* y_ptr, int nrow, int ncol){
@@ -344,6 +344,7 @@ int main() {
 				mutation_load[t][k] = cpu_vector[k*2*nTimes + 2*t + 1] / copy_number[t][k];
 				cout << mutation_load[t][k] << " ";
 			}
+			cout << "\n" ;
 			/*
 			sim_summ[0][t][0] = myMean(mutation_load[t], totalThreads);
 			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
