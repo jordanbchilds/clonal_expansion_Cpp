@@ -182,9 +182,9 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, long unsigned int nTimes, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
+void executeGraphProgram(float* theta_ptr, int nParam, float* times_ptr, long unsigned int nTimes, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 
-	engine.connectStream("write_dataTimes", outTimes_ptr, outTimes_ptr+nTimes);
+	engine.connectStream("write_dataTimes", times_ptr, times_ptr+nTimes);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	
 	engine.run(WRITE_INPUTS);
@@ -279,6 +279,7 @@ int main() {
 	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
 	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3} ;
 	float* theta_ptr = &theta[0];
+	float* times_ptr = &times[0];
 	const unsigned Ntheta = 1;
 						  
 	float param_space[Ntheta][nParam];
@@ -323,7 +324,7 @@ int main() {
 		
 		cout<<endl;
 		
-		executeGraphProgram(theta_ptr, nParam, &times[0], nTimes, engine);
+		executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
 		
 		std::vector<int> cpu_vector( totalThreads * (nParam+nTimes) ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
