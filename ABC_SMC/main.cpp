@@ -147,12 +147,13 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "data_times");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "model_params");
 	
-	Tensor output = graph.addVariable(INT, {datasetSize, nParam+nTimes}, "output");
+	Tensor output = graph.addVariable(FLOAT, {datasetSize, nParam+nTimes}, "output");
 	
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
 	// Map tensors to tiles
 	for(int i=0; i<datasetSize; ++i){
+		
 		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		

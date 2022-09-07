@@ -17,7 +17,7 @@ public:
 	Input<Vector<float>> times;
 	// Input<Vector<int>> Nout;
 	
-    Output<Vector<int>> out;
+    Output<Vector<float>> out;
 	
 	struct sim_network {
 		const float* times_ptr;
@@ -155,7 +155,6 @@ public:
 		int* Post_ptr = &Post_mat[0][0];
 		int S_mat[Nreact][Nspecies];
 		int* S_ptr = &S_mat[0][0];
-		
 		for(int i=0; i<Nreact; ++i){
 			for(int j=0; j<Nspecies; ++j)
 				S_mat[i][j] = Post_mat[i][j] - Pre_mat[i][j];
