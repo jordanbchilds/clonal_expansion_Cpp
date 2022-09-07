@@ -111,6 +111,14 @@ double myStdDev(float* vec_ptr, int len, double mean){
 	return sqrt(accum / len-1);
 }
 
+double myStdDev(int* vec_ptr, int len, double mean){
+		double accum = 0.0;
+				std::for_each (vec_ptr, vec_ptr+len, [&](const double d) {
+		   accum += (d - mean) * (d - mean);
+	   });
+	return sqrt(accum / len-1);
+}
+
 double squared_dist(float* x_ptr, float* y_ptr, int nrow, int ncol){
 	
 	double distance = 0.0;
@@ -146,7 +154,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	Tensor Nout = graph.addVariable(INT, {1}, "n_times");
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "data_times");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "model_params");
-	Tensor output = graph.addVariable(INT, {datasetSize, Nout*2}, "output");
+	Tensor output = graph.addVariable(INT, {datasetSize, nTimes*2}, "output");
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
 	// Map tensors to tiles
@@ -185,7 +193,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, int nTimes, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 	
 	engine.connectStream("write_nTimes", &nTimes, &nTimes);
-	engine.connectStream("write_dataTimes", outTimes_ptr, outTime_ptr+nTimes);
+	engine.connectStream("write_dataTimes", outTimes_ptr, outTimes_ptr+nTimes);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	
 	engine.run(WRITE_INPUTS);
