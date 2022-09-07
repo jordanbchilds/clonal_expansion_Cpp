@@ -251,8 +251,8 @@ int main() {
 		 data_summ[1][t][1] = myStdDev(copy_num[t], nObs, data_summ[1][t][0]);
 	 }
 	 
-	const int numberOfCores = 16; // access to POD16
-	const int numberOfTiles = 1472;
+	const int numberOfCores = 1; // access to POD16
+	const int numberOfTiles = 1;
 	const int threadsPerTile = 6;
 	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
 
@@ -325,15 +325,16 @@ int main() {
 	// float threshold;
 
 	for(int i=0; i<Ntheta; ++i){
-		for(int k=0; k<nParam; ++k){ *(theta_ptr+k) = param_space[i][k]; }
-				
+		for(int k=0; k<nParam; ++k){
+			*(theta_ptr+k) = param_space[i][k];
+		}
+		
 		executeGraphProgram(theta_ptr, nParam, &times[0], &nTimes, engine);
 		
 		std::vector<int> cpu_vector( totalThreads * nTimes * 2 ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 		
 		double sim_summ[2][nTimes][2] ;
-		
 		for(int t=0; t<nTimes; ++t){
 			float mutation_load[nTimes][totalThreads];
 			float copy_number[nTimes][totalThreads];
@@ -345,20 +346,6 @@ int main() {
 				cout << mutation_load[t][k] << " ";
 			}
 			cout << endl;
-			
-			/*
-			sim_summ[0][t][0] = myMean(mutation_load[t], totalThreads);
-			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
-			
-			sim_summ[0][t][1] = myStdDev(mutation_load[t], totalThreads, sim_summ[0][t][0]);
-			sim_summ[1][t][1] = myStdDev(copy_number[t], totalThreads, sim_summ[1][t][0]);
-			
-			cout << sim_summ[0][t][0] << " ";
-			cout << sim_summ[1][t][0] << " ";
-			cout << sim_summ[0][t][1] << " " ;
-			cout << sim_summ[1][t][1] << " ";
-			cout<<endl;
-			 */
 		}
 		
 		/*
