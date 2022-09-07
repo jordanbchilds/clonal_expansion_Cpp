@@ -20,7 +20,7 @@ public:
 	bool compute()
 	{
 		for(int i=0; i<x.size(); ++i){
-			out[i] = theta[i];
+			out[i] = x[i];
 		}
 
 		return true;
