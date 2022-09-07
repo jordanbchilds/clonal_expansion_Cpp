@@ -292,7 +292,7 @@ int main() {
 	float Tmax = 120.0*365.0 ;
 	float theta[nParam] ;
 	float* theta_ptr = &theta[0];
-	const unsigned Ntheta = 100;
+	const unsigned Ntheta = 1;
 						  
 	float param_space[Ntheta][nParam];
 	/*
@@ -340,8 +340,13 @@ int main() {
 			
 			for(int k=0; k<totalThreads; ++k){
 				copy_number[t][k] = cpu_vector[k*2*nTimes + 2*t] + cpu_vector[k*2*nTimes + 2*t + 1];
+				cout << copy_number[t][k] << " " ;
 				mutation_load[t][k] = cpu_vector[k*2*nTimes + 2*t + 1] / copy_number[t][k];
+				cout << mutation_load[y][k] << " ";
 			}
+			cout << endl;
+			
+			/*
 			sim_summ[0][t][0] = myMean(mutation_load[t], totalThreads);
 			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
 			
@@ -353,6 +358,7 @@ int main() {
 			cout << sim_summ[0][t][1] << " " ;
 			cout << sim_summ[1][t][1] << " ";
 			cout<<endl;
+			 */
 		}
 		
 		/*
