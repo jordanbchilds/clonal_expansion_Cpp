@@ -123,7 +123,7 @@ public:
 
 			tt += rand_exp(haz_total);
 
-			if( tt >= *(times+count) ){
+			if( tt >= *(times+count) && count<=nTimes ){
 				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
 				count += 1;
@@ -134,7 +134,6 @@ public:
 			x[1]  += *( S_pt + r*n_species + 1 );
 			copyNum = x[0]+x[1];
 			
-			/*
 			if(copyNum>2*C0 || copyNum==0){
 				// copyNum==0 is specific to this system Darren's general equiv was haz_total<1e-10
 				for(int i=count; i<nTimes; ++i){
@@ -143,7 +142,6 @@ public:
 				}
 				tt = 1e99;
 			}
-			 */
 		}
 	}
 
