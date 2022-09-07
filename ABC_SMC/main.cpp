@@ -329,7 +329,7 @@ int main() {
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 		
 		for(int i=0; i<(nParam+nTimes); ++i){
-			for(int j=0; j<datasetSize; ++j){
+			for(int j=0; j<totalThreads; ++j){
 				cout << cpu_vector[ i*(nParam+nTimes) + j ] << " ";
 			}
 		}
