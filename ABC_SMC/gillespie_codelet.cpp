@@ -20,7 +20,7 @@ public:
     Output<Vector<int>> out;
 	
 	struct sim_network {
-		float* times_ptr;
+		const float* times_ptr;
 		int nTimes;
 		int n_reactions;
 		int n_species;
