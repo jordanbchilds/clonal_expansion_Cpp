@@ -67,10 +67,10 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	
 	// Create streams that allow reading and writing of the variables:
     //auto nTimes_stream = graph.addHostToDeviceFIFO("write_nTimes", INT, 1);
-    auto times_stream = graph.addHostToDeviceFIFO("x_write", FLOAT, x_len);
+    auto stream = graph.addHostToDeviceFIFO("write_x", FLOAT, x_len);
 	
 	std::vector<Program> progs(Progs::NUM_PROGRAMS); // I HAVE NOT IDEA WHAT NUM_PROGRAMS IS/DOES - but without it the empire falls
-	progs[WRITE_INPUTS] = Sequence( Copy(param_stream, theta) );
+	progs[WRITE_INPUTS] = Sequence( Copy(stream, vec.numElemenst()) );
 	progs[CUSTOM_PROG] = Execute(computeSet);
 						  
 	return progs;
@@ -78,7 +78,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 
 void executeGraphProgram(float* x_ptr, int x_len, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 
-	engine.connectStream("x_write", x_ptr, x_ptr+x_len);
+	engine.connectStream("write_x", x_ptr, x_ptr+x_len);
 	engine.run(WRITE_INPUTS);
 	engine.run(CUSTOM_PROG);
 }
@@ -111,9 +111,9 @@ int main() {
 	Engine engine(graph, progs);
 	engine.load(device);
 	
-	executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
+	executeGraphProgram(x_ptr, x_len, engine);
 						  
-	std::vector<int> cpu_vector( totalThreads * (nParam+nTimes) ) ;
+	std::vector<int> cpu_vector( totalThreads * x_len ) ;
 	
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 	
