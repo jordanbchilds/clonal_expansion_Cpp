@@ -193,8 +193,9 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 
 void executeGraphProgram(float* theta_ptr, int nParam, float* outTimes_ptr, int* nTimes_ptr, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
 	
+	int n = *nTimes_ptr;
 	engine.connectStream("write_nTimes", nTimes_ptr, nTimes_ptr+1);
-	engine.connectStream("write_dataTimes", outTimes_ptr, outTimes_ptr+*nTimes);
+	engine.connectStream("write_dataTimes", outTimes_ptr, outTimes_ptr+*nTimes_ptr);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	
 	engine.run(WRITE_INPUTS);
@@ -289,7 +290,7 @@ int main() {
 	std::normal_distribution<float> CN_dist(1e3, 100);
 
 	float times[nTimes] = {25.0,55.0,65.0};
-	int nTimes_vec[2] = {nTimes, nTimes};
+	long unsigned int nTimes_vec[2] = {nTimes, nTimes};
 	float Tmax = 120.0*365.0 ;
 	float theta[nParam] ;
 	float* theta_ptr = &theta[0];
