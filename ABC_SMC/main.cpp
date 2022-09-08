@@ -138,21 +138,21 @@ enum Progs {
 
 std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int nParam, long unsigned int nTimes, const int numberOfCores, const int numberOfTiles, const int threadsPerTile) {
 	
-	long unsigned int datasetSize = numberOfCores*numberOfTiles*threadsPerTile ;
+	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
 	int tileInt;
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "a");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "b");
-	Tensor output = graph.addVariable(FLOAT, {datasetSize, nParam+nTimes}, "output");
+	Tensor output = graph.addVariable(FLOAT, {totalThreads, nTimes, 2}, "output");
 	
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
 	// Map tensors to tiles
 	for(int i=0; i<datasetSize; ++i){
 		
-		int roundCount = i % int(numberOfCores * numberOfTiles * threadsPerTile);
+		int roundCount = i % int( totalThreads );
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		
 		graph.setTileMapping(times, tileInt);
@@ -197,6 +197,7 @@ int main() {
 	 long unsigned int nTimes = 3;
 	 long unsigned int nObs = 1000;
 	 
+	/*
 	 float ml_flat[nTimes*nObs];
 	 int cn_flat[nTimes*nObs];
 			
@@ -240,11 +241,13 @@ int main() {
 		 data_summ[1][t][1] = myStdDev(copy_num[t], nObs, data_summ[1][t][0]);
 	 }
 	 
+	*/
+	
 	const int numberOfCores = 1; // access to POD16
 	const int numberOfTiles = 1; // 1472;
 	const int threadsPerTile = 1; // six threads per tile
 	
-	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
+	long unsigned int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
 	
 	auto manager = DeviceManager::createDeviceManager();
 	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
@@ -264,17 +267,6 @@ int main() {
 	Engine engine(graph, progs);
 	engine.load(device);
 						  
-	/*
-	DEFINE PRIOR DISTRIBUTIONS
-	only used for first sample
-	*/
-	std::default_random_engine generator;
-	std::normal_distribution<float> rate_dist(2.64e-3,5e-4);
-	std::normal_distribution<float> mut_dist(2e-4, 5e-5);
-	std::normal_distribution<float> con_dist(2e-3, 5e-4);
-	std::uniform_real_distribution<float> ML_dist(0.2,0.6);
-	std::normal_distribution<float> CN_dist(1e3, 100);
-
 	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
 	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3} ;
 	float* theta_ptr = &theta[0];
@@ -296,6 +288,15 @@ int main() {
 	
 	
 	/*
+	 DEFINE PRIOR DISTRIBUTIONS
+	 only used for first sample
+	 std::default_random_engine generator;
+	 std::normal_distribution<float> rate_dist(2.64e-3,5e-4);
+	 std::normal_distribution<float> mut_dist(2e-4, 5e-5);
+	 std::normal_distribution<float> con_dist(2e-3, 5e-4);
+	 std::uniform_real_distribution<float> ML_dist(0.2,0.6);
+	 std::normal_distribution<float> CN_dist(1e3, 100);
+
 	float param_space[Ntheta][nParam];
 
 	GENERATE INITIAL PROPOSED PARAMETERS
