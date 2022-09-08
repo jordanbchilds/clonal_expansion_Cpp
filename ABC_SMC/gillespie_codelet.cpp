@@ -184,8 +184,8 @@ public:
 	
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
-		*out = 1.0;
-		*(out+1) = 2.0;
+		out[0] = 1.0;
+		out[1] = 2.0;
 		/*
 		int index = 0;
 		for(int i=0; i<spn.nTimes; ++i){
