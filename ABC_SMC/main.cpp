@@ -103,20 +103,20 @@ double myMean(int* vec_ptr, int len){
 	double m =  (double) sum / (double) len;
 }
 
-double myStdDev(float* vec_ptr, int len, double mean){
-		double accum = 0.0;
-				std::for_each (vec_ptr, vec_ptr+len, [&](const double d) {
-		   accum += (d - mean) * (d - mean);
-	   });
-	return sqrt( accum / (len-1));
+double myStdDev(float* vec_ptr, int len, float mean){
+	double sq_diff = 0.0;
+	for(int i=0; i<len; ++i)
+		sq_diff += (*(vec_ptr + i)-mean) * (*(vec_ptr+i)-mean) ;
+
+	return sq_diff / double(len - 1);
 }
 
-double myStdDev(int* vec_ptr, int len, double mean){
-		double accum = 0.0;
-		std::for_each (vec_ptr, vec_ptr+len, [&](const double d) {
-		   accum += (d - mean) * (d - mean);
-	   });
-	return sqrt(accum / (len-1) );
+double myStdDev(int* vec_ptr, int len, float mean){
+	double sq_diff = 0.0;
+	for(int i=0; i<len; ++i)
+		sq_diff += (*(vec_ptr + i)-mean) * (*(vec_ptr+i)-mean) ;
+
+	return sq_diff / double(len - 1);
 }
 
 double squared_dist(float* x_ptr, float* y_ptr, int nrow, int ncol){
@@ -334,13 +334,8 @@ int main() {
 			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
 			sim_summ[1][t][1] = myStdDev(copy_number[t], totalThreads, sim_summ[1][t][0]);
 			
-			
-			float accum = 0.0;
-			std::for_each (&copy_number[t], &copy_number[t]+3, [&](const float d) {
-				accum += (d - sim_summ[1][t][0]) * (d - sim_summ[1][t][0]);
-			});
-			cout << sqrt( accum / 2.0 ) << endl;
-
+			cout << sim_summ[0][t][1] << endl;
+			cout << sim_summ[1][t][1] << endl;
 		}
 		// double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		// cout<< d << endl;
