@@ -89,34 +89,32 @@ public:
 		return new_rate;
 	}
 
+	
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
-		int Nout = simnet.Nout;
+		int nTimes = simnet.nTimes;
+		float* times = simnet.times_ptr;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;
-		float step_out = simnet.step_out;
-		//float Tmax = simnet.Tmax;
 		int* S_pt = simnet.Stoi;
 		int* Pre_pt = simnet.Pre;
-		
+
 		int x[2];
 		x[0] = *x_init; x[1] = *(x_init+1);
-		*out_array = x[0]; *(out_array+1) = x[1];
-		
+
 		int count = 0;
-		float target = step_out;
 		float tt = 0.0;
+		// float target = *times;
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
+
 		float temp_rates[5];
-		
 		temp_rates[2] = *(rates+2);
 		temp_rates[3] = *(rates+3);
 		temp_rates[4] = *(rates+4);
 
-		while( count<=Nout ){
+		while( tt <= *(times+nTimes-1) ){
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
-			
 			float hazards[5];
 			float haz_total = 0.0;
 			for(int i=0; i<n_reactions; ++i){
@@ -126,29 +124,30 @@ public:
 				hazards[i] = h_i;
 				haz_total += h_i;
 			}
-			if(haz_total<1e-10){
-				for(int i=count; i<Nout; i+=2){
-					*(out_array+i*n_species) = x[0];
-					*(out_array+i*n_species+1) = x[1];
-				}
-				break;
-			}
+
 			tt += rand_exp(haz_total);
-			if( tt>=target ){
-				count += 1;
-				target += step_out;
+
+			while( tt >= *(times+count) && count<nTimes){
+				cout<< count << " ";
 				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
+				count += 1;
 			}
+
 			int r = rand_react(hazards);
-			
 			x[0]  += *( S_pt + r*n_species );
 			x[1]  += *( S_pt + r*n_species + 1 );
-
 			copyNum = x[0]+x[1];
+
+			if(copyNum>2*C0 || copyNum==0){
+				for(int i=count; i<nTimes; ++i){
+					*(out_array+i*n_species) = 0;
+					*(out_array+i*n_species+1) = 0;
+				}
+				tt = 1e99;
+			}
 		}
 	}
-
 	bool compute()
 	{
 		const int Nreact = 5;
