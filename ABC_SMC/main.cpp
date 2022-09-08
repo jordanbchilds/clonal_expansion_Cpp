@@ -145,7 +145,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	graph.addCodelets("gillespie_codelet.cpp");
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "a");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "b");
-	Tensor output = graph.addVariable(FLOAT, {totalThreads, nTimes, 2}, "output");
+	Tensor output = graph.addVariable(FLOAT, {totalThreads, nTimes*2}, "output");
 	
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
