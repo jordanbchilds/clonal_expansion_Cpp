@@ -277,8 +277,10 @@ int main() {
 	std::vector<int> cpu_vector( totalThreads*2*nTimes ) ;
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 	
-	for(int i=0; i<totalThreads*2*nTimes; ++i){
-		cout << cpu_vector[i]  << endl;
+	for(int i=0; i<totalThreads; ++i){
+		for(int j=0; j<nTimes; ++j){
+			cout << cpu_vector[i*2*nTimes + j]  << " " << cpu_vector[i*2*nTimes + j + 1]<< endl;
+		}
 		/*
 		for(int j=0; j<nTimes; ++j){
 			cout << cpu_vector[ i*2*nTimes + 2*j ] << " ";
