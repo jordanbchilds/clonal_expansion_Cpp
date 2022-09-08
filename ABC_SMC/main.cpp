@@ -136,9 +136,9 @@ enum Progs {
 	NUM_PROGRAMS
 };
 
-std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, int nTimes, const int numberOfCores, const int numberOfTiles, const int threadsPerTile) {
+std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int nParam, long unsigned int nTimes, const int numberOfCores, const int numberOfTiles, const int threadsPerTile) {
 	
-	int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
+	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
 	int tileInt;
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
@@ -180,7 +180,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, in
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, float* times_ptr, int nTimes, poplar::Engine &engine) {
+void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* times_ptr, long unsigned int nTimes, poplar::Engine &engine) {
 
 	engine.connectStream("write_dataTimes", times_ptr, times_ptr+nTimes);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
@@ -193,7 +193,7 @@ void executeGraphProgram(float* theta_ptr, int nParam, float* times_ptr, int nTi
 int main() {
 	// READ IN THE DATA AND CALCULATE SUMMARY STATISTICS ARRAY
 	// define input size - not ideal but we make do.
-	 int nTimes = 3;
+	 long unsigned int nTimes = 3;
 	 int nObs = 1000;
 	 
 	/*
@@ -246,7 +246,7 @@ int main() {
 	const int numberOfTiles = 1; // 1472;
 	const int threadsPerTile = 1; // six threads per tile
 	
-	int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
+	long unsigned int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
 	
 	auto manager = DeviceManager::createDeviceManager();
 	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
@@ -258,7 +258,7 @@ int main() {
 	std::cout << "Attached to IPU " << device.getId() << std::endl;
 	Target target = device.getTarget();
 
-	int nParam = 9;
+	long unsigned int nParam = 9;
 	
 	// Create the Graph object
 	Graph graph(target);
