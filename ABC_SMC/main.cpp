@@ -279,7 +279,7 @@ int main() {
 	
 	for(int i=0; i<totalThreads; ++i){
 		for(int j=0; j<nTimes; ++j){
-			cout << cpu_vector[i*2*nTimes + j]  << " " << cpu_vector[i*2*nTimes + j + 1]<< endl;
+			cout << cpu_vector[i*2*nTimes + 2*j]  << " " << cpu_vector[i*2*nTimes + 2*j + 1]<< endl;
 		}
 		/*
 		for(int j=0; j<nTimes; ++j){
