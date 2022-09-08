@@ -320,19 +320,6 @@ int main() {
 		std::vector<int> cpu_vector( totalThreads * 2*nTimes ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 
-		
-		double sim_summ[2][nTimes][2] ;
-		for(int t=0; t<nTimes; ++t){
-			
-			float mutation_load[nTimes][totalThreads];
-			int copy_number[nTimes][totalThreads];
-			
-			for(int k=0; k<totalThreads; ++k){
-				copy_number[t][k] = cpu_vector[k*2*nTimes + 2*t] + cpu_vector[k*2*nTimes + 2*t + 1];
-				mutation_load[t][k] = (float) cpu_vector[k*2*nTimes + 2*t + 1] / (float) copy_number[t][k];
-			}
-		}
-		
 		float sim_summ[2][nTimes][2];
 		for(int t=0; t<nTimes; ++t){
 			float mutation_load[nTimes][totalThreads];
