@@ -93,17 +93,17 @@ void perturb( float* theta_star ){
 	*(theta_star+8) = *(theta_star+8) + runif(1e-5);
 }
 
-double myMean(float* vec_ptr, int len){
+double myMean(float* vec_ptr, long unsigned int len){
 	double sum = std::accumulate(&vec_ptr[0], &vec_ptr[len], 0.0);
 	double m =  sum / len;
 }
 
-double myMean(int* vec_ptr, int len){
+double myMean(int* vec_ptr, long unsigned int len){
 	double sum = std::accumulate(&vec_ptr[0], &vec_ptr[len], 0.0);
 	double m =  (double) sum / (double) len;
 }
 
-double myStdDev(float* vec_ptr, int len, float mean){
+double myStdDev(float* vec_ptr, long unsigned int len, float mean){
 	double sq_diff = 0.0;
 	for(int i=0; i<len; ++i)
 		sq_diff += (*(vec_ptr + i)-mean) * (*(vec_ptr+i)-mean) ;
@@ -111,7 +111,7 @@ double myStdDev(float* vec_ptr, int len, float mean){
 	return sq_diff / double(len - 1);
 }
 
-double myStdDev(int* vec_ptr, int len, float mean){
+double myStdDev(int* vec_ptr, long unsigned int len, float mean){
 	double sq_diff = 0.0;
 	for(int i=0; i<len; ++i)
 		sq_diff += (*(vec_ptr + i)-mean) * (*(vec_ptr+i)-mean) ;
@@ -328,10 +328,10 @@ int main() {
 				copy_number[t][j] = cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1];
 				mutation_load[t][j] = cpu_vector[j*2*nTimes + 2*t + 1] / copy_number[t][j];
 			}
-			sim_summ[0][t][0] = myMean(&mutation_load[t], totalThreads);
-			sim_summ[0][t][1] = myStdDev(&mutation_load[t], totalThreads, sim_summ[0][t][0]);
-			sim_summ[1][t][0] = myMean(&copy_number[t], totalThreads);
-			sim_summ[1][t][1] = myStdDev(&copy_number[t], totalThreads, sim_summ[1][t][0]);
+			sim_summ[0][t][0] = myMean(&mutation_load[t][0], totalThreads);
+			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], totalThreads, sim_summ[0][t][0]);
+			sim_summ[1][t][0] = myMean(&copy_number[t][0], totalThreads);
+			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], totalThreads, sim_summ[1][t][0]);
 			
 			double sq_diff = 0.0;
 			for(int i=0; i<3; ++i)
