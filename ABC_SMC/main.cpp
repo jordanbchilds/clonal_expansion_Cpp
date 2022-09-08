@@ -145,7 +145,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	graph.addCodelets("gillespie_codelet.cpp");
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "a");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "b");
-	Tensor output = graph.addVariable(INT, {totalThreads}, "output");
+	Tensor output = graph.addVariable(FLOAT, {totalThreads, nTimes}, "output");
 	
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
@@ -274,10 +274,10 @@ int main() {
 	
 	executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
 	
-	std::vector<int> cpu_vector( totalThreads ) ;
+	std::vector<float> cpu_vector( totalThreads*nTimes ) ;
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 	
-	for(int i=0; i<totalThreads; ++i){
+	for(int i=0; i<totalThreads*nTimes; ++i){
 		cout << cpu_vector[i]  << endl;
 		/*
 		for(int j=0; j<nTimes; ++j){

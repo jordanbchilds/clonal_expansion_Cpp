@@ -16,7 +16,7 @@ public:
 	Input<Vector<float>> theta ;
 	Input<Vector<float>> times;
 
-    Output<int> out;
+    Output<Vector<float>> out;
 	
 	struct sim_network {
 		const float* times_ptr;
@@ -184,7 +184,9 @@ public:
 	
 		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
-		*out = int( times.size() );
+		for(int i=0; i<spn.nTimes; ++i){
+			out[i] = (float) i ;
+		}
 		/*
 		int index = 0;
 		for(int i=0; i<spn.nTimes; ++i){
