@@ -91,8 +91,10 @@ public:
 
 	
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
-		int nTimes = simnet.nTimes;
-		float* times = simnet.times_ptr;
+		
+		int Nout = simnet.Nout;
+		float Tmax = simnet.Tmax;
+		float step_out = simnet.step_out;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;
 		int* S_pt = simnet.Stoi;
@@ -100,10 +102,11 @@ public:
 
 		int x[2];
 		x[0] = *x_init; x[1] = *(x_init+1);
-
+		*(out_array) = x[0]; *(out_array+1) = x[1];
+		
 		int count = 0;
 		float tt = 0.0;
-		// float target = *times;
+		float target = 0;
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
 
@@ -112,7 +115,7 @@ public:
 		temp_rates[3] = *(rates+3);
 		temp_rates[4] = *(rates+4);
 
-		while( tt <= *(times+nTimes-1) ){
+		while( tt <= Tmax ){
 			temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
 			temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
 			float hazards[5];
@@ -127,8 +130,7 @@ public:
 
 			tt += rand_exp(haz_total);
 
-			while( tt >= *(times+count) && count<nTimes){
-				cout<< count << " ";
+			if( tt >= *(times+count) && count<nTimes){
 				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
 				count += 1;
@@ -165,8 +167,8 @@ public:
 		}
 
 		sim_network spn;
-		spn.Tmax = 120.0*365.0*24.0*3600.0; // 120 years in seconds
-		spn.step_out = 365.0*24.0*60.0*60.0; // 1 year in seconds
+		spn.Tmax = 120.0*365.0; // 120 years in seconds
+		spn.step_out = 10*365.0; // 1 year in seconds
 		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out+1);
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;

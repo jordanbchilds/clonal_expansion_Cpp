@@ -88,16 +88,16 @@ int main()
 	int m_initBoss = 500;
 	
 	int copyNum_0 = 1e3;
-    float reactOne_ratesBoss = 3.06e-8;
-	float reactTwo_ratesBoss = 3.06e-8;
-	float reactThree_ratesBoss = 3.06e-8;
-	float reactFour_ratesBoss = 3.06e-8;
+    float reactOne_ratesBoss = 2.64e-3;
+	float reactTwo_ratesBoss = 2.64e-3;
+	float reactThree_ratesBoss = 2.64e-3;
+	float reactFour_ratesBoss = 2.64e-3;
 	float reactFive_ratesBoss = 0.0;
 	float conOne_ratesBoss = 2.0e-3;
 	float conTwo_ratesBoss = 2.0e-3;
 	
 	std::default_random_engine generator;
-	std::normal_distribution<float> rate_dist(3.06e-8,5e-9);
+	std::normal_distribution<float> rate_dist(2.64e-3, 5e-4);
 	std::normal_distribution<float> con_dist(2e-3, 5e-4);
 	std::uniform_real_distribution<float> ML_dist(0.45,0.55);
 	std::normal_distribution<float> CN_dist(copyNum_0, 100);
