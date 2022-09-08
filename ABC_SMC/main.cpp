@@ -136,9 +136,9 @@ enum Progs {
 	NUM_PROGRAMS
 };
 
-std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int nParam, long unsigned int nTimes, const int numberOfCores, const int numberOfTiles, const int threadsPerTile) {
+std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, int nParam, int nTimes, const int numberOfCores, const int numberOfTiles, const int threadsPerTile) {
 	
-	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
+	int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
 	int tileInt;
 
 	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
@@ -180,7 +180,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, float* times_ptr, long unsigned int nTimes, poplar::Engine &engine) {
+void executeGraphProgram(float* theta_ptr, int nParam, float* times_ptr, int nTimes, poplar::Engine &engine) {
 
 	engine.connectStream("write_dataTimes", times_ptr, times_ptr+nTimes);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
@@ -193,8 +193,8 @@ void executeGraphProgram(float* theta_ptr, int nParam, float* times_ptr, long un
 int main() {
 	// READ IN THE DATA AND CALCULATE SUMMARY STATISTICS ARRAY
 	// define input size - not ideal but we make do.
-	 long unsigned int nTimes = 3;
-	 long unsigned int nObs = 1000;
+	 int nTimes = 3;
+	 int nObs = 1000;
 	 
 	/*
 	 float ml_flat[nTimes*nObs];
@@ -246,7 +246,7 @@ int main() {
 	const int numberOfTiles = 1; // 1472;
 	const int threadsPerTile = 1; // six threads per tile
 	
-	long unsigned int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
+	int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
 	
 	auto manager = DeviceManager::createDeviceManager();
 	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
@@ -258,7 +258,7 @@ int main() {
 	std::cout << "Attached to IPU " << device.getId() << std::endl;
 	Target target = device.getTarget();
 
-	long unsigned int nParam = 9;
+	int nParam = 9;
 	
 	// Create the Graph object
 	Graph graph(target);
@@ -270,11 +270,11 @@ int main() {
 	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3};
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
-	const unsigned Ntheta = 1;
+	int Ntheta = 1;
 	
 	executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
 	
-	std::vector<int> cpu_vector( totalThreads*2*nTimes ) ;
+	std::vector<float> cpu_vector( totalThreads*2*nTimes ) ;
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 	
 	for(int i=0; i<totalThreads*2*nTimes; ++i){
