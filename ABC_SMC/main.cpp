@@ -315,7 +315,7 @@ int main() {
 
 	for(int i=0; i<Ntheta; ++i){
 		for(int k=0; k<nParam; ++k){
-			*(theta_ptr+k) = param_space[i][k];
+			*(theta_ptr+k) = theta[k] ; //param_space[i][k];
 		}
 	
 		executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
