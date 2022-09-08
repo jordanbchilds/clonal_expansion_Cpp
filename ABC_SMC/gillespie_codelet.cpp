@@ -16,7 +16,7 @@ public:
 	Input<Vector<float>> theta ;
 	Input<Vector<float>> times;
 
-    Output<Vector<float>> out;
+    Output<Vector<int>> out;
 	
 	struct sim_network {
 		const float* times_ptr;
@@ -82,7 +82,7 @@ public:
 		return new_rate;
 	}
 
-	void gillespied(int* x_init, float* rates, float* con_rates, float* out_array, sim_network simnet){
+	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
 		int nTimes = simnet.nTimes;
 		float Tmax = simnet.Tmax;
@@ -93,8 +93,8 @@ public:
 		int* Pre_pt = simnet.Pre;
 
 		float x[2];
-		x[0] = (float) *x_init;
-		x[1] = (float) *(x_init+1);
+		x[0] = *x_init;
+		x[1] = *(x_init+1);
 
 		int count = 0;
 		float tt = 0.0;
@@ -185,8 +185,8 @@ public:
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
 		for(int i=0; i<spn.nTimes; ++i){
-			out[2*i] =  (float) *(output_ptr + 2*i) ;
-			out[2*i+1] = (float) *(output_ptr + 2*i + 1) ;
+			out[2*i] =  *(output_ptr + 2*i) ;
+			out[2*i+1] = *(output_ptr + 2*i + 1) ;
 		}
 		/*
 		int index = 0;
