@@ -150,7 +150,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	ComputeSet computeSet = graph.addComputeSet("computeSet");
 	
 	// Map tensors to tiles
-	for(int i=0; i<datasetSize; ++i){
+	for(int i=0; i<totalThreads; ++i){
 		
 		int roundCount = i % int( totalThreads );
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
