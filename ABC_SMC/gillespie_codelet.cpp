@@ -16,7 +16,7 @@ public:
 	Input<Vector<float>> theta ;
 	Input<Vector<float>> times;
 
-    Output<Vector<float>> out;
+    Output<float> out;
 	
 	struct sim_network {
 		const float* times_ptr;
