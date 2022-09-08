@@ -160,7 +160,7 @@ public:
 		}
 		
 		sim_network spn;
-		spn.nTimes = 3;
+		spn.nTimes = (int) times.size();
 		spn.times_ptr = &times[0];
 		spn.Tmax = times[times.size()-1];
 		spn.n_reactions = Nreact;
