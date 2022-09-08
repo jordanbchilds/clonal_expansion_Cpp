@@ -143,7 +143,7 @@ public:
 			copyNum = x[0]+x[1];
 
 			if(copyNum>2*C0 || copyNum==0){
-				for(int i=count; i<nTimes; ++i){
+				for(int i=count; i<Nout; ++i){
 					*(out_array+i*n_species) = 0;
 					*(out_array+i*n_species+1) = 0;
 				}
