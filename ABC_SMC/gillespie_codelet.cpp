@@ -17,7 +17,7 @@ public:
 	Input<Vector<float>> times;
 	// Input<Vector<int>> Nout;
 	
-    Output<Vector<float>> out;
+    Output<Vector<int>> out;
 	
 	struct sim_network {
 		const float* times_ptr;
@@ -123,7 +123,7 @@ public:
 
 			tt += rand_exp(haz_total);
 
-			while( tt >= *(times+count) && count<=nTimes ){
+			if( tt >= *(times+count) && count<=nTimes ){
 				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
 				count += 1;
@@ -147,7 +147,6 @@ public:
 
 	bool compute()
 	{
-		/*
 		const int Nreact = 5;
 		const int Nspecies = 2;
 		int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
@@ -161,13 +160,10 @@ public:
 				S_mat[i][j] = Post_mat[i][j] - Pre_mat[i][j];
 		}
 		
-		
 		float times[Nout];
 		for(int i=0; i<Nout; ++i){
 			times[i] = *(times+i);
 		}
-		
-		
 		sim_network spn;
 		spn.nTimes = times.size();
 		spn.times_ptr = &times[0];
@@ -190,16 +186,7 @@ public:
 		
 		int output[spn.nTimes][spn.n_species];
 		int* output_ptr = &output[0][0];
-		*/
-		
-		for(int i=0; i<9; ++i){
-			out[i] = theta[i];
-		}
-		for(int i=0; i<3; ++i){
-			out[i+9] = times[i];
-		}
-		
-		/*
+	
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 
 		int index = 0;
@@ -208,7 +195,6 @@ public:
 			out[index+1] = output[i][1];
 			index += 2;
 		}
-		 */
 		return true;
 	}
 };
