@@ -171,7 +171,6 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	graph.createHostRead("output-read", output);
 	
 	// Create streams that allow reading and writing of the variables:
-    //auto nTimes_stream = graph.addHostToDeviceFIFO("write_nTimes", INT, 1);
     auto times_stream = graph.addHostToDeviceFIFO("write_dataTimes", FLOAT, nTimes);
 	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
 	
@@ -182,7 +181,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	return progs;
 }
 
-void executeGraphProgram(float* theta_ptr, int nParam, float* times_ptr, long unsigned int nTimes, poplar::Engine &engine) { // poplar::Device &device, std::vector<Program> progs, poplar::Graph &graph,
+void executeGraphProgram(float* theta_ptr, int nParam, float* times_ptr, long unsigned int nTimes, poplar::Engine &engine) {
 
 	engine.connectStream("write_dataTimes", times_ptr, times_ptr+nTimes);
 	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
@@ -242,8 +241,8 @@ int main() {
 	 }
 	 
 	const int numberOfCores = 1; // access to POD16
-	const int numberOfTiles = 1;// 1472;
-	const int threadsPerTile = 1;
+	const int numberOfTiles = 1; // 1472;
+	const int threadsPerTile = 1; // six threads per tile
 	
 	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
 	
@@ -309,9 +308,10 @@ int main() {
 	for(int i=0; i<Nabc; ++i){
 	weights[i] = 1.0;
 	}
+	
+	float threshold;
 	*/
-	// float threshold;
-
+	
 	for(int i=0; i<Ntheta; ++i){
 		/*
 		for(int k=0; k<nParam; ++k){
@@ -326,7 +326,7 @@ int main() {
 		
 		executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
 		
-		std::vector<float> cpu_vector( totalThreads * (nParam+nTimes) ) ;
+		std::vector<float> cpu_vector( totalThreads * datasetSize ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 		
 		for(int i=0; i<(nParam+nTimes); ++i){
