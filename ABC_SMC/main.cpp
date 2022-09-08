@@ -335,7 +335,7 @@ int main() {
 			
 			double sq_diff = 0.0;
 			for(int i=0; i<3; ++i)
-				sq_diff += (copy_number[i]-sim_summ[1][t][0]) * (copy_number[i]-sim_summ[1][t][0]) ;
+				sq_diff += (copy_number[t][i]-sim_summ[1][t][0]) * (copy_number[t][i]-sim_summ[1][t][0]) ;
 
 			cout << sq_diff / 2.0 << endl;
 		}
