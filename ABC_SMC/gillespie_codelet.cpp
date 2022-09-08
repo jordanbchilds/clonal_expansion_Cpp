@@ -82,7 +82,7 @@ public:
 		return new_rate;
 	}
 
-	void gillespied(float* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
+	void gillespied(float* x_init, float* rates, float* con_rates, float* out_array, sim_network simnet){
 		
 		int nTimes = simnet.nTimes;
 		float Tmax = simnet.Tmax;
