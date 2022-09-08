@@ -319,20 +319,19 @@ int main() {
 		
 		std::vector<int> cpu_vector( totalThreads * 2*nTimes ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
-
+		
+		float mutation_load[nTimes][totalThreads];
+		float copy_number[nTimes][totalThreads];
 		float sim_summ[2][nTimes][2];
 		for(int t=0; t<nTimes; ++t){
-			float mutation_load[nTimes][totalThreads];
-			float copy_number[nTimes][totalThreads];
-			
-			for(int i=0; i<totalThreads; ++i){
-				copy_number[t][i] = cpu_vector[i*2*nTimes + 2*t] + cpu_vector[i*2*nTimes + 2*t + 1];
-				mutation_load[t][i] = cpu_vector[i*2*nTimes + 2*t + 1] / copy_number[t][i];
+			for(int j=0; j<totalThreads; ++j){
+				copy_number[t][j] = cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1];
+				mutation_load[t][j] = cpu_vector[j*2*nTimes + 2*t + 1] / copy_number[t][j];
 			}
-			sim_summ[0][t][0] = myMean(mutation_load[t], totalThreads);
-			sim_summ[0][t][1] = myStdDev(mutation_load[t], totalThreads, sim_summ[0][t][0]);
-			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
-			sim_summ[1][t][1] = myStdDev(copy_number[t], totalThreads, sim_summ[1][t][0]);
+			sim_summ[0][t][0] = myMean(&mutation_load[t], totalThreads);
+			sim_summ[0][t][1] = myStdDev(&mutation_load[t], totalThreads, sim_summ[0][t][0]);
+			sim_summ[1][t][0] = myMean(&copy_number[t], totalThreads);
+			sim_summ[1][t][1] = myStdDev(&copy_number[t], totalThreads, sim_summ[1][t][0]);
 			
 			double sq_diff = 0.0;
 			for(int i=0; i<3; ++i)
