@@ -289,15 +289,15 @@ int main() {
 	for(int i=0; i<totalThreads; ++i){
 		for(int j=0; j<nTimes; ++j){
 			cout << cpu_vector[ i*2*nTimes + 2*j ] << " ";
-			cout << cpu_vecotr[ i*2*nTimes + 2*j + 1] << endl;
+			cout << cpu_vector[ i*2*nTimes + 2*j + 1] << endl;
 		}
 		cout<<endl;
 	}
 	
 	
-						  
-	float param_space[Ntheta][nParam];
 	/*
+	float param_space[Ntheta][nParam];
+
 	GENERATE INITIAL PROPOSED PARAMETERS
 	fill param_space array with initial params
 	
@@ -375,8 +375,7 @@ int main() {
 		}
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		cout<< d << endl;
-		 */
 	}
-	
+	*/
 	return 0;
 }
