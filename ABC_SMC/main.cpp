@@ -334,10 +334,11 @@ int main() {
 			sim_summ[1][t][0] = myMean(copy_number[t], totalThreads);
 			sim_summ[1][t][1] = myStdDev(copy_number[t], totalThreads, sim_summ[1][t][0]);
 			
-			cout << sim_summ[0][t][0] << " " ;
-			cout << sim_summ[0][t][1] << endl;
-			cout << sim_summ[1][t][0] << " ";
-			cout << sim_summ[1][t][1] << endl;
+			
+			float accum = 0.0;
+			std::for_each (&copy_number[t], &copy_number[t]+len, [&](const float d) { accum += (d - sim_summ[1][t][0]) * (d - sim_summ[1][t][0]); });
+			cout << sqrt( accum / 2.0 ) << endl;
+
 		}
 		// double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		// cout<< d << endl;
