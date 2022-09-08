@@ -179,8 +179,8 @@ public:
 		con_rates[0] = theta[7];
 		con_rates[1] = theta[8];
 		
-		float output[spn.nTimes*spn.n_species];
-		float* output_ptr = &output[0];
+		int output[spn.nTimes*spn.n_species];
+		int* output_ptr = &output[0];
 	
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
