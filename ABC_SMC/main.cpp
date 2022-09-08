@@ -195,8 +195,7 @@ int main() {
 	// define input size - not ideal but we make do.
 	 long unsigned int nTimes = 3;
 	 int nObs = 1000;
-	 
-	/*
+	
 	 float ml_flat[nTimes*nObs];
 	 int cn_flat[nTimes*nObs];
 			
@@ -239,8 +238,6 @@ int main() {
 		 data_summ[1][t][0] = myMean(copy_num[t], nObs);
 		 data_summ[1][t][1] = myStdDev(copy_num[t], nObs, data_summ[1][t][0]);
 	 }
-	 
-	*/
 	
 	const int numberOfCores = 1; // access to POD16
 	const int numberOfTiles = 1; // 1472;
@@ -332,13 +329,10 @@ int main() {
 			
 			for(int k=0; k<totalThreads; ++k){
 				copy_number[t][k] = cpu_vector[k*2*nTimes + 2*t] + cpu_vector[k*2*nTimes + 2*t + 1];
-				cout << copy_number[t][k] << " " ;
 				mutation_load[t][k] = (float) cpu_vector[k*2*nTimes + 2*t + 1] / (float) copy_number[t][k];
-				cout << mutation_load[t][k] << " ";
 			}
-			cout << endl;
 		}
-		/*
+		
 		float sim_summ[2][nTimes][2];
 		for(int t=0; t<nTimes; ++t){
 			float mutation_load[nTimes][totalThreads];
@@ -355,7 +349,6 @@ int main() {
 		}
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		cout<< d << endl;
-		*/
 	}
 	return 0;
 }
