@@ -17,7 +17,7 @@ public:
 	Input<Vector<float>> times;
 	// Input<Vector<int>> Nout;
 	
-    Output<Vector<int>> out;
+    Output<Vector<float>> out;
 	
 	struct sim_network {
 		const float* times_ptr;
@@ -191,8 +191,8 @@ public:
 
 		int index = 0;
 		for(int i=0; i<spn.nTimes; ++i){
-			out[index] = output[i][0];
-			out[index+1] = output[i][1];
+			out[index] = (float) output[i][0];
+			out[index+1] = (float) output[i][1];
 			index += 2;
 		}
 		return true;
