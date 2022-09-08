@@ -336,7 +336,9 @@ int main() {
 			
 			
 			float accum = 0.0;
-			std::for_each (&copy_number[t], &copy_number[t]+3, [&](const float d) { accum += (d - sim_summ[1][t][0]) * (d - sim_summ[1][t][0]); });
+			std::for_each (&copy_number[t], &copy_number[t]+3, [&](const float d) {
+				accum += (d - sim_summ[1][t][0]) * (d - sim_summ[1][t][0]);
+			});
 			cout << sqrt( accum / 2.0 ) << endl;
 
 		}
