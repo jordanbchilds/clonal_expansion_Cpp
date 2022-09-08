@@ -27,6 +27,10 @@ namespace random_ipu {
               uint32_t worker_increment,
               poplar::program::Sequence &prog);
 
+  void setRandomSeeds(poplar::Graph &graph,
+              uint32_t seed,
+              poplar::program::Sequence &prog);
+
 
 }; // namespace random_ipu
 

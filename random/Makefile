@@ -5,7 +5,7 @@ CODELETS_SRC_DIR := ./src/codelets
 OBJ_DIR := ./build
 
 
-CXXFLAGS ?= -std=c++17 -Wall -Wextra -MMD -g
+CXXFLAGS ?= -std=c++17 -Wall -Wextra -MMD -g $(EXTRA_FLAGS)
 LDFLAGS ?= -lpoplar -lgcl_ct -lpvti
 POPC ?= popc
 POPXXFLAGS_LIB=-O2

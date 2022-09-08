@@ -34,6 +34,8 @@ public:
         work[e] = __builtin_ipu_urand_f32();
 #elif defined(USE_URAND32)
         work[e] = __builtin_ipu_urand32();
+#elif defined(USE_F32V2GRAND)
+        work[e] = __builtin_ipu_f32v2grand()[1];
 #else
         work[e] = dummy[workerId][e];
 #endif
@@ -78,7 +80,7 @@ namespace random_ipu {
       graph.connect(random["out"], random_out);
 
       // Create the dummy (pass through) tensor.
-      std::vector<float> values;
+      std::vector<float>values;
       values.resize(workers * per_worker);
       for (uint32_t worker = 0; worker < workers; ++worker) {
         std::cout << "dummy worker " << worker;
@@ -89,12 +91,16 @@ namespace random_ipu {
         }
         std::cout << std::endl;
       }
-      auto dummy = graph.addConstant(poplar::FLOAT, {workers, per_worker}, values.data(), "dummy");
+      auto dummy = graph.addConstant(
+        poplar::FLOAT,
+        {workers, per_worker},
+        values.data(),
+        "dummy");
       graph.connect(random["dummy"], dummy);
-	  
       for (uint32_t worker = 0; worker < workers; ++worker) {
         graph.setTileMapping(dummy, tile);
       }
+
 
       // Program sequence.
       poplar::program::Sequence seq = {
@@ -105,11 +111,67 @@ namespace random_ipu {
   }
 
 
+  void setRandomSeeds(poplar::Graph &graph,
+              uint32_t seed,
+              poplar::program::Sequence &prog) {
+
+    std::vector<uint32_t>values;
+
+    // There are 4 RNG seed registers per worker per tile.
+    values.resize( tiles * workers * 4 );
+
+    std::cout << "srand " << seed << std:: endl;
+    srand(seed);
+
+    std::cout << "values size " << values.size() << std:: endl;
+    for (uint32_t v = 0, tile = 0; tile < tiles; ++tile) {
+      for (uint32_t worker = 0; worker < workers; ++worker) {
+
+        uint32_t seed[4] = {
+          static_cast<uint32_t>(rand()),
+          static_cast<uint32_t>(rand()),
+          static_cast<uint32_t>(rand()),
+          static_cast<uint32_t>(rand())
+        };
+
+        if (tile == 0)
+           std::cout << "v " << v << " tile " << tile << " worker " << worker << " prng " <<
+             seed[0] << "," << seed[1] << "," << seed[2] << "," << seed[3] << std::endl;
+
+        // Set the $PRNG_x_y
+        // These are the xoroshiro128aox state vectors
+        //  s0 = PRNG_0_1 << 32 |  PRNG_0_0
+        //  s1 = PRNG_1_1 << 32 |  PRNG_0_1
+
+        values[v++] = seed[0];
+        values[v++] = seed[1];
+        values[v++] = seed[2];
+        values[v++] = seed[3];
+      }
+    }
+
+
+    // Create the random seeds tensor.
+    auto seeds = graph.addConstant(
+        poplar::UNSIGNED_INT,
+        {tiles, workers, 4},
+        values.data(),
+        "random_seeds");
+
+    for (uint32_t tile = 0; tile < tiles; ++tile) {
+      graph.setTileMapping(seeds[tile], tile);
+    }
+
+    // Add setSeeds op to program,
+    poplar::setHwSeeds(graph, seeds, prog);
+  }
+
+
   void setSeeds(poplar::Graph &graph,
-				uint32_t base,
-				uint32_t tile_factor,
-				uint32_t worker_factor,
-				poplar::program::Sequence &prog) {
+              uint32_t base,
+              uint32_t tile_factor,
+              uint32_t worker_factor,
+              poplar::program::Sequence &prog) {
 
     std::vector<uint32_t>values;
 
@@ -119,18 +181,37 @@ namespace random_ipu {
     std::cout << "values size " << values.size() << std:: endl;
     for (uint32_t v = 0, tile = 0; tile < tiles; ++tile) {
       for (uint32_t worker = 0; worker < workers; ++worker) {
-        uint32_t seed = base + tile*tile_factor + worker* worker_factor;
+
+        uint32_t seed[4] = {
+          base + tile*tile_factor + worker* worker_factor,
+          base + tile*tile_factor + worker* worker_factor + 1,
+          base + tile*tile_factor + worker* worker_factor + 2,
+          base + tile*tile_factor + worker* worker_factor + 3
+        };
+
         if (tile == 0)
-           std::cout << "v " << v << " tile " << tile << " worker " << worker << " seed " << seed << std::endl;
-        // Just iterate the $PRNG_x_y
-        values[v++] = seed++;
-        values[v++] = seed++;
-        values[v++] = seed++;
-        values[v++] = seed++;
+           std::cout << "v " << v << " tile " << tile << " worker " << worker << " prng " <<
+             seed[0] << "," << seed[1] << "," << seed[2] << "," << seed[3] << std::endl;
+
+        // Set the $PRNG_x_y
+        // These are the xoroshiro128aox state vectors
+        //  s0 = PRNG_0_1 << 32 |  PRNG_0_0
+        //  s1 = PRNG_1_1 << 32 |  PRNG_0_1
+
+        values[v++] = seed[0];
+        values[v++] = seed[1];
+        values[v++] = seed[2];
+        values[v++] = seed[3];
       }
     }
+
+
     // Create the random seeds tensor.
-    auto seeds = graph.addConstant(poplar::UNSIGNED_INT, {tiles, workers, 4}, values.data(), "random_seeds");
+    auto seeds = graph.addConstant(
+        poplar::UNSIGNED_INT,
+        {tiles, workers, 4},
+        values.data(),
+        "random_seeds");
 
     for (uint32_t tile = 0; tile < tiles; ++tile) {
       graph.setTileMapping(seeds[tile], tile);

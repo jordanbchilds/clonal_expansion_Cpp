@@ -1,0 +1,169 @@
+
+---- DUMMY --------------------------------------------
+
+rm -f random_stream random.gp
+rm -f ./build/./*.o;rm -f ./build/./*.d; rm -f ./build/codelets/*.o;rm -f ./build/codelets/*.d;
+mkdir -p build/
+g++ -std=c++17 -Wall -Wextra -MMD -g  -c -o build/main.o src/main.cpp
+mkdir -p build/codelets/
+g++ -std=c++17 -Wall -Wextra -MMD -g  -c -o build/codelets/random.o src/codelets/random.cpp
+./build/main.o ./build/codelets/random.o
+g++ -o random_stream build/main.o build/codelets/random.o -lpoplar -lgcl_ct -lpvti
+popc -I ./src/codelets -O2 -target=ipu2 -DNDEBUG  src/codelets/random.cpp -o random.gp
+
+using random seed state 0
+srand 0
+values size 35328
+v 0 tile 0 worker 0 prng 1804289383,846930886,1681692777,1714636915
+v 4 tile 0 worker 1 prng 1957747793,424238335,719885386,1649760492
+v 8 tile 0 worker 2 prng 596516649,1189641421,1025202362,1350490027
+v 12 tile 0 worker 3 prng 783368690,1102520059,2044897763,1967513926
+v 16 tile 0 worker 4 prng 1365180540,1540383426,304089172,1303455736
+v 20 tile 0 worker 5 prng 35005211,521595368,294702567,1726956429
+dummy worker 0 0 1 2 3 4 5 6 7
+dummy worker 1 100 101 102 103 104 105 106 107
+dummy worker 2 200 201 202 203 204 205 206 207
+dummy worker 3 300 301 302 303 304 305 306 307
+dummy worker 4 400 401 402 403 404 405 406 407
+dummy worker 5 500 501 502 503 504 505 506 507
+
+Results:
+0 1 2 3 4 5 6 7 
+100 101 102 103 104 105 106 107 
+200 201 202 203 204 205 206 207 
+300 301 302 303 304 305 306 307 
+400 401 402 403 404 405 406 407 
+500 501 502 503 504 505 506 507 
+
+---- URAND32 ------------------------------------------
+
+rm -f random_stream random.gp
+rm -f ./build/./*.o;rm -f ./build/./*.d; rm -f ./build/codelets/*.o;rm -f ./build/codelets/*.d;
+mkdir -p build/
+g++ -std=c++17 -Wall -Wextra -MMD -g -DUSE_URAND32=1 -c -o build/main.o src/main.cpp
+mkdir -p build/codelets/
+g++ -std=c++17 -Wall -Wextra -MMD -g -DUSE_URAND32=1 -c -o build/codelets/random.o src/codelets/random.cpp
+./build/main.o ./build/codelets/random.o
+g++ -o random_stream build/main.o build/codelets/random.o -lpoplar -lgcl_ct -lpvti
+popc -I ./src/codelets -O2 -target=ipu2 -DNDEBUG -DUSE_URAND32=1 src/codelets/random.cpp -o random.gp
+
+With non-random PRNG state (0,0,0,0)
+
+user arg : base 0, tile factor 0,worker_factor 0
+using non-random seed state  base 0 tile factor 0 worker_factor 0
+values size 35328
+v 0 tile 0 worker 0 prng 0,1,2,3
+v 4 tile 0 worker 1 prng 0,1,2,3
+v 8 tile 0 worker 2 prng 0,1,2,3
+v 12 tile 0 worker 3 prng 0,1,2,3
+v 16 tile 0 worker 4 prng 0,1,2,3
+v 20 tile 0 worker 5 prng 0,1,2,3
+dummy worker 0 0 1 2 3 4 5 6 7
+dummy worker 1 100 101 102 103 104 105 106 107
+dummy worker 2 200 201 202 203 204 205 206 207
+dummy worker 3 300 301 302 303 304 305 306 307
+dummy worker 4 400 401 402 403 404 405 406 407
+dummy worker 5 500 501 502 503 504 505 506 507
+
+Results:
+2 565199488 2983870976 4120557568 4019486464 2226499840 24085840 1805839488 
+2 565199488 2983870976 4120557568 4019486464 2226499840 24085840 1805839488 
+2 565199488 2983870976 4120557568 4019486464 2226499840 24085840 1805839488 
+2 565199488 2983870976 4120557568 4019486464 2226499840 24085840 1805839488 
+2 565199488 2983870976 4120557568 4019486464 2226499840 24085840 1805839488 
+2 565199488 2983870976 4120557568 4019486464 2226499840 24085840 1805839488 
+
+With random PRNG state
+
+user arg : seed state 0
+using random seed state 0
+srand 0
+values size 35328
+v 0 tile 0 worker 0 prng 1804289383,846930886,1681692777,1714636915
+v 4 tile 0 worker 1 prng 1957747793,424238335,719885386,1649760492
+v 8 tile 0 worker 2 prng 596516649,1189641421,1025202362,1350490027
+v 12 tile 0 worker 3 prng 783368690,1102520059,2044897763,1967513926
+v 16 tile 0 worker 4 prng 1365180540,1540383426,304089172,1303455736
+v 20 tile 0 worker 5 prng 35005211,521595368,294702567,1726956429
+dummy worker 0 0 1 2 3 4 5 6 7
+dummy worker 1 100 101 102 103 104 105 106 107
+dummy worker 2 200 201 202 203 204 205 206 207
+dummy worker 3 300 301 302 303 304 305 306 307
+dummy worker 4 400 401 402 403 404 405 406 407
+dummy worker 5 500 501 502 503 504 505 506 507
+
+Results:
+3481787648 3612352000 1596999424 1875035264 2721092608 1398067200 1963550848 2340670208 
+2644193792 2765999360 1739685248 117434552 175744160 3804241152 143295760 2913207808 
+3634968320 2535670272 3907091456 2807498752 3135455744 466027840 181567776 669673856 
+2761158656 505240128 240027408 3353762048 2053794048 3111320320 3412824064 272755936 
+595528128 4176399872 84464416 681165632 973226624 2999658496 619514048 1639862656 
+333900032 863761152 2742121472 1408950528 74892784 3144458752 2390131456 42645076 
+
+---- URAND_F32 ----------------------------------------
+
+rm -f random_stream random.gp
+rm -f ./build/./*.o;rm -f ./build/./*.d; rm -f ./build/codelets/*.o;rm -f ./build/codelets/*.d;
+mkdir -p build/
+g++ -std=c++17 -Wall -Wextra -MMD -g -DUSE_URAND_F32=1 -c -o build/main.o src/main.cpp
+mkdir -p build/codelets/
+g++ -std=c++17 -Wall -Wextra -MMD -g -DUSE_URAND_F32=1 -c -o build/codelets/random.o src/codelets/random.cpp
+./build/main.o ./build/codelets/random.o
+g++ -o random_stream build/main.o build/codelets/random.o -lpoplar -lgcl_ct -lpvti
+popc -I ./src/codelets -O2 -target=ipu2 -DNDEBUG -DUSE_URAND_F32=1 src/codelets/random.cpp -o random.gp
+
+With non-random PRNG state (0,0,0,0)
+
+user arg : base 0, tile factor 0,worker_factor 0
+using non-random seed state  base 0 tile factor 0 worker_factor 0
+values size 35328
+v 0 tile 0 worker 0 prng 0,1,2,3
+v 4 tile 0 worker 1 prng 0,1,2,3
+v 8 tile 0 worker 2 prng 0,1,2,3
+v 12 tile 0 worker 3 prng 0,1,2,3
+v 16 tile 0 worker 4 prng 0,1,2,3
+v 20 tile 0 worker 5 prng 0,1,2,3
+dummy worker 0 0 1 2 3 4 5 6 7
+dummy worker 1 100 101 102 103 104 105 106 107
+dummy worker 2 200 201 202 203 204 205 206 207
+dummy worker 3 300 301 302 303 304 305 306 307
+dummy worker 4 400 401 402 403 404 405 406 407
+dummy worker 5 500 501 502 503 504 505 506 507
+
+Results:
+-0.5 -0.368404 0.194737 0.459392 0.43586 0.0183974 -0.494392 -0.0795452 
+-0.5 -0.368404 0.194737 0.459392 0.43586 0.0183974 -0.494392 -0.0795452 
+-0.5 -0.368404 0.194737 0.459392 0.43586 0.0183974 -0.494392 -0.0795452 
+-0.5 -0.368404 0.194737 0.459392 0.43586 0.0183974 -0.494392 -0.0795452 
+-0.5 -0.368404 0.194737 0.459392 0.43586 0.0183974 -0.494392 -0.0795452 
+-0.5 -0.368404 0.194737 0.459392 0.43586 0.0183974 -0.494392 -0.0795452 
+
+With random PRNG state
+
+user arg : seed state 0
+using random seed state 0
+srand 0
+values size 35328
+v 0 tile 0 worker 0 prng 1804289383,846930886,1681692777,1714636915
+v 4 tile 0 worker 1 prng 1957747793,424238335,719885386,1649760492
+v 8 tile 0 worker 2 prng 596516649,1189641421,1025202362,1350490027
+v 12 tile 0 worker 3 prng 783368690,1102520059,2044897763,1967513926
+v 16 tile 0 worker 4 prng 1365180540,1540383426,304089172,1303455736
+v 20 tile 0 worker 5 prng 35005211,521595368,294702567,1726956429
+dummy worker 0 0 1 2 3 4 5 6 7
+dummy worker 1 100 101 102 103 104 105 106 107
+dummy worker 2 200 201 202 203 204 205 206 207
+dummy worker 3 300 301 302 303 304 305 306 307
+dummy worker 4 400 401 402 403 404 405 406 407
+dummy worker 5 500 501 502 503 504 505 506 507
+
+Results:
+0.310667 0.341066 -0.12817 -0.0634343 0.133554 -0.174487 -0.0428252 0.0449798 
+0.115649 0.144009 -0.094948 -0.472658 -0.459081 0.385744 -0.466636 0.178284 
+0.346332 0.0903817 0.409691 0.153672 0.23003 -0.391494 -0.457725 -0.344079 
+0.142882 -0.382365 -0.444114 0.280859 -0.0218138 0.224411 0.29461 -0.436494 
+-0.361343 0.472394 -0.480334 -0.341404 -0.273403 0.198412 -0.355758 -0.11819 
+-0.422258 -0.29889 0.13845 -0.171953 -0.482563 0.232126 0.0564958 -0.490071 
+
+done
+
