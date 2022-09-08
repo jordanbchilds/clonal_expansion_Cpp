@@ -169,7 +169,7 @@ public:
 		spn.Pre = Pre_ptr;
 		spn.Stoi = S_ptr;
 		
-		ine x_init[Nspecies];
+		int x_init[Nspecies];
 		x_init[0] = (int) theta[0];
 		x_init[1] = (int) theta[1];
 		float react_rates[Nreact];
