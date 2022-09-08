@@ -232,11 +232,11 @@ int main() {
 
 	 float data_summ[2][nTimes][2];
 	 for(int t=0; t<nTimes; ++t){
-		 data_summ[0][t][0] = myMean(mut_load[t], nObs);
-		 data_summ[0][t][1] = myStdDev(mut_load[t], nObs, data_summ[0][t][0]);
+		 data_summ[0][t][0] = myMean(&mut_load[t][0], nObs);
+		 data_summ[0][t][1] = myStdDev(&mut_load[t][0], nObs, data_summ[0][t][0]);
 
-		 data_summ[1][t][0] = myMean(copy_num[t], nObs);
-		 data_summ[1][t][1] = myStdDev(copy_num[t], nObs, data_summ[1][t][0]);
+		 data_summ[1][t][0] = myMean(&copy_num[t][0], nObs);
+		 data_summ[1][t][1] = myStdDev(&copy_num[t][0], nObs, data_summ[1][t][0]);
 	 }
 	
 	const int numberOfCores = 1; // access to POD16
