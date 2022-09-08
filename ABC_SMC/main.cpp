@@ -182,8 +182,8 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 
 void executeGraphProgram(float* theta_ptr, int nParam, float* times_ptr, long unsigned int nTimes, poplar::Engine &engine) {
 
-	engine.connectStream("write_dataTimes", times_ptr, times_ptr+nTimes-1);
-	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam-1);
+	engine.connectStream("write_dataTimes", times_ptr, times_ptr+nTimes);
+	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	
 	engine.run(WRITE_INPUTS);
 	engine.run(CUSTOM_PROG);
