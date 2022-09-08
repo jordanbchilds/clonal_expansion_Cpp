@@ -151,7 +151,6 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	
 	// Map tensors to tiles
 	for(int i=0; i<totalThreads; ++i){
-		
 		int roundCount = i % int( totalThreads );
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		
@@ -268,7 +267,7 @@ int main() {
 	engine.load(device);
 						  
 	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
-	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3} ;
+	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3};
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
 	const unsigned Ntheta = 1;
