@@ -193,7 +193,7 @@ void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* time
 int main() {
 	// READ IN THE DATA AND CALCULATE SUMMARY STATISTICS ARRAY
 	// define input size - not ideal but we make do.
-	 long unsigned int nTimes = 3;
+	 const long unsigned int nTimes = 3;
 	 int nObs = 1000;
 	
 	 float ml_flat[nTimes*nObs];
@@ -336,7 +336,7 @@ int main() {
 			
 			
 			float accum = 0.0;
-			std::for_each (&copy_number[t], &copy_number[t]+len, [&](const float d) { accum += (d - sim_summ[1][t][0]) * (d - sim_summ[1][t][0]); });
+			std::for_each (&copy_number[t], &copy_number[t]+3, [&](const float d) { accum += (d - sim_summ[1][t][0]) * (d - sim_summ[1][t][0]); });
 			cout << sqrt( accum / 2.0 ) << endl;
 
 		}
