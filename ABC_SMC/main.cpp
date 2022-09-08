@@ -280,6 +280,21 @@ int main() {
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
 	const unsigned Ntheta = 1;
+	
+	executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
+	
+	std::vector<float> cpu_vector( totalThreads * nTimes * 2 ) ;
+	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
+	
+	for(int i=0; i<totalThreads; ++i){
+		for(int j=0; j<nTimes; ++j){
+			cout << cpu_vector[ i*2*nTimes + 2*j ] << " ";
+			cout << cpu_vecotr[ i*2*nTimes + 2*j + 1] << endl;
+		}
+		cout<<endl;
+	}
+	
+	
 						  
 	float param_space[Ntheta][nParam];
 	/*
@@ -310,23 +325,15 @@ int main() {
 	}
 	
 	float threshold;
-	*/
 	
 	for(int i=0; i<Ntheta; ++i){
-		/*
 		for(int k=0; k<nParam; ++k){
 			*(theta_ptr+k) = param_space[i][k];
 		}
-		*/
-		
-		for(int i=0; i<9; ++i)
-			cout << *(theta_ptr+i) << " " ;
-		
-		cout<<endl;
-		
+	
 		executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
 		
-		std::vector<float> cpu_vector( totalThreads * datasetSize ) ;
+		std::vector<float> cpu_vector( totalThreads * Nout ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 		
 		for(int i=0; i<(nParam+nTimes); ++i){
