@@ -92,9 +92,9 @@ public:
 		int* S_pt = simnet.Stoi;
 		int* Pre_pt = simnet.Pre;
 
-		int x[2];
-		x[0] = *x_init;
-		x[1] = *(x_init+1);
+		float x[2];
+		x[0] = (float) *x_init;
+		x[1] = (float) *(x_init+1);
 
 		int count = 0;
 		float tt = 0.0;
@@ -179,14 +179,14 @@ public:
 		con_rates[0] = theta[7];
 		con_rates[1] = theta[8];
 		
-		int output[spn.nTimes][spn.n_species];
-		int* output_ptr = &output[0][0];
+		float output[spn.nTimes*spn.n_species];
+		float* output_ptr = &output[0];
 	
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
 		for(int i=0; i<spn.nTimes; ++i){
 			out[2*i] =  (float) *(output_ptr + 2*i) ;
-			out[2*i + 1] = (float) *(output_ptr + 2*i + 1) ;
+			out[2*i+1] = (float) *(output_ptr + 2*i + 1) ;
 		}
 		/*
 		int index = 0;
