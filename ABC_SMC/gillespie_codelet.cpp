@@ -15,8 +15,7 @@ class sim_network_vertex : public poplar::Vertex
 public:
 	Input<Vector<float>> theta ;
 	Input<Vector<float>> times;
-	// Input<Vector<int>> Nout;
-	
+
     Output<Vector<float>> out;
 	
 	struct sim_network {
