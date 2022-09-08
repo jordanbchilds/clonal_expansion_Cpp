@@ -160,7 +160,7 @@ public:
 		}
 		
 		sim_network spn;
-		spn.nTimes = times.size();
+		spn.nTimes = 3;
 		spn.times_ptr = &times[0];
 		spn.Tmax = times[times.size()-1];
 		spn.n_reactions = Nreact;
@@ -179,7 +179,7 @@ public:
 		con_rates[0] = theta[7];
 		con_rates[1] = theta[8];
 		
-		float output[spn.nTimes*spn.n_species];
+		float output[spn.nTimes * spn.n_species];
 		float* output_ptr = &output[0];
 	
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
