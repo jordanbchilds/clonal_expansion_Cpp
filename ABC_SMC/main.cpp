@@ -265,32 +265,7 @@ int main() {
 	std::vector<Program> progs = buildGraphAndPrograms(graph, nParam, nTimes, numberOfCores, numberOfTiles, threadsPerTile);
 	Engine engine(graph, progs);
 	engine.load(device);
-						  
-	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
-	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3};
-	float* theta_ptr = &theta[0];
-	float* times_ptr = &times[0];
-	int Ntheta = 1;
-	
-	executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
-	
-	std::vector<int> cpu_vector( totalThreads*2*nTimes ) ;
-	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
-	
-	for(int i=0; i<totalThreads; ++i){
-		for(int j=0; j<nTimes; ++j){
-			cout << cpu_vector[i*2*nTimes + 2*j]  << " " << cpu_vector[i*2*nTimes + 2*j + 1]<< endl;
-		}
-		/*
-		for(int j=0; j<nTimes; ++j){
-			cout << cpu_vector[ i*2*nTimes + 2*j ] << " ";
-			cout << cpu_vector[ i*2*nTimes + 2*j + 1] << endl;
-		}
-		cout<<endl;
-		 */
-	}
-	
-	
+
 	/*
 	 DEFINE PRIOR DISTRIBUTIONS
 	 only used for first sample
@@ -300,12 +275,11 @@ int main() {
 	 std::normal_distribution<float> con_dist(2e-3, 5e-4);
 	 std::uniform_real_distribution<float> ML_dist(0.2,0.6);
 	 std::normal_distribution<float> CN_dist(1e3, 100);
-
-	float param_space[Ntheta][nParam];
-
+	*/
+	//float param_space[Ntheta][nParam];
+	/*
 	GENERATE INITIAL PROPOSED PARAMETERS
 	fill param_space array with initial params
-	
 	for(int i=0; i<Ntheta; ++i){
 		int c0 = CN_dist(generator);
 		float h0 = ML_dist(generator);
@@ -320,6 +294,7 @@ int main() {
 		param_space[i][7] = con_dist(generator);
 		param_space[i][8] = con_dist(generator);
 	}
+	
 	FOR ABC SMC (one day you'll get there, stay positive!)
 	const int Nabc = 10;
 	float thresholds[Nabc];
@@ -328,9 +303,16 @@ int main() {
 	for(int i=0; i<Nabc; ++i){
 	weights[i] = 1.0;
 	}
+	*/
+	//float threshold;
 	
-	float threshold;
 	
+	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
+	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3};
+	float* theta_ptr = &theta[0];
+	float* times_ptr = &times[0];
+	int Ntheta = 1;
+
 	for(int i=0; i<Ntheta; ++i){
 		for(int k=0; k<nParam; ++k){
 			*(theta_ptr+k) = param_space[i][k];
@@ -338,32 +320,25 @@ int main() {
 	
 		executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
 		
-		std::vector<float> cpu_vector( totalThreads * Nout ) ;
+		std::vector<int> cpu_vector( totalThreads * 2*nTimes ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
-		
-		for(int i=0; i<(nParam+nTimes); ++i){
-			for(int j=0; j<totalThreads; ++j){
-				cout << cpu_vector[ i*totalThreads + j ] << " ";
-			}
-		}
-		cout << endl;
 
-		/*
+		
 		double sim_summ[2][nTimes][2] ;
 		for(int t=0; t<nTimes; ++t){
+			
 			float mutation_load[nTimes][totalThreads];
-			float copy_number[nTimes][totalThreads];
+			int copy_number[nTimes][totalThreads];
 			
 			for(int k=0; k<totalThreads; ++k){
 				copy_number[t][k] = cpu_vector[k*2*nTimes + 2*t] + cpu_vector[k*2*nTimes + 2*t + 1];
 				cout << copy_number[t][k] << " " ;
-				mutation_load[t][k] = cpu_vector[k*2*nTimes + 2*t + 1] / copy_number[t][k];
+				mutation_load[t][k] = (float) cpu_vector[k*2*nTimes + 2*t + 1] / (float) copy_number[t][k];
 				cout << mutation_load[t][k] << " ";
 			}
 			cout << endl;
 		}
-		
-		
+		/*
 		float sim_summ[2][nTimes][2];
 		for(int t=0; t<nTimes; ++t){
 			float mutation_load[nTimes][totalThreads];
@@ -380,7 +355,7 @@ int main() {
 		}
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		cout<< d << endl;
+		*/
 	}
-	*/
 	return 0;
 }
