@@ -182,14 +182,17 @@ public:
 		int output[spn.nTimes][spn.n_species];
 		int* output_ptr = &output[0][0];
 	
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-
+		//gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		
+		*out = 1.0;
+		/*
 		int index = 0;
 		for(int i=0; i<spn.nTimes; ++i){
 			out[index] = (float) output[i][0];
 			out[index+1] = (float) output[i][1];
 			index += 2;
 		}
+		 */
 		return true;
 	}
 };
