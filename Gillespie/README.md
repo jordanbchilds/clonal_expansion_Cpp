@@ -1,5 +1,5 @@
 Compile with:
-g++ main.cpp -o main -std=c++17 -lstdc++fs
+g++ --std=c++11 main.cpp -lpoplar -lpopops -lpoputil -o main
 
 Execute with:
 ./main
