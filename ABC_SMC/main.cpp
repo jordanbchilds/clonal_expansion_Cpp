@@ -329,19 +329,17 @@ int main() {
 		for(int t=0; t<nTimes; ++t){
 			for(int j=0; j<totalThreads; ++j){
 				copy_number[t][j] = cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1];
+				cout << copy_number[t][j] << " ";
 				mutation_load[t][j] = cpu_vector[j*2*nTimes + 2*t + 1] / copy_number[t][j];
+				cout << mutation_load[t][j] << endl;
 			}
+			/*
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], totalThreads);
 			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], totalThreads, sim_summ[0][t][0]);
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], totalThreads);
 			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], totalThreads, sim_summ[1][t][0]);
-			
-			double sq_diff = 0.0;
-			for(int i=0; i<totalThreads; ++i)
-				sq_diff += (mutation_load[1][i]-sim_summ[0][1][0]) * (mutation_load[1][i]-sim_summ[0][1][0]) ;
+			 */
 
-			cout << sq_diff << endl;
-			cout << sq_diff / double(totalThreads-1) << endl;
 		}
 		//double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		//cout<< d << endl;
