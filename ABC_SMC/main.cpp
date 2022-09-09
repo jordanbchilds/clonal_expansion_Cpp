@@ -362,7 +362,16 @@ int main() {
 			
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], index-1);
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], index-1);
-			cout << sim_summ[0][t][0] << sim_summ[1][t][0] << endl;
+			cout << ml_mean << " " << cn_mean << endl;
+			cout << sim_summ[0][t][0] << " " << sim_summ[1][t][0] << endl;
+			
+			double ml_sqDiff = 0.0;
+			double cn_sqDiff = 0.0;
+			for(int kk=0; kk<(index-1); ++k){
+				ml_sqDiff += (mutation_load[t][kk] - ml_mean)*(mutation_load[t][kk] - ml_mean) ;
+				cn_sqDiff += (copy_number[t][kk] - cn_mean)*(copy_number[t][kk] - cn_mean) ;
+			}
+			
 			/*
 			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], index-1, sim_summ[0][t][0]);
 			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], index-1, sim_summ[1][index][0]);
