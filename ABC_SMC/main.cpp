@@ -227,6 +227,7 @@ int main() {
 		for(int j=0; j<nObs; ++j){
 			copy_num[i][j] = cn_flat[i*nObs +j];
 			mut_load[i][j] = ml_flat[i*nObs +j];
+			cout << copy_num[i][j] << " " << mut_load[i][j] << endl;
 		}
 	 }
 
@@ -239,6 +240,8 @@ int main() {
 		 data_summ[1][t][1] = myStdDev(&copy_num[t][0], nObs, data_summ[1][t][0]);
 	 }
 	
+	
+	/*
 	const int numberOfCores = 1; // access to POD16
 	const int numberOfTiles = 1; // 1472;
 	const int threadsPerTile = 1; // six threads per tile
@@ -263,7 +266,7 @@ int main() {
 	Engine engine(graph, progs);
 	engine.load(device);
 
-	/*
+	
 	 DEFINE PRIOR DISTRIBUTIONS
 	 only used for first sample
 	 std::default_random_engine generator;
@@ -272,9 +275,9 @@ int main() {
 	 std::normal_distribution<float> con_dist(2e-3, 5e-4);
 	 std::uniform_real_distribution<float> ML_dist(0.2,0.6);
 	 std::normal_distribution<float> CN_dist(1e3, 100);
-	*/
+	
 	//float param_space[Ntheta][nParam];
-	/*
+	
 	GENERATE INITIAL PROPOSED PARAMETERS
 	fill param_space array with initial params
 	for(int i=0; i<Ntheta; ++i){
@@ -300,7 +303,7 @@ int main() {
 	for(int i=0; i<Nabc; ++i){
 	weights[i] = 1.0;
 	}
-	*/
+	
 	//float threshold;
 	
 	
@@ -336,5 +339,6 @@ int main() {
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		cout<< d << endl;
 	}
+	*/
 	return 0;
 }
