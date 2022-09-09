@@ -335,7 +335,8 @@ int main() {
 		
 		std::vector<int> cpu_vector( totalThreads * 2*nTimes ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
-
+		
+		cout << cpu_vector[cpu_vector.size()-2] << " " << cpu_vector[cpu_vector.size()-1] << endl;
 		double mutation_load[nTimes][totalThreads];
 		double copy_number[nTimes][totalThreads];
 		double sim_summ[2][nTimes][2];
@@ -374,10 +375,10 @@ int main() {
 			sim_summ[0][t][1] = sqrt(ml_sqDiff / float(index-1)) ;
 			sim_summ[1][t][1] = sqrt(cn_sqDiff / float(index-1)) ;
 			
-			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
-			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
-			cout << endl;
+			// cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
+			// cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
 		}
+		cout << endl;
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		d += squared_dist( &sim_summ[1][0][0], &data_summ[1][0][0], nTimes, 2);
 		
