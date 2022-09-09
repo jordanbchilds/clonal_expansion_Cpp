@@ -104,34 +104,42 @@ int main() {
 	Target target = device.getTarget();
 
 	long unsigned int nParam = 9;
+	const long unsigned int nTimes = 121;
 	
 	// Create the Graph object
 	Graph graph(target);
 	std::vector<Program> progs = buildGraphAndPrograms(graph, nParam, nTimes, numberOfCores, numberOfTiles, threadsPerTile);
 	Engine engine(graph, progs);
 	engine.load(device);
-	
-	const long unsigned int Nout = 100;
-	float times[Nout+1];
-	for(int i=0; i<=Nout; ++i){
+
+	float times[nTimes];
+	for(int i=0; i<nTimes; ++i){
 		times[i] = i*365.0 ;
 	}
+	
 	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3};
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
 	
-	const int Nsim = 10;
+	const int Nsim = 100;
 	double simTimes[Nsim] = {0};
 	for(int t=0; t<Nsim; ++t){
+		
 		auto start = chrono::high_resolution_clock::now();
 		executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
 		auto end = chrono::high_resolution_clock::now();
 		
-		duration<double, std::milli> ms_double = start - end;
+		chrono::duration<double, std::milli> ms_double = end - start;
 		
-		simTimes = ms_double;
-		cout<< ms_double << endl;
+		simTimes[t] = ms_double.count();
+		cout<< ms_double.count() << endl;
 	}
+	
+	std::ofstream file ("./sim_times.txt");
+	for(int j=0; j<nTimes; ++j){
+		file<< times[j] << endl ;
+	}
+	file.close();
 	
 	/*
 	std::vector<int> cpu_vector( totalThreads * 2*nTimes ) ;
