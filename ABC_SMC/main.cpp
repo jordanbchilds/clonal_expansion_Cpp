@@ -195,13 +195,13 @@ int main() {
 	// define input size - not ideal but we make do.
 
 	 const long unsigned int nTimes = 3;
-	 int nObs = 1000;
+	 int nObs = 1e3;
 	
 	 double ml_flat[nTimes*nObs];
 	 int cn_flat[nTimes*nObs];
 			
 	 int count = 0;
-	 fstream ml_file("./simulated_data/mutation_load.txt", ios_base::in);
+	 fstream ml_file("./simulated_data/mutation_load.csv", ios_base::in);
 	 if( ml_file.is_open() ){
 		 double a;
 		 while( ml_file >> a ){
@@ -212,7 +212,7 @@ int main() {
 	 ml_file.close();
 
 	 count = 0;
-	 fstream cn_file("./simulated_data/copy_number.txt", ios_base::in);
+	 fstream cn_file("./simulated_data/copy_number.csv", ios_base::in);
 	 if( cn_file.is_open() ){
 		 int a;
 		 while( cn_file >> a ){
