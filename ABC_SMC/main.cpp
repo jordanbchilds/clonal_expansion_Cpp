@@ -348,12 +348,8 @@ int main() {
 				if( cn > 0 ){
 					copy_number[t][index] = cn;
 					mutation_load[t][index] = (double) cpu_vector[j*2*nTimes + 2*t + 1] / cn;
-					
-					cout<< mutation_load[t][index] << " " << copy_number[t][index] << endl;
 				}
 			}
-			cout << endl;
-			
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], index-1);
 			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], index-1, sim_summ[0][t][0]);
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], index-1);
