@@ -148,7 +148,7 @@ public:
 		}
 		
 		sim_network spn;
-		spn.nTimes = 3;
+		spn.nTimes = 100;
 		spn.times_ptr = &times[0];
 		spn.Tmax = times[times.size()-1];
 		spn.n_reactions = Nreact;
@@ -163,27 +163,17 @@ public:
 		float react_rates[Nreact];
 		for(int i=0; i<5; ++i)
 			react_rates[i] = theta[2+i];
-		float con_rates[2];
-		con_rates[0] = theta[7];
-		con_rates[1] = theta[8];
 		
 		int output[spn.nTimes * spn.n_species];
 		int* output_ptr = &output[0];
 	
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
+		gillespied(x_init, react_rates, output_ptr, spn);
 		
 		for(int i=0; i<spn.nTimes; ++i){
 			out[2*i] =  output[2*i] ;
 			out[2*i+1] = output[2*i+1] ;
 		}
-		/*
-		int index = 0;
-		for(int i=0; i<spn.nTimes; ++i){
-			out[index] = (float) output[i][0];
-			out[index+1] = (float) output[i][1];
-			index += 2;
-		}
-		 */
+
 		return true;
 	}
 };
