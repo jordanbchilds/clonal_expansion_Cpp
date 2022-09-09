@@ -104,7 +104,7 @@ int main() {
 	Target target = device.getTarget();
 
 	const long unsigned int nParam = 7;
-	const long unsigned int nTimes = 100;
+	const long unsigned int nTimes = 121;
 	
 	// Create the Graph object
 	Graph graph(target);
@@ -112,8 +112,8 @@ int main() {
 	Engine engine(graph, progs);
 	engine.load(device);
 	
-	float times[nTimes+1];
-	for(int i=0; i<=nTimes; ++i){
+	float times[nTimes];
+	for(int i=0; i<nTimes; ++i){
 		times[i] = i*365.0*24.0*3600.0 ;
 	}
 	float theta[nParam] = {500.0, 500.0, 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8} ;// = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0};
