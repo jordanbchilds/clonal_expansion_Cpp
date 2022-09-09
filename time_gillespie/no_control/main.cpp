@@ -114,13 +114,13 @@ int main() {
 	
 	float times[nTimes];
 	for(int i=0; i<nTimes; ++i){
-		times[i] = i*365.0*24.0*3600.0 ;
+		times[i] = i*365.0 ;
 	}
-	float theta[nParam] = {500.0, 500.0, 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8} ;// = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0};
+	float theta[nParam] = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0};
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
 	
-	const int Nsim = 10;
+	const int Nsim = 100;
 	double simTimes[Nsim] = {0};
 	for(int t=0; t<Nsim; ++t){
 		
@@ -134,10 +134,15 @@ int main() {
 		cout<< ms_double.count() << endl;
 	}
 	
+	std::ofstream file ("./sim_times.txt");
+	for(int j=0; j<nTimes; ++j){
+		file<< times[j] << endl ;
+	}
+	file.close();
+	
 	/*
 	std::vector<int> cpu_vector( totalThreads * 2*nTimes ) ;
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 	*/
-	
 	return 0;
 }
