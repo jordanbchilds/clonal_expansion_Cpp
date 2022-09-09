@@ -351,6 +351,7 @@ int main() {
 					index += 1;
 				}
 			}
+			/*
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], index-1);
 			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], index-1, sim_summ[0][t][0]);
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], index-1);
@@ -358,7 +359,7 @@ int main() {
 			 
 			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
 			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
-			 
+			 */
 		}
 		/*
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
