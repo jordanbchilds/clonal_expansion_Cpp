@@ -111,7 +111,7 @@ double myStdDev(float* vec_ptr, long unsigned int len, float mean){
 	return sq_diff / double(len - 1);
 }
 
-double myStdDev(int* vec_ptr, long unsigned int len, float mean){
+double myStdDev(int* vec_ptr, long unsigned int len, double mean){
 	double sq_diff = 0.0;
 	for(int i=0; i<len; ++i)
 		sq_diff += (*(vec_ptr + i)-mean) * (*(vec_ptr+i)-mean) ;
@@ -336,8 +336,12 @@ int main() {
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], totalThreads);
 			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], totalThreads, sim_summ[1][t][0]);
 			
-			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] <<endl;
-			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] <<endl;
+			double sq_diff = 0.0;
+			for(int i=0; i<len; ++i)
+				sq_diff += (*(vec_ptr + i)-sim_summ[0][t][0]) * (*(vec_ptr+i)-sim_summ[0][t][0]) ;
+
+			cout << sq_diff << endl;
+			cout << sq_diff / double(totalThreads-1) << endl;
 		}
 		//double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		//cout<< d << endl;
