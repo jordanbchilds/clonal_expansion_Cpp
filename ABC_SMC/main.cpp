@@ -350,7 +350,7 @@ int main() {
 					mutation_load[t][index] = (double) cpu_vector[j*2*nTimes + 2*t + 1] / cn;
 					index += 1;
 					
-					cout<< mutation_load[t][j] << " " ;
+					cout<< mutation_load[t][index] << " " ;
 				}
 			}
 			cout << endl;
