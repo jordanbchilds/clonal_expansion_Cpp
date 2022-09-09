@@ -348,10 +348,8 @@ int main() {
 				if( cn > 0 ){
 					copy_number[t][index] = cn;
 					mutation_load[t][index] = (double) cpu_vector[j*2*nTimes + 2*t + 1] / cn;
+					
 					cout<< mutation_load[t][index] << " " << copy_number[t][index] << endl;
-					
-					
-					cout<< mutation_load[t][j] << " " ;
 				}
 			}
 			cout << endl;
