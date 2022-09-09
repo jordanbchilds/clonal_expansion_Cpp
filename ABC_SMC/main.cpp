@@ -339,21 +339,30 @@ int main() {
 		double sim_summ[2][nTimes][2];
 		
 		cout<< "Simulation summary: " << endl;
+		double cn;
+
 		for(int t=0; t<nTimes; ++t){
+			int index = 0;
 			for(int j=0; j<totalThreads; ++j){
-				copy_number[t][j] = cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1];
-				mutation_load[t][j] = (double) cpu_vector[j*2*nTimes + 2*t + 1] / (double) copy_number[t][j];
-				
-				cout<< mutation_load[t][j] << " " ;
+				cn = double(cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1]) ;
+				if( cn > 0 ){
+					copy_number[t][index] = cn;
+					mutation_load[t][index] = (double) cpu_vector[j*2*nTimes + 2*t + 1] / cn;
+					index += 1;
+					
+					cout<< mutation_load[t][j] << " " ;
+				}
 			}
-			cout<<endl;
-			sim_summ[0][t][0] = myMean(&mutation_load[t][0], totalThreads);
-			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], totalThreads, sim_summ[0][t][0]);
-			sim_summ[1][t][0] = myMean(&copy_number[t][0], totalThreads);
-			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], totalThreads, sim_summ[1][t][0]);
+			cout << endl;
 			
+			sim_summ[0][t][0] = myMean(&mutation_load[t][0], index-1);
+			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], index-1, sim_summ[0][t][0]);
+			sim_summ[1][t][0] = myMean(&copy_number[t][0], index-1);
+			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], index-1, sim_summ[1][index][0]);
+			 
 			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
 			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
+
 		}
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		cout << "Distance: " << " " << d << endl;
