@@ -185,7 +185,7 @@ int main()
 	
 	std::vector<int> cpu_vector( datasetSize * Nout * 2 );
 	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size());
-	
+	/*
 	std::ofstream wild_file ("ipu_wldCount.txt");
 	for(int i=0; i<datasetSize; ++i){
 		for(int j=0; j<Nout; ++j){
@@ -211,6 +211,6 @@ int main()
 
 	std::cout << "Completed computation at " << std::ctime(&end_time)
 			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
-	
+	*/
 	return 0;
 }
