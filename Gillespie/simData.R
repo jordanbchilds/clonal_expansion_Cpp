@@ -1,17 +1,17 @@
 # gen some fake data
 myBlack = function(alpha){ rgb(0,0,0, alpha) }
-Ndata = 1e4
+Ndata = 1e3
 times = c(25,55,65)
 
-mut_load = matrix(NA, nrow=Ndata, ncol=length(times))
-mut_load[,1] = rnorm(Ndata, 0.4, 0.03)
-mut_load[,2] = rnorm(Ndata, 0.8, 0.03)
-mut_load[,3] = rnorm(Ndata, 0.9, 0.02)
+mut_load = c(rnorm(Ndata, 0.4, 0.03), rnorm(Ndata, 0.8, 0.03), rnorm(Ndata, 0.9, 0.02))
+# mut_load[,1] = rnorm(Ndata, 0.4, 0.03)
+# mut_load[,2] = rnorm(Ndata, 0.8, 0.03)
+# mut_load[,3] = rnorm(Ndata, 0.9, 0.02)
 
-copy_num = matrix(NA, nrow=Ndata, ncol=length(times))
-copy_num[,1] = rnorm(Ndata, 1000, 30)
-copy_num[,2] = rnorm(Ndata, 950, 50)
-copy_num[,3] = rnorm(Ndata, 1050, 60)
+copy_num = round(c(rnorm(Ndata, 1000, 30), rnorm(Ndata, 950, 50), rnorm(Ndata, 1050, 60)))
+# copy_num[,1] = rnorm(Ndata, 1000, 30)
+# copy_num[,2] = rnorm(Ndata, 950, 50)
+# copy_num[,3] = rnorm(Ndata, 1050, 60)
 
 pdf("./FIGURE/simulated_data.pdf", width=12, height=7)
 {
@@ -19,7 +19,7 @@ pdf("./FIGURE/simulated_data.pdf", width=12, height=7)
   plot(NA, xlim=c(0,120), ylim=c(0,1), 
        main="", xlab="Time (years)", ylab="Mutation Load")
   for(i in 1:length(times)){
-    points(times[i]+rnorm(Ndata,0,0.5), mut_load[,i], pch=20, cex=0.7, col=myBlack(0.02))
+    points(times[i]+rnorm(Ndata,0,0.5), mut_load[((i-1)*Ndata+1):i*Ndata], pch=20, cex=0.7, col=myBlack(0.02))
   }
   
   plot(NA, xlim=c(0,120), ylim=c(0,2000), 
@@ -33,9 +33,8 @@ dev.off()
 
 dir.create("../simulated_data", showWarnings = FALSE)
 
-write.csv(mut_load, file="../simulated_data/mut_load.csv", row.names=FALSE)
-write.csv(copy_num, file="../simulated_data/sopy_num.csv", row.names=FALSE)
-
+write.csv(mut_load, file="./simulated_data/mut_load_v.csv", row.names=FALSE)
+write.csv(copy_num, file="./simulated_data/copy_num_v.csv", row.names=FALSE)
 
 # priors
 curve(dnorm(x,2.64e-3,5e-4), from=1e-3, to=9e-3, 
