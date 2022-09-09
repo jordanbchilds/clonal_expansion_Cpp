@@ -114,9 +114,9 @@ int main() {
 	
 	float times[nTimes+1];
 	for(int i=0; i<=nTimes; ++i){
-		times[i] = i*365.0 ;
+		times[i] = i*365.0*24.0*3600.0 ;
 	}
-	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0};
+	float theta[nParam] = {500.0, 500.0, 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8}// = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0};
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
 	
@@ -128,7 +128,7 @@ int main() {
 		executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
 		auto end = chrono::high_resolution_clock::now();
 		
-		chrono::duration<double, std::milli> ms_double = start - end;
+		chrono::duration<double, std::milli> ms_double = end - start;
 		
 		simTimes[t] = ms_double.count() ;
 		cout<< ms_double.count() << endl;
