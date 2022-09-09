@@ -329,16 +329,13 @@ int main() {
 		for(int t=0; t<nTimes; ++t){
 			for(int j=0; j<totalThreads; ++j){
 				copy_number[t][j] = cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1];
-				cout << copy_number[t][j] << " ";
 				mutation_load[t][j] = cpu_vector[j*2*nTimes + 2*t + 1] / copy_number[t][j];
-				cout << mutation_load[t][j] << endl;
 			}
-			/*
+			
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], totalThreads);
 			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], totalThreads, sim_summ[0][t][0]);
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], totalThreads);
 			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], totalThreads, sim_summ[1][t][0]);
-			 */
 
 		}
 		//double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
