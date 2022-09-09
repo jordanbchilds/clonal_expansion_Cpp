@@ -93,17 +93,23 @@ void perturb( float* theta_star ){
 	*(theta_star+8) = *(theta_star+8) + runif(1e-5);
 }
 
-double myMean(float* vec_ptr, long unsigned int len){
-	double sum = std::accumulate(&vec_ptr[0], &vec_ptr[len], 0.0);
+double myMean(double* vec_ptr, long unsigned int len){
+	double sum = 0.0;
+	for(int i=0; i<len; ++i)
+		sum += *(vec_ptr+i);
+	
 	return (double) sum / (double) len;
 }
 
 double myMean(int* vec_ptr, long unsigned int len){
-	double sum = std::accumulate(&vec_ptr[0], &vec_ptr[len], 0.0);
+	double sum = 0.0;
+	for(int i=0; i<len; ++i)
+		sum+= *(vec_ptr+i);
+	
 	return (double) sum / (double) len;
 }
 
-double myStdDev(float* vec_ptr, long unsigned int len, double mean){
+double myStdDev(double* vec_ptr, long unsigned int len, double mean){
 	double sq_diff = 0.0;
 	for(int i=0; i<len; ++i)
 		sq_diff += (*(vec_ptr+i)-mean) * (*(vec_ptr+i)-mean) ;
@@ -119,7 +125,7 @@ double myStdDev(int* vec_ptr, long unsigned int len, double mean){
 	return sq_diff / double(len - 1);
 }
 
-double squared_dist(float* x_ptr, float* y_ptr, int nrow, int ncol){
+double squared_dist(double* x_ptr, double* y_ptr, int nrow, int ncol){
 	double distance = 0.0;
 	for(int i=0; i<nrow; ++i){
 		for(int j=0; j<ncol; ++j){
