@@ -95,18 +95,18 @@ void perturb( float* theta_star ){
 
 double myMean(float* vec_ptr, long unsigned int len){
 	double sum = std::accumulate(&vec_ptr[0], &vec_ptr[len], 0.0);
-	double m =  sum / len;
+	return (double) sum / (double) len;
 }
 
 double myMean(int* vec_ptr, long unsigned int len){
 	double sum = std::accumulate(&vec_ptr[0], &vec_ptr[len], 0.0);
-	double m =  (double) sum / (double) len;
+	return (double) sum / (double) len;
 }
 
-double myStdDev(float* vec_ptr, long unsigned int len, float mean){
+double myStdDev(float* vec_ptr, long unsigned int len, double mean){
 	double sq_diff = 0.0;
 	for(int i=0; i<len; ++i)
-		sq_diff += (*(vec_ptr + i)-mean) * (*(vec_ptr+i)-mean) ;
+		sq_diff += (*(vec_ptr+i)-mean) * (*(vec_ptr+i)-mean) ;
 
 	return sq_diff / double(len - 1);
 }
@@ -114,7 +114,7 @@ double myStdDev(float* vec_ptr, long unsigned int len, float mean){
 double myStdDev(int* vec_ptr, long unsigned int len, double mean){
 	double sq_diff = 0.0;
 	for(int i=0; i<len; ++i)
-		sq_diff += (*(vec_ptr + i)-mean) * (*(vec_ptr+i)-mean) ;
+		sq_diff += (*(vec_ptr+i)-mean) * (*(vec_ptr+i)-mean) ;
 
 	return sq_diff / double(len - 1);
 }
@@ -241,7 +241,7 @@ int main() {
 		 data_summ[1][t][1] = myStdDev(&copy_num[t][0], nObs, data_summ[1][t][0]);
 		 
 		 cout << data_summ[0][t][0] << " " << data_summ[0][t][1] << endl;
-		 cout << data_summ[0][t][0] << " " << data_summ[0][t][1] << endl;
+		 cout << data_summ[1][t][0] << " " << data_summ[1][t][1] << endl;
 	 }
 	cout << endl;
 	
