@@ -328,17 +328,19 @@ int main() {
 		std::vector<int> cpu_vector( totalThreads * 2*nTimes ) ;
 		engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 		
-		float mutation_load[nTimes][totalThreads];
-		float copy_number[nTimes][totalThreads];
-		float sim_summ[2][nTimes][2];
+		double mutation_load[nTimes][totalThreads];
+		double copy_number[nTimes][totalThreads];
+		double sim_summ[2][nTimes][2];
 		
 		cout<< "Simulation summary: " << endl;
 		for(int t=0; t<nTimes; ++t){
 			for(int j=0; j<totalThreads; ++j){
 				copy_number[t][j] = cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1];
-				mutation_load[t][j] = cpu_vector[j*2*nTimes + 2*t + 1] / copy_number[t][j];
+				mutation_load[t][j] = (double) cpu_vector[j*2*nTimes + 2*t + 1] / (double) copy_number[t][j];
+				
+				cout<< mutation_load[t][j] << " " ;
 			}
-			
+			cout<<endl;
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], totalThreads);
 			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], totalThreads, sim_summ[0][t][0]);
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], totalThreads);
