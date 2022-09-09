@@ -222,7 +222,7 @@ int main() {
 	 }
 	 cn_file.close();
 	 
-	for(int i=0; i<nTimes*cn_flat; ++i){
+	for(int i=0; i<nTimes*nObs; ++i){
 		cout << cn_flat[i] << " " << ml_flat[i] << endl;
 	}
 	 int copy_num[nTimes][nObs];
