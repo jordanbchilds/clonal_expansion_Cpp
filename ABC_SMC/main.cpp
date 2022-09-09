@@ -231,6 +231,7 @@ int main() {
 		}
 	 }
 
+	cout << "Data summary" << endl;
 	 float data_summ[2][nTimes][2];
 	 for(int t=0; t<nTimes; ++t){
 		 data_summ[0][t][0] = myMean(&mut_load[t][0], nObs);
@@ -242,10 +243,11 @@ int main() {
 		 cout << data_summ[0][t][0] << " " << data_summ[0][t][1] << endl;
 		 cout << data_summ[0][t][0] << " " << data_summ[0][t][1] << endl;
 	 }
-
-	const int numberOfCores = 1; // access to POD16
-	const int numberOfTiles = 10; // 1472;
-	const int threadsPerTile = 1; // six threads per tile
+	cout << endl;
+	
+	const int numberOfCores = 16; // access to POD16
+	const int numberOfTiles = 1472; // 1472;
+	const int threadsPerTile = 6; // six threads per tile
 	
 	long unsigned int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
 	
@@ -330,6 +332,7 @@ int main() {
 		float copy_number[nTimes][totalThreads];
 		float sim_summ[2][nTimes][2];
 		
+		cout<< "Simulation summary: " << endl;
 		for(int t=0; t<nTimes; ++t){
 			for(int j=0; j<totalThreads; ++j){
 				copy_number[t][j] = cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1];
@@ -345,7 +348,7 @@ int main() {
 			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
 		}
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
-		cout<< d << endl;
+		cout << "Distance: " << " " << d << endl;
 	}
 	return 0;
 }
