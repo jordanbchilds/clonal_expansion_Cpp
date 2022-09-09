@@ -359,10 +359,12 @@ int main() {
 			}
 			double ml_mean = ml_sum/float(index);
 			double cn_mean = cn_sum/float(index);
-			/*
+			
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], index-1);
-			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], index-1, sim_summ[0][t][0]);
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], index-1);
+			cout << sim_summ[0][t][0] << sim_summ[1][t][0] << endl;
+			/*
+			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], index-1, sim_summ[0][t][0]);
 			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], index-1, sim_summ[1][index][0]);
 			 
 			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
