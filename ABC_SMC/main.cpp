@@ -221,10 +221,7 @@ int main() {
 		 }
 	 }
 	 cn_file.close();
-	 
-	for(int i=0; i<nTimes*nObs; ++i){
-		cout << cn_flat[i] << " " << ml_flat[i] << endl;
-	}
+
 	 int copy_num[nTimes][nObs];
 	 float mut_load[nTimes][nObs];
 	 for(int i=0; i<nTimes; ++i){
@@ -241,7 +238,11 @@ int main() {
 
 		 data_summ[1][t][0] = myMean(&copy_num[t][0], nObs);
 		 data_summ[1][t][1] = myStdDev(&copy_num[t][0], nObs, data_summ[1][t][0]);
+		 
+		 cout << data_summ[0][t][0] << data_summ[0][t][1] <<endl;
+		 cout << data_summ[1][t][0] << data_summ[1][t][1] <<endl;
 	 }
+
 	
 	
 	/*
