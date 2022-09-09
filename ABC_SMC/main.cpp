@@ -370,17 +370,18 @@ int main() {
 				ml_sqDiff += (mutation_load[t][kk] - ml_mean)*(mutation_load[t][kk] - ml_mean) ;
 				cn_sqDiff += (copy_number[t][kk] - cn_mean)*(copy_number[t][kk] - cn_mean) ;
 			}
-			sim_summ[0][t][1] = ml_sqDiff / float(index-1) ;
-			sim_summ[1][t][1] = cn_sqDiff / float(index-1) ;
+			sim_summ[0][t][1] = sqrt(ml_sqDiff / float(index-1)) ;
+			sim_summ[1][t][1] = sqrt(cn_sqDiff / float(index-1)) ;
 			
 			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
 			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
-
+			cout << endl;
 		}
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		d += squared_dist( &sim_summ[1][0][0], &data_summ[1][0][0], nTimes, 2);
 		
 		cout << "Distance: " << " " << d << endl;
+		cout << endl;
 	}
 	return 0;
 }
