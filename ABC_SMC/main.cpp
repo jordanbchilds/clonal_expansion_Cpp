@@ -15,7 +15,6 @@
 #include <fstream>
 #include <cmath>
 #include <random>
-#include <filesystem>
 
 #include <poplar/Engine.hpp>
 #include <poplar/Graph.hpp>
