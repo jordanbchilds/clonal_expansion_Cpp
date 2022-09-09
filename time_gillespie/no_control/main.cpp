@@ -130,7 +130,7 @@ int main() {
 		
 		chrono::duration<double, std::milli> ms_double = start - end;
 		
-		simTimes = ms_double;
+		simTimes = ms_double.count();
 		cout<< ms_double.count() << endl;
 	}
 	
