@@ -194,9 +194,7 @@ void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* time
 int main() {
 	// READ IN THE DATA AND CALCULATE SUMMARY STATISTICS ARRAY
 	// define input size - not ideal but we make do.
-	
-	cout << "Current working directory: " << filesystem::current_path() << endl;
-	
+
 	 const long unsigned int nTimes = 3;
 	 int nObs = 1000;
 	
@@ -225,13 +223,15 @@ int main() {
 	 }
 	 cn_file.close();
 	 
+	for(int i=0; i<nTimes*cn_flat; ++i){
+		cout << cn_flat[i] << " " << ml_flat[i] << endl;
+	}
 	 int copy_num[nTimes][nObs];
 	 float mut_load[nTimes][nObs];
 	 for(int i=0; i<nTimes; ++i){
 		for(int j=0; j<nObs; ++j){
 			copy_num[i][j] = cn_flat[i*nObs +j];
 			mut_load[i][j] = ml_flat[i*nObs +j];
-			cout << copy_num[i][j] << " " << mut_load[i][j] << endl;
 		}
 	 }
 
