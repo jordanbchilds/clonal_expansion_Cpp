@@ -362,8 +362,8 @@ int main() {
 			
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], index-1);
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], index-1);
-			cout << ml_mean << " " << cn_mean << endl;
-			cout << sim_summ[0][t][0] << " " << sim_summ[1][t][0] << endl;
+
+			// cout << sim_summ[0][t][0] << " " << sim_summ[1][t][0] << endl;
 			
 			double ml_sqDiff = 0.0;
 			double cn_sqDiff = 0.0;
@@ -373,17 +373,11 @@ int main() {
 			}
 			sim_summ[0][t][1] = ml_sqDiff / float(index-2) ;
 			sim_summ[1][t][1] = cn_sqDiff / float(index-2) ;
-			cout << sim_summ[0][t][1] << " " << sim_summ[1][t][1] << endl;
-			
-			/*
-			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
-			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
-			 */
+			// cout << sim_summ[0][t][1] << " " << sim_summ[1][t][1] << endl;
+
 		}
-		/*
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		cout << "Distance: " << " " << d << endl;
-		*/
 	}
 	return 0;
 }
