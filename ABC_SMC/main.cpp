@@ -197,13 +197,13 @@ int main() {
 	 const long unsigned int nTimes = 3;
 	 int nObs = 1000;
 	
-	 float ml_flat[nTimes*nObs];
+	 double ml_flat[nTimes*nObs];
 	 int cn_flat[nTimes*nObs];
 			
 	 int count = 0;
 	 fstream ml_file("./simulated_data/mutation_load.txt", ios_base::in);
 	 if( ml_file.is_open() ){
-		 float a;
+		 double a;
 		 while( ml_file >> a ){
 			 ml_flat[count] = a;
 			 count += 1;
