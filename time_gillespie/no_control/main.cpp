@@ -103,7 +103,8 @@ int main() {
 	std::cout << "Attached to IPU " << device.getId() << std::endl;
 	Target target = device.getTarget();
 
-	long unsigned int nParam = 7;
+	const long unsigned int nParam = 7;
+	const long unsigned int nTimes = 100;
 	
 	// Create the Graph object
 	Graph graph(target);
@@ -111,7 +112,6 @@ int main() {
 	Engine engine(graph, progs);
 	engine.load(device);
 	
-	const long unsigned int nTimes = 100;
 	float times[nTimes+1];
 	for(int i=0; i<=nTimes; ++i){
 		times[i] = i*365.0 ;
