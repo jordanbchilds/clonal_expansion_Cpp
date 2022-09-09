@@ -337,8 +337,8 @@ int main() {
 			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], totalThreads, sim_summ[1][t][0]);
 			
 			double sq_diff = 0.0;
-			for(int i=0; i<len; ++i)
-				sq_diff += (*(vec_ptr + i)-sim_summ[0][t][0]) * (*(vec_ptr+i)-sim_summ[0][t][0]) ;
+			for(int i=0; i<totalThreads; ++i)
+				sq_diff += (mutation_load[i]-sim_summ[0][1][0]) * (mutation_load[i]-sim_summ[0][1][0]) ;
 
 			cout << sq_diff << endl;
 			cout << sq_diff / double(totalThreads-1) << endl;
