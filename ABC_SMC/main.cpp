@@ -232,8 +232,8 @@ int main() {
 	 double mut_load[nTimes][nObs];
 	 for(int i=0; i<nTimes; ++i){
 		for(int j=0; j<nObs; ++j){
-			copy_num[i][j] = cn_flat[i*nObs +j];
-			mut_load[i][j] = ml_flat[i*nObs +j];
+			copy_num[i][j] = cn_flat[i*nObs +j] / 1e3 ;
+			mut_load[i][j] = ml_flat[i*nObs +j] / 1e3 ;
 		}
 	 }
 
