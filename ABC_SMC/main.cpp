@@ -338,7 +338,7 @@ int main() {
 			
 			double sq_diff = 0.0;
 			for(int i=0; i<totalThreads; ++i)
-				sq_diff += (mutation_load[i]-sim_summ[0][1][0]) * (mutation_load[i]-sim_summ[0][1][0]) ;
+				sq_diff += (mutation_load[1][i]-sim_summ[0][1][0]) * (mutation_load[1][i]-sim_summ[0][1][0]) ;
 
 			cout << sq_diff << endl;
 			cout << sq_diff / double(totalThreads-1) << endl;
