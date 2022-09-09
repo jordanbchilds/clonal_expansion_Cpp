@@ -229,7 +229,7 @@ int main() {
 	 cn_file.close();
 
 	 int copy_num[nTimes][nObs];
-	 float mut_load[nTimes][nObs];
+	 double mut_load[nTimes][nObs];
 	 for(int i=0; i<nTimes; ++i){
 		for(int j=0; j<nObs; ++j){
 			copy_num[i][j] = cn_flat[i*nObs +j];
@@ -238,7 +238,7 @@ int main() {
 	 }
 
 	cout << "Data summary" << endl;
-	 float data_summ[2][nTimes][2];
+	 double data_summ[2][nTimes][2];
 	 for(int t=0; t<nTimes; ++t){
 		 data_summ[0][t][0] = myMean(&mut_load[t][0], nObs);
 		 data_summ[0][t][1] = myStdDev(&mut_load[t][0], nObs, data_summ[0][t][0]);
