@@ -93,7 +93,7 @@ void perturb( float* theta_star ){
 	*(theta_star+8) = *(theta_star+8) + runif(1e-5);
 }
 
-double myMean(double* vec_ptr, long unsigned int len){
+double myMean(double* vec_ptr, int len){
 	double sum = 0.0;
 	for(int i=0; i<len; ++i)
 		sum += *(vec_ptr+i);
@@ -101,7 +101,7 @@ double myMean(double* vec_ptr, long unsigned int len){
 	return (double) sum / (double) len;
 }
 
-double myMean(int* vec_ptr, long unsigned int len){
+double myMean(int* vec_ptr, int len){
 	double sum = 0.0;
 	for(int i=0; i<len; ++i)
 		sum+= *(vec_ptr+i);
@@ -109,7 +109,7 @@ double myMean(int* vec_ptr, long unsigned int len){
 	return (double) sum / (double) len;
 }
 
-double myStdDev(double* vec_ptr, long unsigned int len, double mean){
+double myStdDev(double* vec_ptr, int len, double mean){
 	double sq_diff = 0.0;
 	for(int i=0; i<len; ++i)
 		sq_diff += (*(vec_ptr+i)-mean) * (*(vec_ptr+i)-mean) ;
@@ -117,7 +117,7 @@ double myStdDev(double* vec_ptr, long unsigned int len, double mean){
 	return sq_diff / double(len - 1);
 }
 
-double myStdDev(int* vec_ptr, long unsigned int len, double mean){
+double myStdDev(int* vec_ptr, int len, double mean){
 	double sq_diff = 0.0;
 	for(int i=0; i<len; ++i)
 		sq_diff += (*(vec_ptr+i)-mean) * (*(vec_ptr+i)-mean) ;
