@@ -123,11 +123,12 @@ int main() {
 	const int Nsim = 10;
 	double simTimes[Nsim] = {0};
 	for(int t=0; t<Nsim; ++t){
+		
 		auto start = chrono::high_resolution_clock::now();
 		executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
 		auto end = chrono::high_resolution_clock::now();
 		
-		duration<double, std::milli> ms_double = start - end;
+		chrono::duration<double, std::milli> ms_double = start - end;
 		
 		simTimes = ms_double;
 		cout<< ms_double << endl;
