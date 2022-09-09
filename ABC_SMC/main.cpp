@@ -348,6 +348,7 @@ int main() {
 				if( cn > 0 ){
 					copy_number[t][index] = cn;
 					mutation_load[t][index] = (double) cpu_vector[j*2*nTimes + 2*t + 1] / cn;
+					index += 1;
 				}
 			}
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], index-1);
