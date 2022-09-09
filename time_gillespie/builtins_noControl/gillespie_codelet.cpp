@@ -49,7 +49,7 @@ public:
 	
 	double rand_exp(float lambda){
 		float unif_01 = rand_unif();
-		return -1.0*log(1.0-unif_01)/lambda;
+		return -1.0*__builtin_ipu_ln(1.0-unif_01)/lambda;
 	}
 	
 	int rand_react(float* weights){
@@ -111,7 +111,7 @@ public:
 
 			tt += rand_exp(haz_total);
 
-			if( tt >= *(times+count) && count<=nTimes ){
+			if( tt>=*(times+count) && count<=nTimes ){
 				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
 				count += 1;
