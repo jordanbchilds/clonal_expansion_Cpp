@@ -337,8 +337,8 @@ int main() {
 			sim_summ[1][t][0] = myMean(&copy_number[t][0], totalThreads);
 			sim_summ[1][t][1] = myStdDev(&copy_number[t][0], totalThreads, sim_summ[1][t][0]);
 			
-			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][0] << endl;
-			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][0] << endl;
+			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
+			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
 		}
 		//double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		//cout<< d << endl;
