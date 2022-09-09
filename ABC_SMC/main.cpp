@@ -201,7 +201,7 @@ int main() {
 	 int cn_flat[nTimes*nObs];
 			
 	 int count = 0;
-	 fstream ml_file("./mutation_load.txt", ios_base::in);
+	 fstream ml_file("./simulated_data/mutation_load.txt", ios_base::in);
 	 if( ml_file.is_open() ){
 		 float a;
 		 while( ml_file >> a ){
@@ -212,7 +212,7 @@ int main() {
 	 ml_file.close();
 
 	 count = 0;
-	 fstream cn_file("./copy_number.txt", ios_base::in);
+	 fstream cn_file("./simulated_data/copy_number.txt", ios_base::in);
 	 if( cn_file.is_open() ){
 		 int a;
 		 while( cn_file >> a ){
