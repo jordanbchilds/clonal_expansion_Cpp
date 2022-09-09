@@ -15,6 +15,7 @@
 #include <fstream>
 #include <cmath>
 #include <random>
+#include <filesystem>
 
 #include <poplar/Engine.hpp>
 #include <poplar/Graph.hpp>
@@ -193,6 +194,9 @@ void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* time
 int main() {
 	// READ IN THE DATA AND CALCULATE SUMMARY STATISTICS ARRAY
 	// define input size - not ideal but we make do.
+	
+	cout << "Current working directory: " << filesystem::current_path() << endl;
+	
 	 const long unsigned int nTimes = 3;
 	 int nObs = 1000;
 	
