@@ -340,8 +340,8 @@ int main() {
 			cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
 			cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
 		}
-		//double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
-		//cout<< d << endl;
+		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
+		cout<< d << endl;
 	}
 	return 0;
 }
