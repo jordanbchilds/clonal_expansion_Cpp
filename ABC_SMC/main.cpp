@@ -238,6 +238,9 @@ int main() {
 
 		 data_summ[1][t][0] = myMean(&copy_num[t][0], nObs);
 		 data_summ[1][t][1] = myStdDev(&copy_num[t][0], nObs, data_summ[1][t][0]);
+		 
+		 cout << data_summ[0][t][0] << " " << data_summ[0][t][1] << endl;
+		 cout << data_summ[0][t][0] << " " << data_summ[0][t][1] << endl;
 	 }
 
 	const int numberOfCores = 1; // access to POD16
@@ -326,6 +329,7 @@ int main() {
 		float mutation_load[nTimes][totalThreads];
 		float copy_number[nTimes][totalThreads];
 		float sim_summ[2][nTimes][2];
+		
 		for(int t=0; t<nTimes; ++t){
 			for(int j=0; j<totalThreads; ++j){
 				copy_number[t][j] = cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1];
