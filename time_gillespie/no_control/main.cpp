@@ -111,7 +111,7 @@ int main() {
 	Engine engine(graph, progs);
 	engine.load(device);
 	
-	const long unsigned int Nout = 100;
+	const long unsigned int nTimes = 100;
 	float times[Nout+1];
 	for(int i=0; i<=Nout; ++i){
 		times[i] = i*365.0 ;
