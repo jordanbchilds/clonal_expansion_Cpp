@@ -1,263 +1,133 @@
-//
-//  main.cpp
-//  Stochastic Simulation
-//
-//  Created by JORDAN CHILDS on 26/07/2022.
-//
-#include <cmath>
+// Copyright (c) 2022 Graphcore Ltd. All rights reserved.
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+
+//      http://www.apache.org/licenses/LICENSE-2.0
+
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#include <algorithm>
 #include <iostream>
 #include <fstream>
-//#include <experimental/filesystem>
-#include <cassert>
+#include <cmath>
+#include <random>
+
+#include <poplar/Engine.hpp>
+#include <poplar/Graph.hpp>
+#include <poplar/DeviceManager.hpp>
 #include <chrono>
+#include <ctime>
 
 using namespace std;
+using namespace poplar;
+using namespace poplar::program;
 
-class sim_network {
-public:
-	float Tmax;
-	float step_out;
-	int Nout;
-	int n_reactions;
-	int n_species;
-	int* Post;
-	int* Pre;
-	int* Stoi;
-
-	void set_mats(int* post_ptr, int* pre_ptr, int* stoi_ptr );
-	sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut);
-	sim_network();
+enum Progs {
+	WRITE_INPUTS,
+	CUSTOM_PROG,
+	NUM_PROGRAMS
 };
 
-sim_network::sim_network(){
-	Tmax = 0.0;
-	step_out = 0.0;
-	n_reactions = 0;
-	n_species = 0;
-	Post = nullptr;
-	Pre = nullptr;
-	Stoi = nullptr;
-}
-
-sim_network::sim_network(int nReacts, int nSpecies, int* post_ptr, int* pre_ptr, int* stoi_ptr, float tmax, float stepOut){
-	Tmax = tmax;
-	step_out = stepOut;
-	n_reactions = nReacts;
-	n_species = nSpecies;
-	Post = post_ptr;
-	Pre = pre_ptr;
-	Stoi = stoi_ptr;
+std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int nParam, long unsigned int nTimes, const int numberOfCores, const int numberOfTiles, const int threadsPerTile) {
 	
-	for(int i=0; i<n_reactions; ++i){
-		for(int j=0; j<n_species; ++j){
-			*(Stoi+i*nSpecies+j) = *(Post+i*nSpecies+j) - *(Pre+i*nSpecies+j);
-		}
+	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
+	int tileInt;
+
+	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
+	graph.addCodelets("gillespie_codelet.cpp");
+	Tensor times = graph.addVariable(FLOAT, {nTimes}, "a");
+	Tensor theta = graph.addVariable(FLOAT, {nParam}, "b");
+	Tensor output = graph.addVariable(INT, {totalThreads, 2*nTimes}, "output");
+	
+	ComputeSet computeSet = graph.addComputeSet("computeSet");
+	
+	// Map tensors to tiles
+	for(int i=0; i<totalThreads; ++i){
+		int roundCount = i % int( totalThreads );
+		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
+		
+		graph.setTileMapping(times, tileInt);
+		graph.setTileMapping(theta, tileInt);
+		graph.setTileMapping(output[i], tileInt);
+		
+		VertexRef vtx = graph.addVertex(computeSet, "sim_network_vertex");
+		graph.setTileMapping(vtx, tileInt);
+		
+		graph.connect(vtx["times"], times);
+		graph.connect(vtx["theta"], theta);
+		graph.connect(vtx["out"], output[i]);
 	}
-}
-void sim_network::set_mats(int* post_ptr, int* pre_ptr, int* stoi_ptr ){
-	assert(post_ptr!=nullptr & post_ptr!=nullptr & n_reactions!=0 & n_species!=0);
-	Post = post_ptr;
-	Pre = pre_ptr;
-	Stoi = stoi_ptr;
 	
-	for(int i=0; i<n_reactions; ++i){
-		for(int j=0; j<n_species; ++j){
-			*(Stoi+i*n_species+j) = *(Post+i*n_species+j) - *(Pre+i*n_species+j);
-		}
-	}
-}
-
-unsigned choose(unsigned n, unsigned k){
-    if (k>n) return 0;
-    if (k*2>n) k = n-k;
-    if (k==0) return 1;
-    if (k==1) return n;
-    int result = n;
-    for(int i=2; i<=(n-k); ++i){
-        result *= (n-i+1);
-        result /= i;
-    }
-    return result;
-}
-
-double rand_unif(float lower=0.0, float upper=1.0){
-	float unif_01;
-    float unif;
-    unif_01 = (float) rand() / (float) RAND_MAX;
-    unif = unif_01*(upper-lower) + lower;
-    return unif;
-}
-
-double rand_exp(float lambda){ // both lambda and x are positive - use type unsigned double?
-    float x;
-    float unif_01;
-    unif_01 = drand48();
-    x = -log(1-unif_01)/lambda;
-    return x;
-}
-
-int rand_disc(int size, float* weights=0){
-    // size and weights can only be positive - use types unsigned int and unsigned double?
-    float norm; // normalising constant
-    if( weights!=0 ){ // if weights given
-        norm = 0;
-        for(int i=0; i<size; ++i)
-            norm += weights[i];
-    } else {
-        norm = size;
-    } // if no weights given norm is the
-    
-    float cumWeights[size];
-    if( weights==0 ){
-        for(int i=0; i<size; ++i)
-            cumWeights[i] = (i+1)/norm;
-    } else {
-        for(int i=0; i<size; ++i){
-            float cc = 0;
-            for(int j=0; j<=i; ++j)
-                cc += weights[j]/norm;
-            cumWeights[i] = cc;
-        }
-    }
-    float u = drand48();
-    if( u<cumWeights[0] ){
-        return 0;
-    } else {
-        for(int i=1; i<size; ++i){
-            if( cumWeights[i-1]<u & u<=cumWeights[i] )
-				return i;
-        }
-    }
-    return -1; // requires a return outside the loop
-}
-
-float rep_controller(float con_rates[2], float rep_rate, int error) {
-	if( error >= 0){
-		return rep_rate*2.0/(1.0+exp(error*con_rates[0]));
-	} else {
-		return rep_rate*(1.0+exp(-1*error*con_rates[1]))/2.0;
-	}
-}
-
-void myHazard(float* haz_ptr, int* x, float* con_rates, float* rates, int error, sim_network simnet){
-	int n_reactions = simnet.n_reactions;
-	int n_species = simnet.n_species;
-	int* Pre = simnet.Pre;
+	// to be able to read the output
+	graph.createHostRead("output-read", output);
 	
-	*haz_ptr = rep_controller(con_rates, *rates, error);
-	*(haz_ptr+1) = rep_controller(con_rates, *(rates+1), error);
-	for(int i=2; i<n_reactions; ++i)
-		*(haz_ptr+i) = *(rates+i);
-
-	for(int i=0; i<n_reactions; ++i){
-		for(int j=0; j<n_species; ++j)
-			*(haz_ptr+i) *= choose(x[j], *(Pre+i*n_species+j));
-	}
-	// return hazards;
+	// Create streams that allow reading and writing of the variables:
+	auto times_stream = graph.addHostToDeviceFIFO("write_dataTimes", FLOAT, nTimes);
+	auto param_stream = graph.addHostToDeviceFIFO("write_theta", FLOAT, nParam);
+	
+	std::vector<Program> progs(Progs::NUM_PROGRAMS); // I HAVE NOT IDEA WHAT NUM_PROGRAMS IS/DOES - but without it the empire falls
+	progs[WRITE_INPUTS] = Sequence( {Copy(param_stream, theta), Copy(times_stream, times)});
+	progs[CUSTOM_PROG] = Execute(computeSet);
+						  
+	return progs;
 }
 
-void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
-	// could use pointers and such instead of stating array size in function argument?
-	int x[2];
-	for(int i=0; i<2; ++i)
-		x[i] = *(x_init+i);
-	
-	int n_species = simnet.n_species;
-	int n_reactions = simnet.n_reactions;
-	float step_out = simnet.step_out;
-	float Tmax = simnet.Tmax;
-	int* S = simnet.Stoi;
-	int* Pre = simnet.Pre;
-	
-    for(int j=0; j<n_species; ++j)
-		*(out_array+j) = x[j];
-    
-    int count = 1;
-    float target = step_out;
-    float tt = 0;
+void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* times_ptr, long unsigned int nTimes, poplar::Engine &engine) {
 
-	int C0 = x[0]+x[1];
-	int copyNum = C0;
+	engine.connectStream("write_dataTimes", times_ptr, times_ptr+nTimes);
+	engine.connectStream("write_theta", theta_ptr, theta_ptr+nParam);
 	
-    while( tt<Tmax ){
-		float temp_rates[n_reactions];
-		temp_rates[0] = rep_controller(con_rates, *rates, copyNum-C0);
-		temp_rates[1] = rep_controller(con_rates, *(rates+1), copyNum-C0);
-		for(int i=2; i<n_reactions; ++i)
-			temp_rates[i] = *(rates+i);
-		
-		float hazards[n_reactions];
-		for(int i=0; i<n_reactions; ++i){
-			float h_i = temp_rates[i];
-			for(int j=0; j<n_species; ++j)
-				h_i *= choose(x[j], *(Pre+i*n_species+j));
-			hazards[i] = h_i;
-		}
-		
-		//float hazards[n_reactions];
-		//myHazard(hazards, x, con_rates, rates, C0-copyNum, simnet);
-		
-        float haz_total = 0;
-        for(int i=0; i<n_reactions; ++i)
-			haz_total += hazards[i];
-        
-        if( copyNum == 0 )
-			break;
-        else
-            tt += rand_exp(haz_total);
-		if( tt>=target ){
-			for(int j=0; j<n_species; ++j)
-				*(out_array+count*n_species+j ) = x[j];
-			count += 1;
-			target += step_out;
-		}
-		
-        int r = rand_disc(n_reactions, hazards);
-		
-        for(int j=0; j<n_species; ++j)
-			x[j] += *(S+r*n_species+j);
-		
-		copyNum = x[0]+x[1];
-		if( count>(simnet.Tmax/simnet.step_out + 1.0) | copyNum==0 )
-			break;
-    }
-    // return out_arrAY;
+	engine.run(WRITE_INPUTS);
+	engine.run(CUSTOM_PROG);
 }
 
 
 int main() {
-	const int Nreact = 5;
-	const int Nspecies = 2;
-	int Pre_mat[Nreact][Nspecies] = { {1,0}, {0,1}, {1,0}, {0,1}, {1,0} };
-	int* Pre_ptr = &Pre_mat[0][0];
-	int Post_mat[Nreact][Nspecies] = { {2,0}, {0,2}, {0,0}, {0,0}, {1,1} };
-	int* Post_ptr = &Post_mat[0][0];
-	int S_mat[Nreact][Nspecies];
-	int* S_ptr = &S_mat[0][0];
+	const int numberOfCores = 16; // access to POD16
+	const int numberOfTiles = 1472; // 1472;
+	const int threadsPerTile = 6; // six threads per tile
 	
-    int x_init[2] = {500,500};
-    float tmax = 3784320000.0; //120*365*24*60*60 in seconds
-    float stepOut = 365.0*24.0*60.0*60.0; // in seconds
-    float react_rates[5] = { 3.06e-8, 3.06e-8, 3.06e-8, 3.06e-8, 0.0};
-	float con_rates[2] = {2.0e-3, 2.0e-3};
+	long unsigned int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
 	
-	sim_network spn = sim_network(Nreact, Nspecies, Post_ptr, Pre_ptr, S_ptr, tmax, stepOut);
-	
-	int output[int(spn.Tmax/spn.step_out + 1.0)][spn.n_species];
-	int* output_ptr = &output[0][0];
-	
-	int Nsim = 8832;
-	
-	auto start = std::chrono::system_clock::now();
-	for(int i=0; i<Nsim; ++i){
-		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-	}
-	auto end = std::chrono::system_clock::now();
-	
-	std::chrono::duration<double> elapsed_seconds = end-start;
-	std::time_t end_time = std::chrono::system_clock::to_time_t(end);
+	auto manager = DeviceManager::createDeviceManager();
+	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
+	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
+	return device.attach();
+	});
+	auto device = std::move(*it);
 
-	std::cout << "Completed computation at " << std::ctime(&end_time)
-			<< "Elapsed time: " << elapsed_seconds.count() << "s" << std::endl;
+	std::cout << "Attached to IPU " << device.getId() << std::endl;
+	Target target = device.getTarget();
+
+	long unsigned int nParam = 9;
+	const long unsigned int nTimes = 121;
 	
+	// Create the Graph object
+	Graph graph(target);
+	std::vector<Program> progs = buildGraphAndPrograms(graph, nParam, nTimes, numberOfCores, numberOfTiles, threadsPerTile);
+	Engine engine(graph, progs);
+	engine.load(device);
+
+	float times[nTimes];
+	for(int i=0; i<nTimes; ++i){
+		times[i] = i*365.0 ;
+	}
+	
+	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3};
+	float* theta_ptr = &theta[0];
+	float* times_ptr = &times[0];
+	
+	auto start = chrono::high_resolution_clock::now();
+	executeGraphProgram(theta_ptr, nParam, times_ptr, nTimes, engine);
+	auto end = chrono::high_resolution_clock::now();
+	
+	chrono::duration<double, std::milli> ms_double = end - start;
+
+	cout<< "Simulation time: " << ms_double.count() << "/ms" << endl;
+
+	return 0;
 }

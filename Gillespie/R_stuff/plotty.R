@@ -1,5 +1,6 @@
-wld_raw = read.table("./OUTPUT/rand_ICNe3/ipu_wldCount.txt")
-mnt_raw = read.table("./OUTPUT/rand_ICNe3/ipu_mntCount.txt")
+
+wld_raw = read.table("./OUTPUT/streamR/ipu_wldCount.txt")
+mnt_raw = read.table("./OUTPUT/streamR/ipu_mntCount.txt")
 
 imax = 121
 Tmax = 120.0
@@ -14,7 +15,7 @@ mut_load = mnt_ts/copy_num
 
 Nmax = 141132
 
-png("./FIGURE/rand_ICNe3.png",width=2*480*5,height=480*5,pointsize=12*5)
+png("./FIGURE/stream_check.png",width=2*480*5,height=480*5,pointsize=12*5)
 {
   par(mfrow=c(1,2), mar=c(6,6,3,3), cex.main=2, cex.lab=2, cex.axis=1.5)
   

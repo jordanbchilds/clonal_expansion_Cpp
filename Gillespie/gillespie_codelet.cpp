@@ -13,23 +13,15 @@ using namespace std;
 class sim_network_vertex : public poplar::Vertex
 {
 public:
-	Input<int> w_init;
-	Input<int> m_init;
-    Input<float> reactOne_rates;
-	Input<float> reactTwo_rates;
-	Input<float> reactThree_rates;
-	Input<float> reactFour_rates;
-	Input<float> reactFive_rates;
-    Input<float> conOne_rates;
-	Input<float> conTwo_rates;
+	Input<Vector<float>> theta ;
+	Input<Vector<float>> times;
 
-    Output<Vector<int>> out;
-	//Output<float> out;
+	Output<Vector<int>> out;
 	
 	struct sim_network {
+		const float* times_ptr;
 		float Tmax;
-		float step_out;
-		int Nout;
+		int nTimes;
 		int n_reactions;
 		int n_species;
 		int* Post;
@@ -50,12 +42,13 @@ public:
 		return result;
 	}
 	
-	float runif_01(){
-		return (float) (__builtin_ipu_urand32()) / (float) (4294967295);
+	float rand_unif(float lower=0.0, float upper=1.0){
+		float unif_01 = (float) (__builtin_ipu_urand32()) / (float) (4294967295) ; // 4,294,967,295 is the max value of an unsigned iteger... I think.
+		return unif_01*(upper-lower) + lower;
 	}
 	
 	double rand_exp(float lambda){
-		float unif_01 = runif_01();
+		float unif_01 = rand_unif();
 		return -1.0*log(1.0-unif_01)/lambda;
 	}
 	
@@ -72,7 +65,7 @@ public:
 			cumWeights[i] = cc;
 		}
 
-		float u = runif_01() ;
+		float u = rand_unif() ;
 		if( 0<=u && u<cumWeights[0] ){
 			return 0;
 		} else {
@@ -89,24 +82,23 @@ public:
 		return new_rate;
 	}
 
-	
 	void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 		
-		int Nout = simnet.Nout;
+		int nTimes = simnet.nTimes;
 		float Tmax = simnet.Tmax;
-		float step_out = simnet.step_out;
+		const float* times = simnet.times_ptr;
 		int n_species = simnet.n_species;
 		int n_reactions = simnet.n_reactions;
 		int* S_pt = simnet.Stoi;
 		int* Pre_pt = simnet.Pre;
 
 		int x[2];
-		x[0] = *x_init; x[1] = *(x_init+1);
-		*(out_array) = x[0]; *(out_array+1) = x[1];
-		
+		x[0] = *x_init;
+		x[1] = *(x_init+1);
+
 		int count = 0;
 		float tt = 0.0;
-		float target = 0;
+		// float target = *times;
 		int C0 = x[0]+x[1];
 		int copyNum = C0;
 
@@ -130,20 +122,20 @@ public:
 
 			tt += rand_exp(haz_total);
 
-			if( tt >= target && count<Nout){
+			if( tt >= *(times+count) && count<=nTimes ){
 				*(out_array+count*n_species) = x[0];
 				*(out_array+count*n_species+1) = x[1];
 				count += 1;
-				target += step_out;
 			}
 
 			int r = rand_react(hazards);
 			x[0]  += *( S_pt + r*n_species );
 			x[1]  += *( S_pt + r*n_species + 1 );
 			copyNum = x[0]+x[1];
-
+			
 			if(copyNum>2*C0 || copyNum==0){
-				for(int i=count; i<Nout; ++i){
+				// copyNum==0 is specific to this system Darren's general equiv was haz_total<1e-10
+				for(int i=count; i<nTimes; ++i){
 					*(out_array+i*n_species) = 0;
 					*(out_array+i*n_species+1) = 0;
 				}
@@ -151,6 +143,7 @@ public:
 			}
 		}
 	}
+
 	bool compute()
 	{
 		const int Nreact = 5;
@@ -161,16 +154,15 @@ public:
 		int* Post_ptr = &Post_mat[0][0];
 		int S_mat[Nreact][Nspecies];
 		int* S_ptr = &S_mat[0][0];
-		
 		for(int i=0; i<Nreact; ++i){
 			for(int j=0; j<Nspecies; ++j)
 				S_mat[i][j] = Post_mat[i][j] - Pre_mat[i][j];
 		}
-
+		
 		sim_network spn;
-		spn.Tmax = 120.0*365.0; // 120 years in seconds
-		spn.step_out = 10*365.0; // 1 year in seconds
-		spn.Nout = (long unsigned int) (spn.Tmax/spn.step_out+1);
+		spn.nTimes = 3;
+		spn.times_ptr = &times[0];
+		spn.Tmax = times[times.size()-1];
 		spn.n_reactions = Nreact;
 		spn.n_species = Nspecies;
 		spn.Post = Post_ptr;
@@ -178,28 +170,23 @@ public:
 		spn.Stoi = S_ptr;
 		
 		int x_init[Nspecies];
-		x_init[0] = w_init;
-		x_init[1] = m_init;
+		x_init[0] = (int) theta[0];
+		x_init[1] = (int) theta[1];
 		float react_rates[Nreact];
-		react_rates[0] = reactOne_rates;
-		react_rates[1] = reactTwo_rates;
-		react_rates[2] = reactThree_rates;
-		react_rates[3] = reactFour_rates;
-		react_rates[4] = reactFive_rates;
+		for(int i=0; i<5; ++i)
+			react_rates[i] = theta[2+i];
 		float con_rates[2];
-		con_rates[0] = conOne_rates;
-		con_rates[1] = conTwo_rates;
+		con_rates[0] = theta[7];
+		con_rates[1] = theta[8];
 		
-		int output[spn.Nout][spn.n_species];
-		int* output_ptr = &output[0][0];
-
+		int output[spn.nTimes * spn.n_species];
+		int* output_ptr = &output[0];
+	
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
-
-		int index = 0;
-		for(int i=0; i<spn.Nout; ++i){
-			out[index] = output[i][0];
-			out[index+1] = output[i][1];
-			index += 2;
+		
+		for(int i=0; i<spn.nTimes; ++i){
+			out[2*i] =  output[2*i] ;
+			out[2*i+1] = output[2*i+1] ;
 		}
 		return true;
 	}

@@ -188,14 +188,6 @@ public:
 			out[2*i] =  output[2*i] ;
 			out[2*i+1] = output[2*i+1] ;
 		}
-		/*
-		int index = 0;
-		for(int i=0; i<spn.nTimes; ++i){
-			out[index] = (float) output[i][0];
-			out[index+1] = (float) output[i][1];
-			index += 2;
-		}
-		 */
 		return true;
 	}
 };
