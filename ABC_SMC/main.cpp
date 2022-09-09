@@ -351,6 +351,14 @@ int main() {
 					index += 1;
 				}
 			}
+			double ml_sum = 0.0;
+			double cn_sum = 0.0;
+			for(int kk=0; kk<(index-1); ++kk){
+				ml_sum += mutation_load[t][kk];
+				cn_sum += copy_number[t][kk];
+			}
+			double ml_mean = ml_sum/float(index);
+			double cn_mean = cn_sum/float(index);
 			/*
 			sim_summ[0][t][0] = myMean(&mutation_load[t][0], index-1);
 			sim_summ[0][t][1] = myStdDev(&mutation_load[t][0], index-1, sim_summ[0][t][0]);
