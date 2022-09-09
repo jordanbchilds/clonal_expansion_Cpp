@@ -137,7 +137,7 @@ int main() {
 	
 	std::ofstream file ("./sim_times.txt");
 	for(int j=0; j<nTimes; ++j){
-		file<< times[j] << endl ;
+		file<< simTimes[j] << endl ;
 	}
 	file.close();
 	
