@@ -320,6 +320,7 @@ int main() {
 	
 	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
 	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3};
+	float init_CN = (float) 1e3;
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
 	int Ntheta = 10;
@@ -346,7 +347,7 @@ int main() {
 			for(int j=0; j<totalThreads; ++j){
 				double cn = double(cpu_vector[j*2*nTimes + 2*t] + cpu_vector[j*2*nTimes + 2*t + 1]) ;
 				if( cn > 0 ){
-					copy_number[t][index] = cn;
+					copy_number[t][index] = cn / init_CN ;
 					mutation_load[t][index] = (double) cpu_vector[j*2*nTimes + 2*t + 1] / cn;
 					index += 1;
 				}
