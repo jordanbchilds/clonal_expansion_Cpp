@@ -238,14 +238,8 @@ int main() {
 
 		 data_summ[1][t][0] = myMean(&copy_num[t][0], nObs);
 		 data_summ[1][t][1] = myStdDev(&copy_num[t][0], nObs, data_summ[1][t][0]);
-		 
-		 cout << data_summ[0][t][0] << data_summ[0][t][1] <<endl;
-		 cout << data_summ[1][t][0] << data_summ[1][t][1] <<endl;
 	 }
 
-	
-	
-	/*
 	const int numberOfCores = 1; // access to POD16
 	const int numberOfTiles = 1; // 1472;
 	const int threadsPerTile = 1; // six threads per tile
@@ -270,7 +264,7 @@ int main() {
 	Engine engine(graph, progs);
 	engine.load(device);
 
-	
+	/*
 	 DEFINE PRIOR DISTRIBUTIONS
 	 only used for first sample
 	 std::default_random_engine generator;
@@ -279,9 +273,11 @@ int main() {
 	 std::normal_distribution<float> con_dist(2e-3, 5e-4);
 	 std::uniform_real_distribution<float> ML_dist(0.2,0.6);
 	 std::normal_distribution<float> CN_dist(1e3, 100);
+	*/
 	
 	//float param_space[Ntheta][nParam];
 	
+	/*
 	GENERATE INITIAL PROPOSED PARAMETERS
 	fill param_space array with initial params
 	for(int i=0; i<Ntheta; ++i){
@@ -309,7 +305,7 @@ int main() {
 	}
 	
 	//float threshold;
-	
+	*/
 	
 	float times[nTimes] = {25.0*365.0, 55.0*365.0, 65.0*365.0};
 	float theta[nParam]  = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0, 2e-3, 2e-3};
