@@ -121,7 +121,7 @@ int main() {
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
 	
-	const int Nsim = 5;
+	const int Nsim = 1000;
 	double simTimes[Nsim] = {0};
 	for(int t=0; t<Nsim; ++t){
 		
