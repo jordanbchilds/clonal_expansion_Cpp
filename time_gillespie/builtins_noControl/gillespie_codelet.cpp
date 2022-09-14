@@ -122,7 +122,7 @@ public:
 			x[1]  += *( S_pt + r*n_species + 1 );
 			copyNum = x[0]+x[1];
 			
-			if(copyNum>2*C0 || copyNum==0){
+			if( copyNum==0 ){
 				for(int i=count; i<nTimes; ++i){
 					*(out_array+i*n_species) = 0;
 					*(out_array+i*n_species+1) = 0;
