@@ -89,7 +89,7 @@ void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* time
 int main() {
 	const int numberOfCores = 1; // access to POD16
 	const int numberOfTiles = 1472; // 1472;
-	const int threadsPerTile = 6; // six threads per tile
+	const int threadsPerTile = 1; // six threads per tile
 	
 	long unsigned int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
 	
@@ -134,7 +134,7 @@ int main() {
 		cout<< ms_double.count() << endl;
 	}
 	
-	std::ofstream file ("./sim_times.txt");
+	std::ofstream file ("./oneIPU_noThreads_simTimes.txt");
 	for(int j=0; j<nTimes; ++j){
 		file<< simTimes[j] << endl ;
 	}
