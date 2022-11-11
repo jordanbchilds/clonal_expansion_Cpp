@@ -90,7 +90,7 @@ void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* time
 int main() {
 	const int numberOfCores = 4; // access to POD16
 	const int numberOfTiles = 1472; // 1472;
-	const int threadsPerTile = 6; // six threads per tile
+	const int threadsPerTile = 1; // six threads per tile
 	
 	long unsigned int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
 	
@@ -129,6 +129,8 @@ int main() {
 	chrono::duration<double, std::milli> ms_double = end - start;
 
 	cout<< "Simulation time: " << ms_double.count() << "/ms" << endl;
+	
+	
 
 	return 0;
 }
