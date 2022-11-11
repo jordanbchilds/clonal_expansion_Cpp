@@ -29,7 +29,8 @@ using namespace poplar::program;
 enum Progs {
 	WRITE_INPUTS,
 	CUSTOM_PROG,
-	NUM_PROGRAMS
+	NUM_PROGRAMS,
+	READ_RESULTS
 };
 
 std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned int x_len, const int numberOfCores, const int numberOfTiles, const int threadsPerTile) {

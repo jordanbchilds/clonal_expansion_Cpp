@@ -15,3 +15,8 @@ Gillespie/ipu_wldCount.txt
 *.png
 *.txt
 *.pdf
+*.pbxproj
+*.xcworkspacedata
+*.plist
+*.xcuserstate
+*.plist

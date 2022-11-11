@@ -47,7 +47,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	
 	// Map tensors to tiles
 	for(int i=0; i<totalThreads; ++i){
-		int roundCount = i % int( totalThreads );
+		int roundCount = i % int( numberOfTiles*threadsPerTile );
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		
 		graph.setTileMapping(times, tileInt);
@@ -85,7 +85,6 @@ void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* time
 	engine.run(CUSTOM_PROG);
 }
 
-
 int main() {
 	const int numberOfCores = 1; // access to POD16
 	const int numberOfTiles = 1472; // 1472;
@@ -96,7 +95,7 @@ int main() {
 	auto manager = DeviceManager::createDeviceManager();
 	auto devices = manager.getDevices(poplar::TargetType::IPU, numberOfCores);
 	auto it = std::find_if(devices.begin(), devices.end(), [](Device &device) {
-	return device.attach();
+		return device.attach();
 	});
 	auto device = std::move(*it);
 
@@ -113,9 +112,9 @@ int main() {
 	engine.load(device);
 	
 	float times[nTimes];
-	for(int i=0; i<nTimes; ++i){
-		times[i] = i*365.0 ;
-	}
+	for(int i=0; i<nTimes; ++i)
+		times[i] = i*365.0;
+	
 	float theta[nParam] = {500.0, 500.0, 2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0};
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
@@ -130,13 +129,13 @@ int main() {
 		
 		chrono::duration<double, std::milli> ms_double = end - start;
 		
-		simTimes[t] = ms_double.count() ;
-		cout<< ms_double.count() << endl;
+		simTimes[t] = ms_double.count();
+		cout << ms_double.count() << endl;
 	}
 	
-	std::ofstream file ("./oneIPU_noThreads_simTimes.txt");
-	for(int j=0; j<nTimes; ++j){
-		file<< simTimes[j] << endl ;
+	ofstream file ("./oneIPU_noThreads_simTimes.txt");
+	for(int j=0; j<Nsim; ++j){
+		file << simTimes[j] << endl ;
 	}
 	file.close();
 	
