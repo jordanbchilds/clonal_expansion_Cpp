@@ -88,9 +88,9 @@ void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* time
 
 
 int main() {
-	const int numberOfCores = 1; // depends on the POD avaibles (POD4 = <=4 cores)
-	const int numberOfTiles = 1; // max number of tiles per core  1472
-	const int threadsPerTile = 1; // six threads per tile
+	const int numberOfCores = 1; // depends on the POD avaible (POD4 = <=4 cores)
+	const int numberOfTiles = 1; //  <= 1472
+	const int threadsPerTile = 1; // <= 6
 	
 	long unsigned int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
 	
@@ -127,10 +127,19 @@ int main() {
 	auto end = chrono::high_resolution_clock::now();
 	
 	chrono::duration<double, std::milli> ms_double = end - start;
-
 	cout<< "Simulation time: " << ms_double.count() << "/ms" << endl;
 	
+	std::vector<int> cpu_vector( totalThreads * 2*nTimes ) ;
+	engine.readTensor("output-read", cpu_vector.data(), cpu_vector.data()+cpu_vector.size()) ;
 	
-
+	std::ofstream file ("sim_output.txt");
+	for(int i=0; i<totalThreads; ++i){
+		for(int j=0; j<nTimes; ++j){
+			file<< cpu_vector[ i*2*nTimes+ j] << " " ;
+		}
+		file << "\n" ;
+	}
+	file.close();
+	
 	return 0;
 }
