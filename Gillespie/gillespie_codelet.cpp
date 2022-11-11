@@ -160,7 +160,7 @@ public:
 		}
 		
 		sim_network spn;
-		spn.nTimes = 3;
+		spn.nTimes = times.size();
 		spn.times_ptr = &times[0];
 		spn.Tmax = times[times.size()-1];
 		spn.n_reactions = Nreact;
@@ -185,7 +185,7 @@ public:
 		gillespied(x_init, react_rates, con_rates, output_ptr, spn);
 		
 		for(int i=0; i<spn.nTimes; ++i){
-			out[2*i] =  output[2*i] ;
+			out[2*i] = output[2*i] ;
 			out[2*i+1] = output[2*i+1] ;
 		}
 		return true;

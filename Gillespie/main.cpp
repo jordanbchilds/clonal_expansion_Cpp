@@ -135,7 +135,7 @@ int main() {
 	std::ofstream file ("sim_output.txt");
 	for(int i=0; i<totalThreads; ++i){
 		for(int j=0; j<nTimes; ++j){
-			file<< cpu_vector[ i*2*nTimes+ j] << " " ;
+			file<< cpu_vector[ i*2*nTimes + j] << " " ;
 		}
 		file << "\n" ;
 	}
