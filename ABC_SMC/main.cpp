@@ -341,7 +341,7 @@ int main() {
 		double copy_number[nTimes][totalThreads];
 		double sim_summ[2][nTimes][2];
 		
-		cout<< "Simulation summary: " << endl;
+		// cout<< "Simulation summary: " << endl;
 
 		for(int t=0; t<nTimes; ++t){
 			int index = 0;
@@ -378,7 +378,7 @@ int main() {
 			// cout << sim_summ[0][t][0] << " " << sim_summ[0][t][1] << endl;
 			// cout << sim_summ[1][t][0] << " " << sim_summ[1][t][1] << endl;
 		}
-		cout << endl;
+		// cout << endl;
 		double d = squared_dist(&sim_summ[0][0][0], &data_summ[0][0][0], nTimes, 2);
 		d += squared_dist( &sim_summ[1][0][0], &data_summ[1][0][0], nTimes, 2);
 		

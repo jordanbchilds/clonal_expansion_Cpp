@@ -48,7 +48,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	
 	// Map tensors to tiles
 	for(int i=0; i<totalThreads; ++i){
-		int roundCount = i % int( numberOfTiles*threadsPerTile );
+		int roundCount = i % int( numberOfTiles * threadsPerTile );
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		
 		graph.setTileMapping(times, tileInt);

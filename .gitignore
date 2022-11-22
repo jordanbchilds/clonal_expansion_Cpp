@@ -20,3 +20,7 @@ Gillespie/ipu_wldCount.txt
 *.plist
 *.xcuserstate
 *.plist
+ABC_SMC/simulated_data/.Rhistory
+Gillespie/.Rhistory
+Gillespie/R_stuff/Untitled.R
+time_gillespie/CPU/a.out

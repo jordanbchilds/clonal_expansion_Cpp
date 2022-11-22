@@ -1,22 +1,26 @@
 
-Nout = 121
+myBlack = function(alpha) { rgb(0,0,0,alpha)}
 
-wld_1 = read.table("./OUTPUT/Check_seed/wld_sd_1111.txt", sep="\t")[,1:Nout]
-mnt_1 = read.table("./OUTPUT/Check_seed/mnt_sd_1111.txt", sep="\t")[,1:Nout]
-wld_2 = read.table("./OUTPUT/Check_seed/wld_sd_1212.txt", sep="\t")[,1:Nout]
-mnt_2 = read.table("./OUTPUT/Check_seed/mnt_sd_1212.txt", sep="\t")[,1:Nout]
+Nsim = 1e3
+ml = read.table("./syn_ml.txt", sep="\n")[[1]]
+cn = read.table("./syn_cn.txt", sep="\n")[[1]]
 
+ts = 0:120
 
-cn_1 = wld_1+mnt_1
-ml_1 = mnt_1 / cn_1
-cn_2 = wld_2+mnt_2
-ml_2 = mnt_2 / cn_2
+pdf("./synData.pdf", width=12, height=9)
+{
+  par(mfrow=c(1,2), mar=c(6,6,6,3), cex.main=2, cex.lab=2, cex.axis=1.5)
+  
+  plot(NA, xlim=c(0,120), ylim=c(0,1), 
+       main="Mutation Load", xlab="Time (years)", ylab="")
+  for(i in 0:120){
+    points(i+rnorm(Nsim), ml[i*1000+(1:1000)], pch=20, col=myBlack(0.01))
+  }
 
-dim(cn_1)
-dim(cn_2)
-
-sum(abs(cn_1-cn_2))
-sum(ml_1-ml_2)
-range(ml_1)
-range(ml_2)
-
+  plot(NA, xlim=c(0,120), ylim=c(0,2000), 
+       main="Copy Number", xlab="Time (years)", ylab="")
+  for(i in 0:120){
+    points(i+rnorm(Nsim), cn[i*1000+(1:1000)], pch=20, col=myBlack(0.01))
+  }
+}
+dev.off()

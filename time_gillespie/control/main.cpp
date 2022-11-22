@@ -37,7 +37,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	long unsigned int totalThreads = numberOfCores*numberOfTiles*threadsPerTile ;
 	int tileInt;
 
-	// SHOULD WE PRE-COMPILE GILLESPIED? HOW YOU DO THAT?
+	// SHOULD WE PRE-COMPILE GILLESPIED? HOW DO YOU DO THAT?
 	graph.addCodelets("gillespie_codelet.cpp");
 	Tensor times = graph.addVariable(FLOAT, {nTimes}, "a");
 	Tensor theta = graph.addVariable(FLOAT, {nParam}, "b");
@@ -47,7 +47,7 @@ std::vector<Program> buildGraphAndPrograms( poplar::Graph &graph, long unsigned 
 	
 	// Map tensors to tiles
 	for(int i=0; i<totalThreads; ++i){
-		int roundCount = i % int( totalThreads );
+		int roundCount = i % int( numberOfTiles*threadsPerTile );
 		int tileInt = std::floor( float(roundCount) / float(threadsPerTile) );
 		
 		graph.setTileMapping(times, tileInt);
