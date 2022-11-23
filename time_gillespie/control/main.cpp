@@ -88,7 +88,7 @@ void executeGraphProgram(float* theta_ptr, long unsigned int nParam, float* time
 
 int main() {
 	const int numberOfCores = 1; // access to POD16
-	const int numberOfTiles = 1472; // 1472;
+	const int numberOfTiles = 1; // 1472;
 	const int threadsPerTile = 1; // six threads per tile
 	
 	long unsigned int totalThreads = numberOfCores * numberOfTiles * threadsPerTile ;
@@ -121,7 +121,7 @@ int main() {
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
 	
-	const int Nsim = 1000;
+	const int Nsim = 5e3;
 	double simTimes[Nsim] = {0};
 	for(int t=0; t<Nsim; ++t){
 		
