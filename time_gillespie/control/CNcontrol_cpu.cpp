@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <sys/stat.h>
 
 using namespace std;
 
@@ -186,11 +187,18 @@ int main(){
 		simTimes[i] = ms_double.count();
 	}
 	
+	filesystem::cerate_directory("TIMES");
+	filesystem::create_directory("OUTPUT");
+	
 	std::ofstream time_file ("./TIMES/cpu_times.txt");
 	for(int j=0; j<Nsim; ++j){
 		time_file<< simTimes[j] << endl ;
 	}
 	time_file.close();
+	
+	for(int i=0; i<Nsim; ++i)
+		std::cout<< simTimes[i] << " ";
+	cout<< "\n" ;
 	
 	std::ofstream out_file ("./OUTPUT/cpu_output.txt");
 	for(int i=0; i<Nsim; ++i){
@@ -203,4 +211,14 @@ int main(){
 	}
 	out_file.close();
 	
+	/*
+	for(int i=0; i<Nsim; ++i){
+		for(int j=0; j<spn.nTimes; ++j){
+			for(int l=0; l<spn.n_species; ++l){
+				cout << output[ i*spn.nTimes*spn.n_species + j*spn.n_species + l ] << " ";
+			}
+		}
+		out_file << "\n";
+	}
+	*/
 }
