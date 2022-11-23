@@ -187,7 +187,7 @@ int main(){
 		simTimes[i] = ms_double.count();
 	}
 	
-	filesystem::cerate_directory("TIMES");
+	filesystem::create_directory("TIMES");
 	filesystem::create_directory("OUTPUT");
 	
 	std::ofstream time_file ("./TIMES/cpu_times.txt");
