@@ -171,15 +171,20 @@ int main(){
 	
 	const unsigned int Nsim = 1e3;
 	
-	int output[spn.nTimes * spn.n_species * Nsim];
+	// int output[spn.nTimes * spn.n_species * Nsim];
+	int output[spn.nTimes * spn.n_species];
 	int* output_ptr = &output[0];
 	
 	float simTimes[Nsim] = {0};
+	
+	int nThreads = 8832; // 8832 independent threads on one IPU core - for direct time comparison
 
 	for(int i=0; i<Nsim; ++i){
-
+		
 		auto start = chrono::high_resolution_clock::now();
-		gillespied(&x_init[0], &react_rates[0], &con_rates[0], &output_ptr[ i*spn.nTimes*spn.n_species ], spn) ;
+		for(int j=0; j<nThreads; ++j){ //
+			gillespied(&x_init[0], &react_rates[0], &con_rates[0], output_ptr, spn) ;
+		}
 		auto end = chrono::high_resolution_clock::now();
 		
 		chrono::duration<double, std::milli> ms_double = end - start;
@@ -188,18 +193,15 @@ int main(){
 	}
 	
 	filesystem::create_directory("TIMES");
-	filesystem::create_directory("OUTPUT");
+	// filesystem::create_directory("OUTPUT");
 	
-	std::ofstream time_file ("./TIMES/cpu_times.txt");
-	for(int j=0; j<Nsim; ++j){
-		time_file<< simTimes[j] << endl ;
+	std::ofstream time_file ("./TIMES/cpu_times_nThreads.txt");
+	for(int i=0; i<Nsim; ++i){
+		time_file<< simTimes[i] << endl ;
 	}
 	time_file.close();
 	
-	for(int i=0; i<Nsim; ++i)
-		std::cout<< simTimes[i] << " ";
-	cout<< "\n" ;
-	
+	/*
 	std::ofstream out_file ("./OUTPUT/cpu_output.txt");
 	for(int i=0; i<Nsim; ++i){
 		for(int j=0; j<spn.nTimes; ++j){
@@ -210,15 +212,6 @@ int main(){
 		out_file << "\n";
 	}
 	out_file.close();
+	 */
 	
-	/*
-	for(int i=0; i<Nsim; ++i){
-		for(int j=0; j<spn.nTimes; ++j){
-			for(int l=0; l<spn.n_species; ++l){
-				cout << output[ i*spn.nTimes*spn.n_species + j*spn.n_species + l ] << " ";
-			}
-		}
-		out_file << "\n";
-	}
-	*/
 }

@@ -175,6 +175,9 @@ int main(){
 		simTimes[i] = ms_double.count();
 	}
 	
+	filesystem::create_directory("TIMES");
+	filesystem::create_directory("OUTPUT");
+	
 	std::ofstream time_file ("./TIMES/cpu_times.txt");
 	for(int j=0; j<Nsim; ++j){
 		time_file<< simTimes[j] << endl ;
