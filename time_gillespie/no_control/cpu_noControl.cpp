@@ -10,7 +10,6 @@ using namespace std;
 
 struct sim_network {
 	const float* times_ptr;
-	float Tmax;
 	int nTimes;
 	int n_reactions;
 	int n_species;
@@ -33,13 +32,16 @@ unsigned choose(unsigned n, unsigned k){
 }
 
 float rand_unif(float lower=0.0, float upper=1.0){
-	float unif_01 = (float) rand() / (float) 4294967295 ; // 4,294,967,295 is the max value of an unsigned iteger... I think.
+	float unif_01 = (float) rand() / (float) RAND_MAX ;
 	return unif_01*(upper-lower) + lower;
 }
 
-double rand_exp(float lambda){
-	float unif_01 = rand_unif();
-	return -1.0*log(1.0-unif_01)/lambda;
+float runif_01(){
+	return (float) rand() / (float) RAND_MAX ;
+}
+
+float rand_exp(float lambda){
+	return -1.0*log(1.0-runif_01())/lambda;
 }
 
 int rand_react(float* weights){
@@ -70,8 +72,8 @@ int rand_react(float* weights){
 void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim_network simnet){
 	
 	int nTimes = simnet.nTimes;
-	float Tmax = simnet.Tmax;
-	const float* times = simnet.times_ptr;
+	const float* times_ptr = simnet.times_ptr;
+	float Tmax = *(times_ptr + nTimes -1);
 	int n_species = simnet.n_species;
 	int n_reactions = simnet.n_reactions;
 	int* S_pt = simnet.Stoi;
@@ -100,7 +102,7 @@ void gillespied(int* x_init, float* rates, float* con_rates, int* out_array, sim
 
 		tt += rand_exp(haz_total);
 
-		if( tt >= *(times+count) && count<=nTimes ){
+		if( tt >= *(times_ptr+count) && count<=nTimes ){
 			*(out_array+count*n_species) = x[0];
 			*(out_array+count*n_species+1) = x[1];
 			count += 1;
@@ -145,7 +147,6 @@ int main(){
 	sim_network spn;
 	spn.nTimes = Nout;
 	spn.times_ptr = &times[0];
-	spn.Tmax = times[Nout-1];
 	spn.n_reactions = Nreact;
 	spn.n_species = Nspecies;
 	spn.Post = Post_ptr;
@@ -157,34 +158,38 @@ int main(){
 	float react_rates[Nreact] = {2.64e-3, 2.64e-3, 2.64e-3, 2.64e-3, 0.0};
 	float con_rates[2] = {2.0e-3, 2.0e-3};
 	
-	int output[spn.nTimes * spn.n_species];
-	int* output_ptr = &output[0];
-	
-	const unsigned int Nsim = 1000;
-	const unsigned int Ntile = 1472;
+	const unsigned int Nsim = 1e3;
+	// const unsigned int Ntile = 1472;
 	float simTimes[Nsim] = {0};
+	
+	int output[spn.nTimes * spn.n_species * Nsim];
 
 	for(int i=0; i<Nsim; ++i){
-
-		// chrono::time_point start = chrono::high_resolution_clock::now();
-		auto start = chrono::high_resolution_clock::now();
 		
-		for(int j=0; j<Ntile; ++j)
-			gillespied(&x_init[0], &react_rates[0], &con_rates[0], output_ptr, spn);
-			
-		// chrono::time_point end = chrono::high_resolution_clock::now();
+		auto start = chrono::high_resolution_clock::now();
+		gillespied(&x_init[0], &react_rates[0], &con_rates[0], &output[i*spn.nTimes*spn.n_species], spn);
 		auto end = chrono::high_resolution_clock::now();
 		
 		chrono::duration<double, std::milli> ms_double = (end - start);
 		
-		std::cout << ms_double.count() << std::endl;
 		simTimes[i] = ms_double.count();
 	}
-	__fs::filesystem::current_path("/Users/jordanchilds/Documents/GitHub/clonal_expansion_Cpp/time_gillespie/CPU");
-	ofstream file ("./noControl_sim_times.txt");
+	
+	std::ofstream time_file ("./TIMES/cpu_times.txt");
 	for(int j=0; j<Nsim; ++j){
-		file << simTimes[j] << endl ;
+		time_file<< simTimes[j] << endl ;
 	}
-	file.close();
+	time_file.close();
+	
+	std::ofstream out_file ("./OUTPUT/cpu_output.txt");
+	for(int i=0; i<Nsim; ++i){
+		for(int j=0; j<spn.nTimes; ++j){
+			for(int l=0; l<spn.n_species; ++l){
+				out_file << output[ i*spn.nTimes*spn.n_species + j*spn.n_species + l ] << " ";
+			}
+		}
+		out_file << "\n";
+	}
+	out_file.close();
 	
 }
