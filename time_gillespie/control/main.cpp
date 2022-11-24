@@ -121,7 +121,7 @@ int main() {
 	float* theta_ptr = &theta[0];
 	float* times_ptr = &times[0];
 	
-	const int Nsim = 5e3;
+	const int Nsim = 1e3;
 	double simTimes[Nsim] = {0};
 	for(int t=0; t<Nsim; ++t){
 		
@@ -137,7 +137,7 @@ int main() {
 		cout<< ms_double.count() << endl;
 	}
 	
-	std::ofstream file ("./oneIPU_noThreads_simTimes.txt");
+	std::ofstream file ("./oneCore_oneSim_times.txt");
 	for(int j=0; j<nTimes; ++j){
 		file<< simTimes[j] << endl ;
 	}
