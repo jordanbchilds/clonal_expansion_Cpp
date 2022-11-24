@@ -182,9 +182,13 @@ int main(){
 	for(int i=0; i<Nsim; ++i){
 		
 		auto start = chrono::high_resolution_clock::now();
-		for(int j=0; j<nThreads; ++j){ //
+		/* // to time batch simulations
+		for(int j=0; j<nThreads; ++j){
 			gillespied(&x_init[0], &react_rates[0], &con_rates[0], output_ptr, spn) ;
 		}
+		 */
+		// to time single simulations
+		gillespied(&x_init[0], &react_rates[0], &con_rates[0], output_ptr, spn) ;
 		auto end = chrono::high_resolution_clock::now();
 		
 		chrono::duration<double, std::milli> ms_double = end - start;
@@ -192,10 +196,10 @@ int main(){
 		simTimes[i] = ms_double.count();
 	}
 	
-	filesystem::create_directory("TIMES");
+	filesystem::create_directory("TIMES_test");
 	// filesystem::create_directory("OUTPUT");
 	
-	std::ofstream time_file ("./TIMES/cpu_times_nThreads.txt");
+	std::ofstream time_file ("./TIMES/cpu_oneSim_times.txt");
 	for(int i=0; i<Nsim; ++i){
 		time_file<< simTimes[i] << endl ;
 	}
